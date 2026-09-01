@@ -85,6 +85,59 @@ Export an entire source table from the Trassets Data API into your warehouse or 
       -H "X-API-Key: $TRASSETS_API_KEY" | grep -i x-snapshot-at
     ```
   </Step>
+  <Step title="Full Python example">
+    A complete script that exports a table page by page, following the cursor until
+    exhausted, and verifies snapshot consistency across pages. Requires the
+    [`requests`](https://pypi.org/project/requests/) package.
+
+    ```python bulk_export.py
+    import os
+    import requests
+
+    API_KEY = os.environ["TRASSETS_API_KEY"]
+    BASE_URL = "https://api.trassets.ai"
+    HEADERS = {"X-API-Key": API_KEY}
+
+
+    def export_table(table_name: str, page_size: int = 10000) -> list[dict]:
+        """Export every row of a raw table, verifying a single consistent snapshot."""
+        rows: list[dict] = []
+        cursor = None
+        snapshot_at = None
+
+        while True:
+            params = {"limit": page_size}
+            if cursor:
+                params["cursor"] = cursor
+
+            resp = requests.get(
+                f"{BASE_URL}/raw/{table_name}", headers=HEADERS, params=params, timeout=60
+            )
+            resp.raise_for_status()
+
+            page_snapshot = resp.headers.get("X-Snapshot-At")
+            if snapshot_at is None:
+                snapshot_at = page_snapshot
+            elif page_snapshot != snapshot_at:
+                raise RuntimeError(
+                    f"Snapshot changed mid-export ({snapshot_at} -> {page_snapshot}); "
+                    "restart the export from the beginning."
+                )
+
+            body = resp.json()
+            rows.extend(body["data"])
+            cursor = body["next_cursor"]
+            if cursor is None:
+                break
+
+        return rows, snapshot_at
+
+
+    if __name__ == "__main__":
+        rows, snapshot_at = export_table("ixhaus_contracts")
+        print(f"Exported {len(rows)} rows as of snapshot {snapshot_at}")
+    ```
+  </Step>
 </Steps>
 
 <Note>

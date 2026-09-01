@@ -51,6 +51,56 @@ Discover which tables have been updated since your last sync without fetching ev
   <Step title="Advance the since parameter">
     After a successful sync, store the current timestamp and use it as the `since` value for the next poll. This creates a sliding window so each run evaluates only the interval since the previous run.
   </Step>
+  <Step title="Full Python example">
+    A complete poller that tracks the `since` timestamp and `ETag` between runs, and only
+    processes tables that actually changed. Requires the
+    [`requests`](https://pypi.org/project/requests/) package.
+
+    ```python poll_changes.py
+    import os
+    from datetime import datetime, timezone
+
+    import requests
+
+    API_KEY = os.environ["TRASSETS_API_KEY"]
+    BASE_URL = "https://api.trassets.ai"
+    HEADERS = {"X-API-Key": API_KEY}
+
+
+    def poll_changes(since: str, etag: str | None = None):
+        """Poll /changes and return (changed_tables, new_etag, new_since).
+
+        changed_tables is an empty list on a 304 Not Modified response.
+        """
+        headers = dict(HEADERS)
+        if etag:
+            headers["If-None-Match"] = etag
+
+        resp = requests.get(
+            f"{BASE_URL}/changes", headers=headers, params={"since": since}, timeout=30
+        )
+
+        now = datetime.now(timezone.utc).isoformat()
+        if resp.status_code == 304:
+            return [], etag, now
+
+        resp.raise_for_status()
+        return resp.json(), resp.headers.get("ETag"), now
+
+
+    if __name__ == "__main__":
+        since = "2026-07-01T00:00:00Z"
+        etag = None
+
+        changed, etag, since = poll_changes(since, etag)
+        for table in changed:
+            print(f"Changed: {table['table_name']} -> {table['endpoint_url']}")
+        if not changed:
+            print("No changes since last poll.")
+
+        # Persist `since` and `etag` and pass them into the next scheduled run.
+    ```
+  </Step>
 </Steps>
 
 <Warning>
