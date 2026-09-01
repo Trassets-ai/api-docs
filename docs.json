@@ -47,11 +47,12 @@
                 "group": "Data Model",
                 "pages": [
                   "data-model/overview",
-                  "data-model/real-estates",
+                  "data-model/property",
                   "data-model/contracts",
                   "data-model/accounting",
-                  "data-model/meters",
-                  "data-model/market-data",
+                  "data-model/depreciation",
+                  "data-model/operations",
+                  "data-model/stakeholder",
                   "data-model/field-glossary"
                 ]
               }

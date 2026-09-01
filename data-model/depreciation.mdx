@@ -1,0 +1,93 @@
+---
+title: "Depreciation Data Model: Assets and Depreciation Postings"
+sidebarTitle: "Depreciation"
+description: "Understand the Depreciation domain in the Trassets Data API: fixed assets and their depreciation postings."
+---
+
+The Depreciation domain contains fixed-asset master data and the individual depreciation
+postings booked against each asset.
+
+## assets
+
+`GET /depreciation/assets` — fixed-asset master data.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="asset_hdr_id" type="integer" required>
+  Unique asset identifier. `depreciation` postings reference this field.
+</ResponseField>
+
+<ResponseField name="asset_id" type="string">
+  Asset number.
+</ResponseField>
+
+<ResponseField name="asset_name" type="string">
+  Asset name.
+</ResponseField>
+
+<ResponseField name="acquisition_date" type="date">
+  Date the asset was acquired.
+</ResponseField>
+
+<ResponseField name="built_date" type="date">
+  Date the asset was put into service.
+</ResponseField>
+
+<ResponseField name="begin_afa" type="date">
+  Start date of the depreciation schedule.
+</ResponseField>
+
+<ResponseField name="end_afa" type="date">
+  End date of the depreciation schedule.
+</ResponseField>
+
+<ResponseField name="afa_duration" type="string">
+  Depreciation duration.
+</ResponseField>
+
+<ResponseField name="afa_method" type="string">
+  Depreciation method applied.
+</ResponseField>
+
+<ResponseField name="depreciation_active" type="string">
+  Whether depreciation is currently active for this asset.
+</ResponseField>
+
+## depreciation
+
+`GET /depreciation/depreciation` — individual depreciation postings, one row per booking.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="asset_hdr_id" type="integer" required>
+  References the asset in `assets.asset_hdr_id`.
+</ResponseField>
+
+<ResponseField name="asset_id" type="string">
+  Asset number.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date" required>
+  Date of the depreciation posting.
+</ResponseField>
+
+<ResponseField name="booking_date_text" type="string">
+  Display text for the posting date.
+</ResponseField>
+
+<ResponseField name="booking_net_value" type="number" required>
+  Net value posted in this depreciation entry.
+</ResponseField>
+
+<ResponseField name="booking_text" type="string">
+  Free-text description of the posting.
+</ResponseField>
+
+<Tip>
+  One `assets` row typically has many `depreciation` rows over its useful life — join on
+  `asset_hdr_id` to build a full depreciation schedule for an asset.
+</Tip>

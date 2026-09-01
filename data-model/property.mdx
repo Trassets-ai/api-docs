@@ -1,0 +1,155 @@
+---
+title: "Property Data Model: Objects, Structure, and Technical Assets"
+sidebarTitle: "Property"
+description: "Understand the Property domain in the Trassets Data API: property objects, the property structure tree, property-creditor services, and technical objects."
+---
+
+The Property domain is the structural foundation of the API. Every other domain's rows
+carry `property_id`, which resolves back to a record in `properties`. Use this domain to
+retrieve property objects, their internal structure (units, cost centres), assigned
+service providers, and technical/metered objects.
+
+## properties
+
+`GET /property/properties` — one row per property object.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier. The primary join key across all domains.
+</ResponseField>
+
+<ResponseField name="sk_properties" type="integer">
+  Internal surrogate key. Not stable across data reloads — join on `property_id`, not this field.
+</ResponseField>
+
+<ResponseField name="property_id_name" type="string">
+  Combined display label: property ID and name.
+</ResponseField>
+
+<ResponseField name="obj_name" type="string">
+  Property name.
+</ResponseField>
+
+<ResponseField name="entrance_1" type="string">
+  Primary building entrance / street address component. Up to five entrance fields
+  (`entrance_1`–`entrance_5`) exist for properties with multiple entrances.
+</ResponseField>
+
+<ResponseField name="adr1_combined" type="string">
+  Combined address line.
+</ResponseField>
+
+<ResponseField name="postcode" type="string">
+  Postal code.
+</ResponseField>
+
+<ResponseField name="city" type="string">
+  City.
+</ResponseField>
+
+```bash Example request
+curl "https://api.trassets.ai/property/properties?limit=1" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+```
+
+## property_structure
+
+`GET /property/property_structure` — the hierarchy tree that connects buildings, cost
+centres, and floor areas. This is the bridge table for the rest of the API: bookings and
+tenancy data join to a specific unit or cost centre through `join_key`, not directly
+through `floor_area_id`.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="join_key" type="string" required>
+  Bridge key. Equals `account_id` for cost-centre nodes, or `floor_area_id` for floor-area
+  nodes. `Accounting.booking_header` and `Accounting.booking_positions` join to this table
+  through `join_key`.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Floor-area identifier, when this node represents a unit rather than a cost centre.
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Display name of the structure node (cost centre or unit name).
+</ResponseField>
+
+<ResponseField name="account_type" type="string">
+  Node type — distinguishes cost centres from floor areas.
+</ResponseField>
+
+<Tip>
+  `property_structure` has no natural single-column primary key of its own — `join_key` is
+  unique per property, so treat `(property_id, join_key)` as the effective key when
+  deduplicating or joining.
+</Tip>
+
+## property_creditor_services
+
+`GET /property/property_creditor_services` — which creditor provides which service for a
+property, and whether that assignment is exclusive.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer" required>
+  References `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="service_id" type="integer" required>
+  Identifies the service type.
+</ResponseField>
+
+<ResponseField name="service" type="string">
+  Service name (e.g. cleaning, elevator maintenance).
+</ResponseField>
+
+<ResponseField name="exclusivity" type="string">
+  Whether the creditor holds an exclusive assignment for this service at this property.
+</ResponseField>
+
+## technical_objects
+
+`GET /property/technical_objects` — technical/metered installations at a property
+(elevators, heating systems, meters, and similar equipment).
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Floor area the technical object is installed in, if applicable.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Maintenance creditor responsible for the object. References `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="to_id" type="integer" required>
+  Technical object identifier.
+</ResponseField>
+
+<ResponseField name="to_nr" type="string">
+  Technical object number.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Object name.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Object type.
+</ResponseField>
+
+<ResponseField name="built_date" type="date">
+  Installation/build date.
+</ResponseField>
+
+<Note>
+  There is no separate meter-reading endpoint. A `technical_objects` row can represent a
+  meter, but this endpoint only returns the object's master data (type, location,
+  responsible creditor) — not consumption readings.
+</Note>

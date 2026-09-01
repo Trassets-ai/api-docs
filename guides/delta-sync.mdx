@@ -11,7 +11,7 @@ Discover which tables have been updated since your last sync without fetching ev
     Send a `GET` request to `/changes` with an ISO-8601 UTC `since` timestamp. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL.
 
     ```bash
-    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
+    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -22,9 +22,9 @@ Discover which tables have been updated since your last sync without fetching ev
       {
         "table_name": "properties",
         "last_sync_at": "2026-07-07T06:00:00",
-        "category": "realestates",
-        "api_table_name": "objects",
-        "endpoint_url": "/realestates/objects"
+        "category": "property",
+        "api_table_name": "properties",
+        "endpoint_url": "/property/properties"
       },
       {
         "table_name": "ixhaus_contracts",
@@ -41,7 +41,7 @@ Discover which tables have been updated since your last sync without fetching ev
     Store the `ETag` header from the first successful `/changes` response. On your next poll, send it back as `If-None-Match`.
 
     ```bash
-    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
+    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
       -H "X-API-Key: $TRASSETS_API_KEY" \
       -H "If-None-Match: \"abc123\""
     ```

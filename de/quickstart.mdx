@@ -11,11 +11,11 @@ Diese Anleitung bringt dich in wenigen Minuten von null zum erfolgreichen API-Ca
     Besuche [portal.api.trassets.ai](https://portal.api.trassets.ai) und erstelle einen Account. Erzeuge einen API-Key und speichere ihn sicher. Der Klartext-Key wird nur einmal angezeigt.
   </Step>
   <Step title="Deinen ersten Request stellen">
-    Setze deinen Key als Umgebungsvariable und rufe den Real-Estate-Objects-Endpunkt mit einer kleinen Seitengröße ab.
+    Setze deinen Key als Umgebungsvariable und rufe den Property-Endpunkt mit einer kleinen Seitengröße ab.
 
     ```bash
     export TRASSETS_API_KEY="sk_live_…"
-    curl "https://api.trassets.ai/v1/realestates/objects?limit=1" \
+    curl "https://api.trassets.ai/property/properties?limit=1" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -25,8 +25,10 @@ Diese Anleitung bringt dich in wenigen Minuten von null zum erfolgreichen API-Ca
     [
       {
         "property_id": 42,
-        "entrance": "Musterstrasse 12",
-        "address": "10115, Berlin"
+        "obj_name": "Musterstrasse 12",
+        "entrance_1": "Musterstrasse 12",
+        "postcode": "10115",
+        "city": "Berlin"
       }
     ]
     ```

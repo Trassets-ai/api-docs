@@ -1,10 +1,10 @@
 ---
 title: "Trassets Data API: Immobiliendaten für Entwickler"
-description: "Die Trassets Data API liefert Immobilien-, Vertrags-, Buchhaltungs- und Marktdaten für Entwickler, die Property-Management-Integrationen und Analysen bauen."
+description: "Die Trassets Data API liefert Immobilien-, Vertrags-, Buchhaltungs- und Betriebsdaten für Entwickler, die Property-Management-Integrationen und Analysen bauen."
 sidebarTitle: "Übersicht"
 ---
 
-Die Trassets Data API liefert strukturierte, maschinenlesbare Immobiliendaten an Entwickler und Data Engineers. Sie stellt Objektinformationen, Mietverträge, Buchungen, Zählerdaten und Marktdaten über eine einzige REST-Schnittstelle bereit, sodass du Dashboards, Sync-Pipelines und Reporting-Tools bauen kannst, ohne mehrere Integrationen zu pflegen.
+Die Trassets Data API liefert strukturierte, maschinenlesbare Immobiliendaten an Entwickler und Data Engineers. Sie stellt Objektinformationen, Mietverträge, Buchungen, Anlagenwerte und Wartungsvorgänge über eine einzige REST-Schnittstelle bereit, sodass du Dashboards, Sync-Pipelines und Reporting-Tools bauen kannst, ohne mehrere Integrationen zu pflegen.
 
 <CardGroup cols={2}>
   <Card title="Quickstart" icon="rocket" href="/de/quickstart">
@@ -26,15 +26,16 @@ Die Trassets Data API liefert strukturierte, maschinenlesbare Immobiliendaten an
 
 ## Worauf du zugreifen kannst
 
-Die API ist in Datenkategorien organisiert, die typischen Immobilien-Workflows entsprechen:
+Die API ist in Datenkategorien organisiert, die den echten Kategorie-Tags entsprechen (siehe `GET /tables`):
 
-- **Real Estates** — Objekte, Einheiten und Strukturmetadaten.
-- **Contracts** — Mietsollstellungen und -gutschriften, Vertragslaufzeiten, Dienstleistungsverträge, Kündigungen.
-- **Accounting** — Kontenplan, Buchungsköpfe und -positionen, Budgets und Kontogruppen-Zuordnungen.
-- **Meters** — Zählerdaten, verknüpft mit Einheiten und Flächen.
-- **Market Data** — Externe Marktindikatoren und Benchmarks.
+- **Property** — Objekte, Strukturbaum, technische Objekte und Kreditoren-Zuordnungen.
+- **Contracts** — Mietsollstellungen und -abweichungen, Dienstleistungsverträge, Vertragsenden.
+- **Accounting** — Kontenplan, Buchungsköpfe und -positionen, Budgets, Kontenmapping-Bereiche.
+- **Depreciation** — Anlagegüter und ihre Abschreibungsbuchungen.
+- **Operations** — Meldungen, Angebote, Aufträge und Projekte.
+- **Stakeholder** — Kreditoren, Mitarbeiter, Eigentümer und Mieter.
 
-Jede Kategorie stellt normalisierte, geschäftsfertige Endpunkte unter `/{category}/{table}` bereit, plus die zugehörigen Raw-Tabellen unter `/raw/{table_name}` für Bulk-Exporte.
+Jede Kategorie stellt normalisierte, geschäftsfertige Endpunkte unter `/{category}/{table}` bereit, plus die zugehörigen Raw-Tabellen unter `/raw/{table_name}` für Bulk-Exporte. Siehe [Data Model](/data-model/overview) (Englisch) für Beziehungen und echte Feldnamen.
 
 <Note>
   Diese deutsche Übersetzung deckt aktuell nur den Bereich "Erste Schritte" ab. Alle

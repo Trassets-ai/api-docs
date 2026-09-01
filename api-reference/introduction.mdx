@@ -39,8 +39,8 @@ The API currently lives at the base path. URL versioning under `/v1/` is planned
 ## Endpoint groups
 
 <CardGroup cols={2}>
-  <Card title="Real Estates" icon="building">
-    Properties, units, and structural data — see the **Real Estates** group in the sidebar.
+  <Card title="Property" icon="building">
+    Property objects, structure tree, technical objects, and creditor service assignments — see the **Property** group in the sidebar.
   </Card>
 
   <Card title="Contracts" icon="file-contract">
@@ -51,12 +51,16 @@ The API currently lives at the base path. URL versioning under `/v1/` is planned
     Bookings, budgets, and account mappings — see the **Accounting** group in the sidebar.
   </Card>
 
-  <Card title="Meters" icon="bolt">
-    Utility and consumption metering data — see the **Meters** group in the sidebar.
+  <Card title="Depreciation" icon="chart-line-down">
+    Fixed assets and depreciation postings — see the **Depreciation** group in the sidebar.
   </Card>
 
-  <Card title="Market Data" icon="chart-line">
-    External market indicators and benchmarks — see the **Market Data** group in the sidebar.
+  <Card title="Operations" icon="clipboard-list">
+    Notifications, offers, orders, and projects — see the **Operations** group in the sidebar.
+  </Card>
+
+  <Card title="Stakeholder" icon="users">
+    Creditors, employees, owners, and tenants — see the **Stakeholder** group in the sidebar.
   </Card>
 
   <Card title="Raw Data" icon="database" href="/api-reference/raw-data/list-available-raw-tables-for-the-authenticated-customer">
@@ -67,3 +71,10 @@ The API currently lives at the base path. URL versioning under `/v1/` is planned
     Detect changed tables since a timestamp — see the **Delta Sync** group in the sidebar.
   </Card>
 </CardGroup>
+
+<Note>
+  There is no "Meters" or "Market Data" category. If you saw those names in an earlier
+  version of this documentation, they described planned functionality that was never
+  implemented — see [Data Model Overview](/data-model/overview) for the current, live
+  category list.
+</Note>

@@ -1,87 +1,250 @@
 ---
 title: "Contracts Data Model: Leases, Debits, and Services"
 sidebarTitle: "Contracts"
-description: "Explore the Contracts domain in the Trassets Data API, covering rental debits, debit diffs, service contracts, and contract ends with key fields and usage notes."
+description: "Explore the Contracts domain in the Trassets Data API, covering rental debits, debit diffs, service contracts, and contract ends with real field names and join keys."
 ---
 
-The Contracts domain contains rental, debit, and service contract data for your properties. Use these endpoints to retrieve time-series debit positions, monthly deviations, service agreement details, and lease end information.
+The Contracts domain contains rental, debit, and service contract data for your
+properties. Use these endpoints to retrieve time-series debit positions, monthly
+deviations, service agreement details, and lease-end information.
 
-## contract\_debits
+## contract_debits
 
-The `/contracts/contract_debits` endpoint returns rental debit positions as a time series. Each record represents a scheduled debit with a validity interval and links to the floor area it applies to.
+`GET /contracts/contract_debits` — rental debit positions as a time series. Each record
+represents a scheduled debit with a validity interval.
 
 <ResponseField name="property_id" type="integer" required>
-  Unique property identifier. Filter and join key across domains.
+  Unique property identifier.
 </ResponseField>
 
-<ResponseField name="floor_area_id" type="string">
-  References floor\_area\_id in the property\_structure table. Use to join with unit data.
+<ResponseField name="floor_area_id" type="integer">
+  References the unit in `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="floor_area_person_id" type="integer">
+  Composite key identifying a specific tenant in a specific unit.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Composite key identifying a specific tenant at property level.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Ledger account the debit posts to.
+</ResponseField>
+
+<ResponseField name="debit_amount" type="number" required>
+  The debit amount for the validity interval.
 </ResponseField>
 
 <ResponseField name="debit_type" type="string">
   Category of the debit, for example rent or ancillary charges.
 </ResponseField>
 
-<ResponseField name="amount" type="number">
-  The debit amount for the validity interval.
+<ResponseField name="net_rent" type="number">
+  Net rent portion of the debit.
+</ResponseField>
+
+<ResponseField name="side_costs" type="number">
+  Ancillary-cost portion of the debit.
+</ResponseField>
+
+<ResponseField name="date_begin" type="date" required>
+  Start of the validity interval.
+</ResponseField>
+
+<ResponseField name="date_end" type="date">
+  End of the validity interval.
+</ResponseField>
+
+<ResponseField name="due_date_day" type="integer">
+  Day of the month the debit is due.
+</ResponseField>
+
+<ResponseField name="state" type="string">
+  Status of the debit record.
 </ResponseField>
 
 <Tip>
-  Use floor\_area\_id to join debit data with the property structure so you can aggregate debits by unit or floor area.
+  Use `floor_area_id` to join debit data to `Property.property_structure`, or
+  `floor_area_person_id`/`property_id_person_id` to join to a specific tenancy in
+  `Stakeholder.tenants`.
 </Tip>
 
-## contract\_debit\_diffs
+## contract_debit_diffs
 
-The `/contracts/contract_debit_diffs` endpoint returns monthly deviations between the debit target and the actual account movements. Use this to reconcile planned debits against realised cash flow.
+`GET /contracts/contract_debit_diffs` — monthly deviations between the debit target and
+the actual account movements. Use this to reconcile planned debits against realised cash
+flow.
 
 <ResponseField name="property_id" type="integer" required>
   Unique property identifier.
 </ResponseField>
 
-<ResponseField name="net_amount" type="number">
+<ResponseField name="property_id_person_id" type="integer">
+  Composite key identifying the tenant this deviation applies to.
+</ResponseField>
+
+<ResponseField name="person_id" type="string">
+  Tenant identifier.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Ledger account the deviation applies to.
+</ResponseField>
+
+<ResponseField name="valid_from" type="date" required>
+  Month the deviation applies to.
+</ResponseField>
+
+<ResponseField name="debit_diff_net_value" type="number">
   Net deviation amount for the period.
 </ResponseField>
 
-<ResponseField name="tax_amount" type="number">
+<ResponseField name="debit_diff_tax_value" type="number">
   Tax portion of the deviation.
 </ResponseField>
 
-<ResponseField name="gross_amount" type="number">
+<ResponseField name="debit_diff_gross_value" type="number">
   Gross deviation amount including tax.
 </ResponseField>
 
-## service\_contracts
+<ResponseField name="debit_diff_reminder_from" type="string">
+  Date from which a payment reminder applies to this deviation, if any.
+</ResponseField>
 
-The `/contracts/service_contracts` endpoint returns maintenance and service contracts, expanded to monthly rows. Each row represents a month of contract duration with financial and counterparty details.
+<ResponseField name="debit_diff_reminder_manual" type="string">
+  Manually set reminder override, if any.
+</ResponseField>
+
+## service_contracts
+
+`GET /contracts/service_contracts` — maintenance and service contracts.
 
 <ResponseField name="property_id" type="integer" required>
   Unique property identifier.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="string">
-  Identifies the service provider or vendor.
+<ResponseField name="creditor_id" type="integer" required>
+  Identifies the service provider. References `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="creditor_name" type="string">
+  Display name of the service provider.
+</ResponseField>
+
+<ResponseField name="contract_id" type="integer" required>
+  Contract identifier.
+</ResponseField>
+
+<ResponseField name="contract_number" type="string">
+  Human-readable contract number.
+</ResponseField>
+
+<ResponseField name="contract_name" type="string">
+  Contract name.
+</ResponseField>
+
+<ResponseField name="contract_category" type="string">
+  Contract category.
+</ResponseField>
+
+<ResponseField name="contract_type" type="string">
+  Contract type.
+</ResponseField>
+
+<ResponseField name="contract_begin" type="date">
+  Contract start date.
+</ResponseField>
+
+<ResponseField name="contract_end" type="date">
+  Contract end date.
 </ResponseField>
 
 <ResponseField name="contract_value" type="number">
-  Monthly or periodic contract value depending on the row granularity.
+  Contract value.
 </ResponseField>
 
-## contract\_ends
+<ResponseField name="contract_value_year" type="number">
+  Contract value normalised to an annual figure.
+</ResponseField>
 
-The `/contracts/contract_ends` endpoint returns lease end dates and extension options. Use this to track upcoming expiries, deadlines for exercising options, and the current exercise status.
+<ResponseField name="contract_reasoning" type="string">
+  Reason code for the contract.
+</ResponseField>
+
+<ResponseField name="contract_reasoning_comment" type="string">
+  Free-text comment on the contract reasoning.
+</ResponseField>
+
+## contract_ends
+
+`GET /contracts/contract_ends` — lease end dates and extension/option handling. Use this
+to track upcoming expiries, deadlines for exercising options, and the current exercise
+status.
 
 <ResponseField name="property_id" type="integer" required>
   Unique property identifier.
 </ResponseField>
 
-<ResponseField name="valid_from" type="date">
-  Start of the validity interval for the lease end record.
+<ResponseField name="floor_area_id" type="integer">
+  References the unit in `Property.property_structure`.
 </ResponseField>
 
-<ResponseField name="valid_until" type="date">
-  End of the validity interval for the lease end record.
+<ResponseField name="floor_area_person_id" type="integer">
+  Composite key identifying the tenancy this record applies to.
 </ResponseField>
 
-<ResponseField name="exercise_status" type="string">
-  Indicates whether an extension option has been exercised, declined, or is still pending.
+<ResponseField name="start_date" type="date">
+  Start of the lease.
+</ResponseField>
+
+<ResponseField name="end_date" type="date">
+  Contractual end of the lease.
+</ResponseField>
+
+<ResponseField name="contract_end_date" type="date">
+  Effective contract end date after applying any option logic.
+</ResponseField>
+
+<ResponseField name="contract_end_new" type="date">
+  New end date if the lease was extended.
+</ResponseField>
+
+<ResponseField name="request_date" type="date">
+  Date the tenant was asked to decide on an extension option.
+</ResponseField>
+
+<ResponseField name="response_deadline" type="date">
+  Deadline for the tenant's response.
+</ResponseField>
+
+<ResponseField name="tenant_response_date" type="date">
+  Date the tenant actually responded.
+</ResponseField>
+
+<ResponseField name="response_type" type="string">
+  How the tenant responded (e.g. exercised, declined).
+</ResponseField>
+
+<ResponseField name="option_deadline" type="date">
+  Deadline by which an extension option must be exercised.
+</ResponseField>
+
+<ResponseField name="auto_use_option" type="boolean">
+  Whether the option is exercised automatically if the tenant does not respond.
+</ResponseField>
+
+<ResponseField name="options_used" type="integer">
+  Number of extension options already used.
+</ResponseField>
+
+<ResponseField name="options_not_used" type="integer">
+  Number of extension options still available.
+</ResponseField>
+
+<ResponseField name="controct_prolongation_months" type="integer">
+  Extension length in months. Note the field name reflects the underlying source system
+  and contains a spelling irregularity (`controct`, not `contract`) — this is not a typo
+  in this documentation.
 </ResponseField>
