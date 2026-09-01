@@ -26,13 +26,16 @@ This guide gets you from zero to a successful API call in a few minutes. You nee
       {
         "property_id": 42,
         "entrance": "Musterstrasse 12",
-        "address": "10115, Berlin",
-        "floor_area_id": "fa-123",
-        "property_type": "residential",
-        "construction_year": 2010
+        "address": "10115, Berlin"
       }
     ]
     ```
+
+    <Note>
+      The exact set of fields depends on your customer schema — columns are read
+      dynamically from your database. See the [Field Glossary](/data-model/field-glossary)
+      for fields that appear across multiple endpoints.
+    </Note>
 
     Success! You have authenticated and fetched your first row of real-estate data.
   </Step>

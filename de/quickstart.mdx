@@ -1,0 +1,47 @@
+---
+title: "Erste Schritte mit der Trassets Data API"
+description: "Erfahre, wie du einen API-Key beantragst und in drei Schritten deinen ersten Call an die Trassets Data API machst."
+sidebarTitle: "Quickstart"
+---
+
+Diese Anleitung bringt dich in wenigen Minuten von null zum erfolgreichen API-Call. Du brauchst eine Unix-ähnliche Shell mit installiertem curl.
+
+<Steps>
+  <Step title="API-Key beantragen">
+    Besuche [portal.api.trassets.ai](https://portal.api.trassets.ai) und erstelle einen Account. Erzeuge einen API-Key und speichere ihn sicher. Der Klartext-Key wird nur einmal angezeigt.
+  </Step>
+  <Step title="Deinen ersten Request stellen">
+    Setze deinen Key als Umgebungsvariable und rufe den Real-Estate-Objects-Endpunkt mit einer kleinen Seitengröße ab.
+
+    ```bash
+    export TRASSETS_API_KEY="sk_live_…"
+    curl "https://api.trassets.ai/v1/realestates/objects?limit=1" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Die API liefert ein JSON-Array von Objekten zurück. Eine typische Antwort sieht so aus:
+
+    ```json
+    [
+      {
+        "property_id": 42,
+        "entrance": "Musterstrasse 12",
+        "address": "10115, Berlin"
+      }
+    ]
+    ```
+
+    <Note>
+      Der genaue Umfang der Felder hängt von deinem Kunden-Schema ab — Spalten werden
+      dynamisch aus deiner Datenbank gelesen. Siehe das [Field Glossary](/data-model/field-glossary)
+      für Felder, die über mehrere Endpunkte hinweg vorkommen.
+    </Note>
+
+    Geschafft! Du hast dich authentifiziert und deine erste Zeile Immobiliendaten abgerufen.
+  </Step>
+  <Step title="Nächste Schritte">
+    - Lies [Authentifizierung](/de/authentication) für Key-Management und Zugriffsstufen.
+    - Erkunde [Endpunkt-Typen](/concepts/endpoint-types), um zu verstehen, wann Category- vs. Raw-Endpunkte sinnvoll sind.
+    - Durchsuche die [API-Referenz-Übersicht](/api-reference/introduction) für die vollständige Endpunktliste.
+  </Step>
+</Steps>

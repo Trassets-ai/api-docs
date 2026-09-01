@@ -9,62 +9,86 @@
   },
   "favicon": "/favicon.ico",
   "navigation": {
-    "tabs": [
+    "languages": [
       {
-        "tab": "Documentation",
-        "groups": [
+        "language": "en",
+        "default": true,
+        "tabs": [
           {
-            "group": "Get Started",
-            "pages": [
-              "index",
-              "quickstart",
-              "authentication"
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "index",
+                  "quickstart",
+                  "authentication"
+                ]
+              },
+              {
+                "group": "Core Concepts",
+                "pages": [
+                  "concepts/endpoint-types",
+                  "concepts/pagination",
+                  "concepts/errors",
+                  "concepts/rate-limits",
+                  "concepts/versioning"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "guides/incremental-sync",
+                  "guides/bulk-export",
+                  "guides/delta-sync"
+                ]
+              },
+              {
+                "group": "Data Model",
+                "pages": [
+                  "data-model/overview",
+                  "data-model/real-estates",
+                  "data-model/contracts",
+                  "data-model/accounting",
+                  "data-model/meters",
+                  "data-model/market-data",
+                  "data-model/field-glossary"
+                ]
+              }
             ]
           },
           {
-            "group": "Core Concepts",
-            "pages": [
-              "concepts/endpoint-types",
-              "concepts/pagination",
-              "concepts/errors",
-              "concepts/rate-limits",
-              "concepts/versioning"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/incremental-sync",
-              "guides/bulk-export",
-              "guides/delta-sync"
-            ]
-          },
-          {
-            "group": "Data Model",
-            "pages": [
-              "data-model/overview",
-              "data-model/real-estates",
-              "data-model/contracts",
-              "data-model/accounting",
-              "data-model/meters",
-              "data-model/market-data",
-              "data-model/field-glossary"
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "api-reference/introduction"
+                ]
+              },
+              {
+                "group": "Endpoints",
+                "openapi": "https://api.trassets.ai/openapi.json"
+              }
             ]
           }
         ]
       },
       {
-        "tab": "API Reference",
-        "groups": [
+        "language": "de",
+        "tabs": [
           {
-            "group": "Overview",
-            "pages": [
-              "api-reference/introduction"
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Erste Schritte",
+                "pages": [
+                  "de/index",
+                  "de/quickstart",
+                  "de/authentication"
+                ]
+              }
             ]
-          },
-          {
-            "group": "Endpoints",
-            "openapi": "https://api.trassets.ai/openapi.json"
           }
         ]
       }
