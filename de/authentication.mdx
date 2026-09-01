@@ -15,7 +15,7 @@ Registriere dich unter [portal.api.trassets.ai](https://portal.api.trassets.ai) 
 Füge den `X-API-Key`-Header bei jedem Call hinzu. Hier ein minimales curl-Beispiel:
 
 ```bash
-curl "https://api.trassets.ai/v1/realestates/objects?limit=1" \
+curl "https://api.trassets.ai/property/properties?limit=1" \
   -H "X-API-Key: $TRASSETS_API_KEY"
 ```
 
@@ -41,7 +41,7 @@ Wenn der Key fehlt, ungültig ist oder nicht die erforderliche Zugriffsstufe hat
   "title": "Unauthorized",
   "status": 401,
   "detail": "API key required",
-  "instance": "/realestates/objects"
+  "instance": "/property/properties"
 }
 ```
 
@@ -55,7 +55,7 @@ Das bedeutet, dass der Request keinen gültigen `X-API-Key`-Header enthielt oder
   "title": "Forbidden",
   "status": 403,
   "detail": "Invalid or disabled API key",
-  "instance": "/realestates/objects"
+  "instance": "/property/properties"
 }
 ```
 

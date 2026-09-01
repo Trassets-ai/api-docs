@@ -1,10 +1,10 @@
 ---
 title: "Trassets Data API: Real-Estate Data for Developers"
-description: "The Trassets Data API provides real-estate, contract, accounting and market data for developers building property management integrations and analytics."
+description: "The Trassets Data API provides property, contract, accounting, and operations data for developers building property management integrations and analytics."
 sidebarTitle: "Overview"
 ---
 
-The Trassets Data API delivers structured, machine-readable real estate data to developers and data engineers. It exposes property information, rental contracts, financial bookings, utility meters, and market data through a single REST interface so you can build dashboards, sync pipelines, and reporting tools without maintaining multiple integrations.
+The Trassets Data API delivers structured, machine-readable real estate data to developers and data engineers. It exposes property information, rental contracts, financial bookings, fixed assets, and maintenance operations through a single REST interface so you can build dashboards, sync pipelines, and reporting tools without maintaining multiple integrations.
 
 <CardGroup cols={2}>
   <Card title="Quickstart" icon="rocket" href="/quickstart">
@@ -26,12 +26,13 @@ The Trassets Data API delivers structured, machine-readable real estate data to 
 
 ## What you can access
 
-The API is organized into data categories that match common real-estate workflows:
+The API is organized into data categories that match the live category tags (see `GET /tables`):
 
-- **Real Estates** — Properties, units, and structural metadata.
-- **Contracts** — Rental debits and credits, lease terms, service contracts, terminations.
-- **Accounting** — Chart of accounts, booking headers and positions, budgets, and account-group mappings.
-- **Meters** — Utility metering data linked to units and floor areas.
-- **Market Data** — External market indicators and benchmarks.
+- **Property** — Objects, the property structure tree, technical objects, and creditor service assignments.
+- **Contracts** — Rental debits and diffs, service contracts, and lease/contract ends.
+- **Accounting** — Chart of accounts, booking headers and positions, budgets, and account-range mappings.
+- **Depreciation** — Fixed assets and their depreciation postings.
+- **Operations** — Maintenance notifications, offers, orders, and capital projects.
+- **Stakeholder** — Creditors, employees, owners, and tenants.
 
-Each category exposes normalized, business-ready endpoints under `/{category}/{table}`, plus corresponding raw tables under `/raw/{table_name}` for bulk exports.
+Each category exposes normalized, business-ready endpoints under `/{category}/{table}`, plus corresponding raw tables under `/raw/{table_name}` for bulk exports. See the [Data Model](/data-model/overview) section for entity relationships and real field names.

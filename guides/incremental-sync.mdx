@@ -8,10 +8,10 @@ Use the Trassets Data API category endpoints to maintain a continuously updated 
 
 <Steps>
   <Step title="Fetch the first page">
-    Start with `limit=1000` and `offset=0`. The example uses the `/realestates/objects` endpoint, but the pattern works for any category endpoint.
+    Start with `limit=1000` and `offset=0`. The example uses the `/property/properties` endpoint, but the pattern works for any category endpoint.
 
     ```bash
-    curl -s "https://api.trassets.ai/v1/realestates/objects?limit=1000&offset=0" \
+    curl -s "https://api.trassets.ai/property/properties?limit=1000&offset=0" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
   </Step>
@@ -30,7 +30,7 @@ Use the Trassets Data API category endpoints to maintain a continuously updated 
     For example, if the previous run ended at offset `4000`, your next run begins with:
 
     ```bash
-    curl -s "https://api.trassets.ai/v1/realestates/objects?limit=1000&offset=4000" \
+    curl -s "https://api.trassets.ai/property/properties?limit=1000&offset=4000" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
   </Step>

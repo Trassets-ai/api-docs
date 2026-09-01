@@ -11,7 +11,7 @@ Export an entire source table from the Trassets Data API into your warehouse or 
     Call `GET /raw/tables` to discover which tables are available, their primary keys, row counts, and sync status.
 
     ```bash
-    curl -s "https://api.trassets.ai/v1/raw/tables" \
+    curl -s "https://api.trassets.ai/raw/tables" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -33,7 +33,7 @@ Export an entire source table from the Trassets Data API into your warehouse or 
     Request the first page of the table you want. Set `limit` up to the maximum of `10000`.
 
     ```bash
-    curl -s "https://api.trassets.ai/v1/raw/ixhaus_contracts?limit=10000" \
+    curl -s "https://api.trassets.ai/raw/ixhaus_contracts?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -61,10 +61,10 @@ Export an entire source table from the Trassets Data API into your warehouse or 
     
     while true; do
       if [ -z "$CURSOR" ]; then
-        RESP=$(curl -s "https://api.trassets.ai/v1/raw/${TABLE}?limit=10000" \
+        RESP=$(curl -s "https://api.trassets.ai/raw/${TABLE}?limit=10000" \
           -H "X-API-Key: $TRASSETS_API_KEY")
       else
-        RESP=$(curl -s "https://api.trassets.ai/v1/raw/${TABLE}?limit=10000&cursor=${CURSOR}" \
+        RESP=$(curl -s "https://api.trassets.ai/raw/${TABLE}?limit=10000&cursor=${CURSOR}" \
           -H "X-API-Key: $TRASSETS_API_KEY")
       fi
     
@@ -81,7 +81,7 @@ Export an entire source table from the Trassets Data API into your warehouse or 
     Check the `X-Snapshot-At` response header on every page. All rows within a single cursor sequence are consistent as of that timestamp. If the header changes between pages, start the export over to ensure a single snapshot view.
 
     ```bash
-    curl -sI "https://api.trassets.ai/v1/raw/ixhaus_contracts?limit=10000" \
+    curl -sI "https://api.trassets.ai/raw/ixhaus_contracts?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY" | grep -i x-snapshot-at
     ```
   </Step>

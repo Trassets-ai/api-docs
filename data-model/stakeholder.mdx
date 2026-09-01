@@ -1,0 +1,183 @@
+---
+title: "Stakeholder Data Model: Creditors, Employees, Owners, and Tenants"
+sidebarTitle: "Stakeholder"
+description: "Understand the Stakeholder domain in the Trassets Data API: creditors, employees, property owners, and tenants."
+---
+
+The Stakeholder domain contains master data for every person or organisation involved with
+a property: the vendors you pay (`creditor`), your own team (`employees`), the owners
+(`owner`), and the tenants (`tenants`).
+
+## creditor
+
+`GET /stakeholder/creditor` — vendor and creditor master data. This is the only Stakeholder
+endpoint without a `property_id` column — a creditor is a standalone entity that may serve
+multiple properties; the relationship is expressed through `creditor_id` on other
+domains (`Property.property_creditor_services`, `Contracts.service_contracts`,
+`Property.technical_objects`, `Accounting.booking_header`/`booking_positions`,
+`Operations.offers`/`orders`/`projects`), not the other way around.
+
+<ResponseField name="creditor_id" type="integer" required>
+  Unique creditor identifier.
+</ResponseField>
+
+<ResponseField name="name_1" type="string">
+  Primary name line (company or last name).
+</ResponseField>
+
+<ResponseField name="name_2" type="string">
+  Secondary name line.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Creditor type.
+</ResponseField>
+
+<ResponseField name="address_line_1" type="string">
+  Address line.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Email address.
+</ResponseField>
+
+<ResponseField name="phone_1" type="string">
+  Primary phone number.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  Bank account IBAN.
+</ResponseField>
+
+<ResponseField name="tax_id" type="string">
+  Tax identification number.
+</ResponseField>
+
+## employees
+
+`GET /stakeholder/employees` — the property management team responsible for a property.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="team" type="string">
+  Team name responsible for the property.
+</ResponseField>
+
+<ResponseField name="first_name" type="string">
+  Employee first name.
+</ResponseField>
+
+<ResponseField name="last_name" type="string">
+  Employee last name.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Full employee name as a single field.
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  Contact phone number.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Contact email address.
+</ResponseField>
+
+<ResponseField name="inactive" type="boolean">
+  Whether the employee record is inactive.
+</ResponseField>
+
+<Note>
+  This endpoint returns one row per property showing the responsible team/employee — it is
+  not a general employee directory.
+</Note>
+
+## owner
+
+`GET /stakeholder/owner` — property owner master data, including ownership share for
+co-owned properties.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="debitor_id" type="integer" required>
+  Owner identifier.
+</ResponseField>
+
+<ResponseField name="share" type="number" required>
+  Ownership share as a percentage. A property can have multiple `owner` rows that sum to
+  the total share.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Owner name (individual or company).
+</ResponseField>
+
+<ResponseField name="salutation" type="string">
+  Salutation/title.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Contact email address.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  Bank account IBAN.
+</ResponseField>
+
+## tenants
+
+`GET /stakeholder/tenants` — tenant master data and current lease terms.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer" required>
+  Unit the tenant occupies. References `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="floor_area_person_id" type="integer" required>
+  Composite key identifying this specific tenant-in-unit relationship. Used by
+  `Contracts.contract_debits` and `Contracts.contract_ends` to reference a tenancy.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Composite key identifying the tenant at property level.
+</ResponseField>
+
+<ResponseField name="person_id" type="string" required>
+  Tenant identifier.
+</ResponseField>
+
+<ResponseField name="person_name" type="string">
+  Full tenant name as a single field. No separate first/last name available.
+</ResponseField>
+
+<ResponseField name="address" type="string">
+  Tenant's contact address, if different from the unit address.
+</ResponseField>
+
+<ResponseField name="contract_begin" type="date">
+  Lease start date.
+</ResponseField>
+
+<ResponseField name="contract_end" type="date">
+  Lease end date.
+</ResponseField>
+
+<ResponseField name="contract_end_option" type="date">
+  Lease end date if an extension option is exercised.
+</ResponseField>
+
+<ResponseField name="contract_end_actual" type="date">
+  Actual/effective lease end date.
+</ResponseField>
+
+<Tip>
+  For the full lifecycle of extension options and deadlines around a lease end, see
+  `Contracts.contract_ends`, which joins to this table via `floor_area_person_id`.
+</Tip>

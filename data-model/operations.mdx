@@ -1,0 +1,194 @@
+---
+title: "Operations Data Model: Notifications, Offers, Orders, and Projects"
+sidebarTitle: "Operations"
+description: "Understand the Operations domain in the Trassets Data API: maintenance notifications, offers, work orders, and capital projects."
+---
+
+The Operations domain covers the maintenance and procurement workflow: a tenant or
+technician reports an issue (`notifications`), a creditor submits a price (`offers`), work
+is commissioned (`orders`), and larger initiatives are tracked as `projects`.
+
+<Note>
+  `orders` and `projects` each expose 60+ fields in the live schema (invoicing amounts,
+  hierarchy levels, contact details, and more). This page documents the key identifying
+  and join fields only — see the **API Reference** tab for the complete, auto-generated
+  field list.
+</Note>
+
+## notifications
+
+`GET /operations/notifications` — maintenance reports and damage notifications.
+
+<ResponseField name="report_hdr_id" type="integer" required>
+  Unique notification identifier.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="to_hdr_id" type="integer">
+  Technical object the report concerns. References `Property.technical_objects.to_id`.
+</ResponseField>
+
+<ResponseField name="person_id" type="integer">
+  Reporting person.
+</ResponseField>
+
+<ResponseField name="report_type" type="string">
+  Type of report.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current status of the notification.
+</ResponseField>
+
+<ResponseField name="priority_text" type="string">
+  Priority level.
+</ResponseField>
+
+<ResponseField name="report_date" type="date">
+  Date the report was created.
+</ResponseField>
+
+## offers
+
+`GET /operations/offers` — price offers submitted by creditors for a piece of work.
+
+<ResponseField name="offer_hdr_id" type="integer" required>
+  Unique offer identifier. `orders` references this as `offer_hdr_id`.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer" required>
+  Creditor submitting the offer. References `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="string">
+  Unit the offer applies to, if applicable.
+</ResponseField>
+
+<ResponseField name="offer_value" type="number">
+  Total offer value.
+</ResponseField>
+
+<ResponseField name="offer_type" type="string">
+  Type of offer.
+</ResponseField>
+
+<ResponseField name="status_text" type="string">
+  Current status of the offer.
+</ResponseField>
+
+<ResponseField name="offer_accepted" type="boolean">
+  Whether the offer was accepted.
+</ResponseField>
+
+## orders
+
+`GET /operations/orders` — commissioned work orders.
+
+<ResponseField name="order_id" type="integer" required>
+  Unique order identifier.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="offer_hdr_id" type="integer">
+  Offer this order was created from. References `offers.offer_hdr_id`.
+</ResponseField>
+
+<ResponseField name="creditor_number" type="integer">
+  Creditor performing the work.
+</ResponseField>
+
+<ResponseField name="to_hdr_id" type="integer">
+  Technical object the order concerns, if applicable.
+</ResponseField>
+
+<ResponseField name="report_hdr_id" type="integer">
+  Originating notification, if the order was created from one.
+</ResponseField>
+
+<ResponseField name="order_type" type="string">
+  Order type.
+</ResponseField>
+
+<ResponseField name="total_net" type="number">
+  Total net order value.
+</ResponseField>
+
+<ResponseField name="total_gross" type="number">
+  Total gross order value.
+</ResponseField>
+
+<ResponseField name="cost_center_id" type="string">
+  Cost centre the order is booked against.
+</ResponseField>
+
+<ResponseField name="invoice_status" type="string">
+  Invoicing status of the order.
+</ResponseField>
+
+## projects
+
+`GET /operations/projects` — capital projects and larger multi-order initiatives.
+
+<ResponseField name="project_hdr_id" type="integer" required>
+  Unique project identifier.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Primary creditor for the project.
+</ResponseField>
+
+<ResponseField name="offer_hdr_id" type="integer">
+  Related offer, if applicable.
+</ResponseField>
+
+<ResponseField name="to_hdr_id" type="integer">
+  Related technical object, if applicable.
+</ResponseField>
+
+<ResponseField name="project_id" type="string">
+  Project number.
+</ResponseField>
+
+<ResponseField name="project_type" type="string">
+  Project type.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current project status.
+</ResponseField>
+
+<ResponseField name="project_budget" type="number">
+  Total budgeted amount for the project.
+</ResponseField>
+
+<ResponseField name="percentage_completed" type="number">
+  Completion percentage.
+</ResponseField>
+
+<ResponseField name="project_begin_date" type="date">
+  Project start date.
+</ResponseField>
+
+<ResponseField name="project_end_date" type="date">
+  Project end date.
+</ResponseField>
+
+<Tip>
+  `hierarchy_1` through `hierarchy_20` describe the project's position in a cost-breakdown
+  hierarchy — most integrations only need `hierarchy_1`/`hierarchy_2` for top-level
+  grouping.
+</Tip>

@@ -1,257 +1,221 @@
 ---
 title: "Accounting Data Model: Ledger and Budget Entities"
 sidebarTitle: "Accounting"
-description: "Explore the five accounting tables in the Trassets Data API covering accounts, booking headers, booking positions, budgets, and kontenmapping ranges."
+description: "Explore the five accounting tables in the Trassets Data API covering accounts, booking headers, booking positions, budgets, and account-range mappings, with real field names."
 ---
 
-The Accounting domain contains the general ledger and budget data for your portfolio. Use these endpoints to retrieve chart of accounts information, individual bookings, budget plans, and account group mappings. All accounting endpoints require `property_id` as a mandatory filter.
+The Accounting domain contains the general ledger and budget data for your portfolio. Use
+these endpoints to retrieve chart-of-accounts information, individual bookings, budget
+plans, and account-range mappings.
 
 ## accounts
 
-The `/accounting/accounts` endpoint returns the chart of accounts. Each record includes the account number, name, and classification.
-
-<ResponseField name="account_number" type="string" required>
-  Unique account identifier within the chart of accounts.
-</ResponseField>
-
-<ResponseField name="account_type" type="string">
-  Classification of the account: G/L, personal, creditor, or asset.
-</ResponseField>
-
-<ResponseField name="balance_sheet_side" type="string">
-  Indicates whether the account belongs to assets or liabilities.
-</ResponseField>
-
-## booking\_header
-
-The `/accounting/booking_header` endpoint returns general ledger booking headers. Each header groups related line items and carries references to cost centres, persons, creditors, and floor areas.
-
-<ResponseField name="booking_id" type="string" required>
-  Unique identifier for the booking header.
-</ResponseField>
+`GET /accounting/accounts` — the chart of accounts.
 
 <ResponseField name="property_id" type="integer" required>
-  Unique property identifier. Mandatory filter for this endpoint.
+  Unique property identifier.
 </ResponseField>
 
-<ResponseField name="floor_area_id" type="string">
-  References floor\_area\_id in the property\_structure table.
+<ResponseField name="account_hdr_id" type="integer" required>
+  Internal account identifier. Referenced by `booking_positions` and `budgets` as
+  `account_hdr_id`.
 </ResponseField>
 
-<ResponseField name="floor_area_m2" type="number">
-  Floor area in square metres associated with the booking.
+<ResponseField name="account_id" type="string">
+  Account number.
 </ResponseField>
 
-<ResponseField name="cost_centre" type="string">
-  Cost centre assigned to the booking.
+<ResponseField name="account_name" type="string">
+  Account name.
+</ResponseField>
+
+<ResponseField name="account_id_name_concat" type="string">
+  Combined account number and name for display.
+</ResponseField>
+
+<ResponseField name="category" type="string">
+  Account category.
+</ResponseField>
+
+<ResponseField name="account_type_name" type="string">
+  Human-readable account type.
+</ResponseField>
+
+<ResponseField name="account_group" type="string">
+  Account group assignment. Related to, but not derived through, `kontenmapping_ranges`.
+</ResponseField>
+
+<ResponseField name="account_balance_type" type="string">
+  Balance-side code for the account.
+</ResponseField>
+
+<ResponseField name="account_balance_type_name" type="string">
+  Human-readable balance side (assets vs. liabilities).
+</ResponseField>
+
+<ResponseField name="cashflow" type="string">
+  Cashflow classification of the account.
+</ResponseField>
+
+## booking_header
+
+`GET /accounting/booking_header` — general ledger booking headers. Each header groups
+related line items.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="bko_hdr_id" type="integer" required>
+  Unique identifier for the booking header. `booking_positions` references this as
+  `booking_hdr_id`.
+</ResponseField>
+
+<ResponseField name="booking_nr" type="string">
+  Booking number.
+</ResponseField>
+
+<ResponseField name="join_key" type="string">
+  Bridges this booking to a cost centre or unit in `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Creditor linked to the booking. References `Stakeholder.creditor`.
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
-  Identifies a tenant or contact person linked to the booking.
+  Tenant or contact person linked to the booking.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="string">
-  Identifies the creditor (vendor or service provider) linked to the booking.
+<ResponseField name="booking_date" type="date">
+  Date of the booking.
 </ResponseField>
 
-## booking\_positions
-
-The `/accounting/booking_positions` endpoint returns individual booking line items. Each position belongs to a booking header and contains the monetary breakdown.
-
-<ResponseField name="booking_id" type="string" required>
-  Identifier of the parent booking header.
+<ResponseField name="booking_value" type="number">
+  Total value of the booking header.
 </ResponseField>
 
-<ResponseField name="account_number" type="string" required>
-  Chart of accounts number the line item is posted to.
+<ResponseField name="m2" type="number">
+  Floor area in square metres associated with the booking, if applicable.
 </ResponseField>
 
-<ResponseField name="net_amount" type="number">
+<ResponseField name="booking_text" type="string">
+  Free-text description of the booking.
+</ResponseField>
+
+## booking_positions
+
+`GET /accounting/booking_positions` — individual booking line items. Each position
+belongs to exactly one booking header via `booking_hdr_id`.
+
+<ResponseField name="booking_position_hdr_id" type="integer" required>
+  Unique identifier for the line item.
+</ResponseField>
+
+<ResponseField name="booking_hdr_id" type="integer" required>
+  Identifier of the parent booking header. Joins to `booking_header.bko_hdr_id`.
+</ResponseField>
+
+<ResponseField name="account_hdr_id" type="integer" required>
+  Account the line item is posted to. Joins to `accounts.account_hdr_id`.
+</ResponseField>
+
+<ResponseField name="contra_account_id" type="string">
+  Contra account for the posting.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Composite key identifying the tenant this posting applies to.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Creditor linked to the posting. References `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="join_key" type="string">
+  Bridges this posting to a cost centre or unit in `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="booking_sum_net" type="number">
   Net amount of the line item.
 </ResponseField>
 
-<ResponseField name="tax_amount" type="number">
+<ResponseField name="booking_sum_tax" type="number">
   Tax amount of the line item.
 </ResponseField>
 
-<ResponseField name="gross_amount" type="number">
+<ResponseField name="booking_sum_gross" type="number">
   Gross amount including tax.
 </ResponseField>
 
-<ResponseField name="per_m2_net" type="number">
+<ResponseField name="net_m2" type="number">
   Net amount normalised per square metre.
 </ResponseField>
 
-<ResponseField name="per_m2_gross" type="number">
+<ResponseField name="gross_m2" type="number">
   Gross amount normalised per square metre.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Date of the posting.
 </ResponseField>
 
 ## budgets
 
-The `/accounting/budgets` endpoint returns budget amounts. Budgets are normalised from 12 monthly columns into individual monthly rows so each record represents a single month.
+`GET /accounting/budgets` — budget amounts, one row per property, account, and month.
 
 <ResponseField name="property_id" type="integer" required>
-  Unique property identifier. Mandatory filter for this endpoint.
+  Unique property identifier.
 </ResponseField>
 
-<ResponseField name="account_number" type="string" required>
-  Chart of accounts number the budget applies to.
+<ResponseField name="account_hdr_id" type="integer" required>
+  Account the budget applies to. Joins to `accounts.account_hdr_id`.
 </ResponseField>
 
-<ResponseField name="budget_year" type="integer">
-  Calendar year of the budget.
+<ResponseField name="account_id" type="string">
+  Account number.
 </ResponseField>
 
-<ResponseField name="budget_month" type="integer">
-  Month number (1 to 12) of the budget row.
+<ResponseField name="date" type="date" required>
+  Month the budget row applies to.
 </ResponseField>
 
-<ResponseField name="budget_amount" type="number">
+<ResponseField name="budget" type="number" required>
   Budget amount for the specific month and account.
 </ResponseField>
 
-## kontenmapping\_ranges
+## kontenmapping_ranges
 
-The `/accounting/kontenmapping_ranges` endpoint returns account group assignments. Each record maps a range of account numbers to a group or position for reporting and aggregation.
+`GET /accounting/kontenmapping_ranges` — account-range-to-position mappings used to group
+accounts for reporting.
 
-<ResponseField name="range_from" type="string" required>
-  Start of the account number range (inclusive).
+<ResponseField name="property_min" type="integer" required>
+  Lower bound of the property range this mapping applies to.
 </ResponseField>
 
-<ResponseField name="range_to" type="string" required>
-  End of the account number range (inclusive).
+<ResponseField name="property_max" type="integer" required>
+  Upper bound of the property range this mapping applies to.
 </ResponseField>
 
-<ResponseField name="group_name" type="string">
-  Name of the account group the range belongs to.
+<ResponseField name="start_konto" type="integer" required>
+  Start of the account-number range (inclusive).
 </ResponseField>
 
-<ResponseField name="position_name" type="string">
-  Reporting position within the group.
+<ResponseField name="end_konto" type="integer" required>
+  End of the account-number range (inclusive).
 </ResponseField>
 
-The Accounting domain contains the general ledger and budget data for your portfolio. Use these endpoints to retrieve chart of accounts information, individual bookings, budget plans, and account group mappings. All accounting endpoints require `property_id` as a mandatory filter.
-
-## accounts
-
-The `/accounting/accounts` endpoint returns the chart of accounts. Each record includes the account number, name, and classification.
-
-<ResponseField name="account_number" type="string" required>
-  Unique account identifier within the chart of accounts.
+<ResponseField name="position" type="string">
+  Reporting position the account range is grouped under.
 </ResponseField>
 
-<ResponseField name="account_type" type="string">
-  Classification of the account: G/L, personal, creditor, or asset.
-</ResponseField>
-
-<ResponseField name="balance_sheet_side" type="string">
-  Indicates whether the account belongs to assets or liabilities.
-</ResponseField>
-
-## booking\_header
-
-The `/accounting/booking_header` endpoint returns general ledger booking headers. Each header groups related line items and carries references to cost centres, persons, creditors, and floor areas.
-
-<ResponseField name="booking_id" type="string" required>
-  Unique identifier for the booking header.
-</ResponseField>
-
-<ResponseField name="property_id" type="integer" required>
-  Unique property identifier. Mandatory filter for this endpoint.
-</ResponseField>
-
-<ResponseField name="floor_area_id" type="string">
-  References floor\_area\_id in the property\_structure table.
-</ResponseField>
-
-<ResponseField name="floor_area_m2" type="number">
-  Floor area in square metres associated with the booking.
-</ResponseField>
-
-<ResponseField name="cost_centre" type="string">
-  Cost centre assigned to the booking.
-</ResponseField>
-
-<ResponseField name="person_id" type="string">
-  Identifies a tenant or contact person linked to the booking.
-</ResponseField>
-
-<ResponseField name="creditor_id" type="string">
-  Identifies the creditor (vendor or service provider) linked to the booking.
-</ResponseField>
-
-## booking\_positions
-
-The `/accounting/booking_positions` endpoint returns individual booking line items. Each position belongs to a booking header and contains the monetary breakdown.
-
-<ResponseField name="booking_id" type="string" required>
-  Identifier of the parent booking header.
-</ResponseField>
-
-<ResponseField name="account_number" type="string" required>
-  Chart of accounts number the line item is posted to.
-</ResponseField>
-
-<ResponseField name="net_amount" type="number">
-  Net amount of the line item.
-</ResponseField>
-
-<ResponseField name="tax_amount" type="number">
-  Tax amount of the line item.
-</ResponseField>
-
-<ResponseField name="gross_amount" type="number">
-  Gross amount including tax.
-</ResponseField>
-
-<ResponseField name="per_m2_net" type="number">
-  Net amount normalised per square metre.
-</ResponseField>
-
-<ResponseField name="per_m2_gross" type="number">
-  Gross amount normalised per square metre.
-</ResponseField>
-
-## budgets
-
-The `/accounting/budgets` endpoint returns budget amounts. Budgets are normalised from 12 monthly columns into individual monthly rows so each record represents a single month.
-
-<ResponseField name="property_id" type="integer" required>
-  Unique property identifier. Mandatory filter for this endpoint.
-</ResponseField>
-
-<ResponseField name="account_number" type="string" required>
-  Chart of accounts number the budget applies to.
-</ResponseField>
-
-<ResponseField name="budget_year" type="integer">
-  Calendar year of the budget.
-</ResponseField>
-
-<ResponseField name="budget_month" type="integer">
-  Month number (1 to 12) of the budget row.
-</ResponseField>
-
-<ResponseField name="budget_amount" type="number">
-  Budget amount for the specific month and account.
-</ResponseField>
-
-## kontenmapping\_ranges
-
-The `/accounting/kontenmapping_ranges` endpoint returns account group assignments. Each record maps a range of account numbers to a group or position for reporting and aggregation.
-
-<ResponseField name="range_from" type="string" required>
-  Start of the account number range (inclusive).
-</ResponseField>
-
-<ResponseField name="range_to" type="string" required>
-  End of the account number range (inclusive).
-</ResponseField>
-
-<ResponseField name="group_name" type="string">
-  Name of the account group the range belongs to.
-</ResponseField>
-
-<ResponseField name="position_name" type="string">
-  Reporting position within the group.
-</ResponseField>
+<Note>
+  This endpoint returns range definitions, not individual accounts. It answers "which
+  reporting position does account X belong to for property Y" via a range lookup
+  (`start_konto <= account <= end_konto` and `property_min <= property_id <= property_max`),
+  not a direct foreign-key join.
+</Note>

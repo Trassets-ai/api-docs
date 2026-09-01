@@ -29,7 +29,7 @@ Category endpoints accept `limit` and `offset` query parameters. The API returns
 This example fetches page 2 with an offset of 100:
 
 ```bash
-curl -G "https://api.trassets.ai/realestates/objects" \
+curl -G "https://api.trassets.ai/property/properties" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=100" \
   -d "offset=100"

@@ -1,35 +1,96 @@
 ---
 title: "Trassets Data Model: Entities and Relationships"
 sidebarTitle: "Overview"
-description: "Explore the five data domains of the Trassets Data API and how entities relate through property_id and floor_area_id across real estate, contracts, accounting, meters, and market data."
+description: "Explore the six data domains of the Trassets Data API and how entities relate through property_id, floor_area_id, and other join keys."
 ---
 
-The Trassets Data API organises real-estate data into five domains. Each domain contains normalised tables you can query through category endpoints, or you can access the underlying raw tables directly. The domains share common identifiers so you can join data across categories to build a complete view of your portfolio.
+The Trassets Data API organises real-estate data into six domains, matching the category
+tags exposed by the API itself (`GET /tables` lists them live). Each domain contains
+normalised category endpoints under `/{category}/{table}`, plus corresponding raw tables
+under `/raw/{table_name}` for bulk export.
 
 <CardGroup cols={2}>
-  <Card title="Real Estates" icon="building" href="/data-model/real-estates">
-    Properties, objects, units, and floor-area structures.
+  <Card title="Property" icon="building" href="/data-model/property">
+    Objects, property-creditor services, the property structure tree, and technical objects.
   </Card>
 
   <Card title="Contracts" icon="file-contract" href="/data-model/contracts">
-    Rental debits, debit diffs, service contracts, and lease ends.
+    Rental debits, debit diffs, service contracts, and contract ends.
   </Card>
 
   <Card title="Accounting" icon="book" href="/data-model/accounting">
-    Ledger accounts, booking headers, positions, budgets, and account mapping.
+    Chart of accounts, booking headers and positions, budgets, and account-range mappings.
   </Card>
 
-  <Card title="Meters" icon="gauge" href="/data-model/meters">
-    Utility meter readings and consumption data.
+  <Card title="Depreciation" icon="chart-line-down" href="/data-model/depreciation">
+    Fixed assets and their depreciation postings.
   </Card>
 
-  <Card title="Market Data" icon="chart-line" href="/data-model/market-data">
-    Benchmarks and comparable market data for assets.
+  <Card title="Operations" icon="clipboard-list" href="/data-model/operations">
+    Notifications, offers, orders, and projects.
+  </Card>
+
+  <Card title="Stakeholder" icon="users" href="/data-model/stakeholder">
+    Creditors, employees, owners, and tenants.
   </Card>
 </CardGroup>
 
-## Join keys
+<Note>
+  Two domains referenced in earlier drafts of this documentation — **Meters** and
+  **Market Data** — do not exist as live API categories. There is no meter-reading or
+  consumption-data endpoint, and no market-benchmark endpoint. The only trace of metering
+  in the current data model is an `is_meter` flag on individual `technical_objects` rows;
+  utility consumption history is processed in a separate, internal pipeline that is not
+  exposed through this API. Do not build integrations against a Meters or Market Data
+  endpoint — they will 404.
+</Note>
 
-`property_id` is the primary join key across all domains. Use it to link real-estate objects with contract debits, accounting bookings, and meter readings that belong to the same property.
+## How the domains connect
 
-`floor_area_id` references the property structure table and connects units and floor areas to other records such as contract debits and booking headers. This lets you aggregate financial or consumption data at the level of an individual unit or floor area.
+`property_id` is the primary join key. Every domain except `Stakeholder.creditor` carries
+`property_id`, so any record can be attributed back to a property in `Property.properties`.
+
+```mermaid
+graph LR
+  properties["Property.properties<br/>(property_id)"]
+  property_structure["Property.property_structure<br/>(join_key = floor_area_id | account_id)"]
+  creditor["Stakeholder.creditor<br/>(creditor_id)"]
+
+  properties -->|property_id| Accounting["Accounting.*"]
+  properties -->|property_id| Depreciation["Depreciation.*"]
+  properties -->|property_id| Operations["Operations.*"]
+  properties -->|property_id| technical_objects["Property.technical_objects"]
+  properties -->|property_id| property_structure
+
+  property_structure -->|join_key| tenants["Stakeholder.tenants"]
+  property_structure -->|join_key| contract_ends["Contracts.contract_ends"]
+  property_structure -->|join_key| contract_debits["Contracts.contract_debits"]
+
+  creditor -->|creditor_id| property_creditor_services["Property.property_creditor_services"]
+  creditor -->|creditor_id| service_contracts["Contracts.service_contracts"]
+  creditor -->|creditor_id| technical_objects
+  creditor -->|creditor_id| Accounting
+
+  booking_header["Accounting.booking_header"] -->|bko_hdr_id| booking_positions["Accounting.booking_positions"]
+  offers["Operations.offers"] -->|offer_hdr_id| orders["Operations.orders"]
+  assets["Depreciation.assets"] -->|asset_hdr_id| depreciation["Depreciation.depreciation"]
+```
+
+### Join keys in detail
+
+| Key | Meaning | Cardinality |
+|---|---|---|
+| `property_id` | Identifies a property object in `Property.properties`. Present on nearly every table as a foreign key. | 1 property → many rows in every other domain |
+| `join_key` | Produced by `Property.property_structure` (`= floor_area_id` for floor areas, `= account_id` for cost centres). Bridges bookings and tenancy data to a specific unit or cost centre. | 1 structure node → many bookings/tenancies |
+| `floor_area_id` / `floor_area_person_id` / `property_id_person_id` | Composite keys that pin a tenancy to a specific unit (`floor_area_id`) or a specific tenant-in-unit (`floor_area_person_id`, `property_id_person_id`). Used by `Contracts.*` and `Stakeholder.tenants`. | 1 property → many units; 1 unit → many tenancies over time |
+| `creditor_id` | Identifies a vendor/creditor in `Stakeholder.creditor`. | 1 creditor → many service contracts, bookings, technical objects |
+| `bko_hdr_id` / `booking_hdr_id` | Groups booking line items under one booking header. | 1 `booking_header` → many `booking_positions` |
+| `account_hdr_id` | Identifies a ledger account. Referenced by `budgets` and `booking_positions`. | 1 `accounts` row → many bookings/budgets |
+| `offer_hdr_id` | Links an offer to the orders placed against it. | 1 `offers` row → many `orders` |
+| `asset_hdr_id` | Identifies a fixed asset. Referenced by `depreciation` postings. | 1 `assets` row → many `depreciation` postings |
+
+<Note>
+  Cardinalities above describe the intended data model (1:N via foreign key columns). They
+  are not independently verified against live row counts — if you rely on strict uniqueness
+  for a key, validate it against your own dataset first.
+</Note>
