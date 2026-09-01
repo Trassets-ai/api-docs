@@ -1,0 +1,53 @@
+---
+title: "Category- und Raw-Endpunkte erklärt"
+sidebarTitle: "Endpunkt-Typen"
+description: "Die Trassets Data API bietet zwei Endpunkt-Typen: normalisierte Category-Endpunkte für Dashboards und Raw-Endpunkte für Bulk-Warehouse-Syncs. Wähle den richtigen für deinen Anwendungsfall."
+---
+
+Die Trassets Data API stellt deine Immobiliendaten über zwei unterschiedliche Endpunkt-Typen bereit. Jeder Typ ist auf ein anderes Integrationsmuster optimiert: Category-Endpunkte liefern normalisierte, geschäftsfertige Daten, die du direkt abfragen kannst, während Raw-Endpunkte vollständige Quelltabellen für Bulk-Replikation und Data-Warehousing bereitstellen.
+
+## Category-Endpunkte
+
+Category-Endpunkte folgen dem Pfadmuster `/{category}/{api_table}` und liefern denormalisierte, geschäftsfertige Daten, die bereits auf deinen Kunden-Scope vorgefiltert sind.
+
+Nutze diese Endpunkte für alltägliche Integrationen, Dashboards und inkrementelle Datenabrufe. Sie unterstützen [Offset-basierte Pagination](/de/concepts/pagination) mit den Query-Parametern `limit` und `offset` und liefern Pagination-Metadaten in Response-Headern wie `X-Total-Count`, `X-Has-More`, `X-Next-Offset` und `X-Next-Cursor`.
+
+Beispiel-Request an einen Category-Endpunkt:
+
+```bash
+curl -G "https://api.trassets.ai/property/properties" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=10" \
+  -d "offset=0"
+```
+
+## Raw-Endpunkte
+
+Raw-Endpunkte folgen dem Pfadmuster `/raw/{table_name}` und liefern vollständige, ungefilterte Quelltabellen genau so, wie sie in der Replikationsschicht existieren.
+
+Nutze diese Endpunkte für Bulk-Synchronisation, vollständige Tabellenexporte und das Laden von Daten in ein Data Warehouse. Sie unterstützen [Cursor-basierte Pagination](/de/concepts/pagination) über den Query-Parameter `cursor` und ein `next_cursor`-Feld im Response-Body. Die maximale Seitengröße beträgt 10.000 Zeilen. Die Antwort enthält einen `X-Snapshot-At`-Header, der dir den Sync-Zeitstempel für den aktuellen Snapshot mitteilt.
+
+Beispiel-Request an einen Raw-Endpunkt:
+
+```bash
+curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=5000"
+```
+
+Um die Pagination fortzusetzen, übergib den `next_cursor`-Wert aus der vorherigen Antwort als `cursor`-Parameter im nächsten Request. Wenn `next_cursor` `null` ist, hast du alle Zeilen der Tabelle abgerufen.
+
+## Vergleich
+
+| Aspekt | Category-Endpunkte | Raw-Endpunkte |
+| --- | --- | --- |
+| Pfad | `/{category}/{api_table}` | `/raw/{table_name}` |
+| Daten | Normalisiert, geschäftsfertig | Vollständige Quelltabelle, ungefiltert |
+| Pagination | Offset-basiert (`limit`/`offset`) | Cursor-basiert (`cursor`/`next_cursor`) |
+| Max. Seitengröße | 100.000 Zeilen | 10.000 Zeilen |
+| Am besten für | Dashboards, inkrementelle Abrufe | Bulk-Sync, Data-Warehousing |
+| Header | `X-Total-Count`, `X-Has-More`, `X-Next-Offset`, `X-Next-Cursor` | `X-Snapshot-At` |
+
+<Tip>
+  Nutze Category-Endpunkte für alltägliche operative Abfragen und Raw-Endpunkte für die vollständige Tabellen-Replikation in dein Data Warehouse. Wenn du nur eine Teilmenge der Datensätze brauchst, sind Category-Endpunkte schneller und einfacher zu paginieren.
+</Tip>

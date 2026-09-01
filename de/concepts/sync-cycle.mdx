@@ -1,0 +1,59 @@
+---
+title: "Sync-Zyklus: Wie Daten in die API gelangen"
+sidebarTitle: "Sync-Zyklus"
+description: "Verstehe die Databricks-zu-RDS-Sync-Pipeline hinter der Trassets Data API: TRUNCATE+Reload-Semantik, last_sync_at und was GET /changes tatsächlich erkennt."
+---
+
+Die Trassets Data API ist eine reine Lese-Schnittstelle über Daten, die von einer vorgelagerten Pipeline in RDS PostgreSQL synchronisiert werden. Zu verstehen, wie und wann dieser Sync passiert, ist essenziell, um eine korrekte Polling- oder inkrementelle Sync-Integration zu bauen.
+
+## Pipeline-Architektur
+
+Daten fließen durch drei Stufen: **Databricks Unity Catalog → S3 → RDS PostgreSQL**. Die API hat zur Laufzeit keine direkte Verbindung zu Databricks — sie liest ausschließlich aus RDS. Die zugrunde liegenden Databricks-Jobs heißen `parquet_to_s3` und `ingest_parquet_to_rds`.
+
+<Note>
+  Trassets' interne Dokumentation beschreibt diesen Sync als **täglich** laufend. Die
+  öffentliche API-Schicht in diesem Repository hat keinen eigenen, maschinell erzwungenen
+  Zeitplan, gegen den man das prüfen könnte — der Sync-Takt ist eine Eigenschaft der
+  vorgelagerten Pipeline, nicht etwas, das die API konfiguriert oder offenlegt. Gehe nicht
+  von einer Aktualität unterhalb eines Tages aus — prüfe stattdessen immer `last_sync_at`
+  (siehe unten), statt anzunehmen, dass ein festes Intervall verstrichen ist.
+</Note>
+
+## TRUNCATE + Reload-Semantik
+
+Bei jedem Sync-Lauf wird jede Tabelle **vollständig gelöscht und komplett neu geladen** — es gibt kein inkrementelles Update auf Zeilenebene innerhalb der Tabelle. Das hat zwei direkte Konsequenzen für Integratoren:
+
+1. **Kein partieller Sync.** Eine Tabelle wird entweder vollständig durch den neuesten Sync ersetzt, oder gar nicht berührt. Es gibt keinen Mechanismus, um "nur die Zeilen zu synchronisieren, die sich geändert haben" innerhalb einer einzelnen Tabelle — `GET /changes` (unten) sagt dir, welche *Tabellen* sich geändert haben, nicht welche *Zeilen*.
+2. **Schema-Änderungen sind für kumulative Tabellen immer ein Breaking Change.** Bei Tabellen, die über mehrere Reloads hinweg Historie ansammeln (zum Beispiel `contract_ends`), kann eine Schema-Änderung nicht additiv angewendet werden — TRUNCATE + Reload ersetzt immer den gesamten Tabelleninhalt, es gibt also keine Möglichkeit, alte Zeilen in-place in eine neue Form zu migrieren. Jede Schema-Änderung an einer solchen Tabelle wird als Breaking Change behandelt, der eine neue API-Version erfordert, wobei sowohl die alte als auch die neue Tabellenform während eines Deprecation-Fensters parallel synchronisiert werden.
+
+## Wann `last_sync_at` gesetzt wird
+
+Der Sync-Status wird pro `(customer_id, table_name)` in einer internen Statustabelle mit diesen Feldern erfasst: `last_sync_at` (nullable Timestamp), `status` (`synced`, `pending` oder `error`), `row_count`, `primary_key_column` und `error_message`.
+
+`last_sync_at` wird **nur gesetzt, wenn ein Sync für diese Tabelle erfolgreich abgeschlossen wird** — es bleibt `NULL`, bis der erste erfolgreiche Sync stattfindet, und ein fehlgeschlagener Sync (`status = 'error'`) treibt es nicht voran. Das bedeutet:
+
+- Eine Tabelle mit `status = 'pending'` oder `status = 'error'` erscheint niemals in `GET /changes`, unabhängig davon, wie kürzlich ein Sync versucht wurde.
+- `last_sync_at` spiegelt den Abschluss **auf Tabellenebene** wider, nicht den Änderungszeitpunkt einer einzelnen Zeile innerhalb dieser Tabelle.
+
+## Was `GET /changes` tatsächlich prüft
+
+`GET /changes?since=<timestamp>` liefert eine Tabelle nur zurück, wenn **alle** der folgenden Bedingungen erfüllt sind:
+
+- `status` ist exakt `'synced'` (kein anderer Statuswert)
+- `last_sync_at` ist nicht `NULL`
+- `last_sync_at > since` — ein **strikter** Größer-als-Vergleich, kein `>=`
+
+Der `ETag`-Response-Header ist das Maximum von `last_sync_at` über alle synchronisierten Tabellen eines Kunden. Polling mit `If-None-Match` erlaubt dir daher, einen Request komplett zu überspringen, wenn seit deinem letzten Poll nichts synchronisiert wurde (siehe [Delta Sync](/de/guides/delta-sync) für das vollständige Polling-Muster).
+
+<Warning>
+  `since` darf nicht älter als 30 Tage sein — ältere Werte werden mit einem 400-Fehler
+  abgelehnt. Diese Grenze ist im Code erzwungen, aber nirgendwo in der eigenen Dokumentation
+  der API oder in Quellcode-Kommentaren erklärt; behandle sie als harte betriebliche
+  Einschränkung, nicht als einstellbaren Parameter.
+</Warning>
+
+## Praktische Auswirkungen für deine Integration
+
+- **Poll `/changes`, statt einen Zeitplan zu raten.** Da es kein dokumentiertes, erzwungenes Sync-Intervall gibt, baue deine Integration so, dass sie auf das reagiert, was `/changes` meldet, statt anzunehmen, dass Daten zu einer festen Tageszeit aktualisiert werden.
+- **Eine geänderte Tabelle bedeutet "alles für diese Tabelle neu abrufen", nicht "hier sind die Diffs".** Änderungserkennung auf Zeilenebene existiert noch nicht — wenn eine Tabelle in `/changes` erscheint, ist der sicherste Weg ein vollständiger erneuter Abruf dieser Category oder dieses Raw-Endpunkts.
+- **Behandle `last_sync_at` als Aktualitätssignal, nicht als Änderungsprotokoll.** Es sagt dir, dass die Tabelle zu diesem Zeitpunkt erfolgreich neu geladen wurde; es sagt dir nicht, welche Zeilen sich von der vorherigen Version unterscheiden.

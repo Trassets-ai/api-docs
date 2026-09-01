@@ -1,0 +1,89 @@
+---
+title: "Immobiliendaten mit Trassets inkrementell synchronisieren"
+description: "Hole nur geänderte Daten mithilfe von Offset-basierter Pagination und Category-Endpunkten, um eine lokale Kopie der Trassets-Daten aktuell zu halten, ohne alles neu abzurufen."
+sidebarTitle: "Incremental Sync"
+---
+
+Nutze die Category-Endpunkte der Trassets Data API, um eine kontinuierlich aktualisierte lokale Kopie deiner Daten zu pflegen, ohne bei jedem Lauf jede Zeile zu übertragen. Offset-basierte Pagination liefert vorhersehbare Fortsetzungspunkte über geplante Syncs hinweg.
+
+<Steps>
+  <Step title="Die erste Seite abrufen">
+    Starte mit `limit=1000` und `offset=0`. Das Beispiel nutzt den Endpunkt `/property/properties`, aber das Muster funktioniert für jeden Category-Endpunkt.
+
+    ```bash
+    curl -s "https://api.trassets.ai/property/properties?limit=1000&offset=0" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+  </Step>
+  <Step title="Die Pagination-Header prüfen">
+    Prüfe nach jedem Request die Response-Header:
+
+    - `X-Has-More`: `"true"`, wenn weitere Seiten existieren
+    - `X-Next-Offset`: der Offset für die nächste Seite (nur vorhanden, wenn `X-Has-More` `"true"` ist)
+    - `X-Total-Count`: Gesamtzahl der verfügbaren Zeilen für die aktuelle Abfrage
+
+    Wenn `X-Has-More` `"true"` ist, erhöhe den Offset um dein Limit und wiederhole den Vorgang, bis du das Ende erreichst.
+  </Step>
+  <Step title="Den nächsten Offset für den nächsten Lauf speichern">
+    Speichere den Wert von `X-Next-Offset` aus dem letzten erfolgreichen Request dauerhaft. Beginne beim nächsten geplanten Sync bei diesem gespeicherten Offset statt bei null, um zu vermeiden, dass du Zeilen erneut abrufst, die du bereits hast.
+
+    Endete der vorherige Lauf beispielsweise bei Offset `4000`, beginnt dein nächster Lauf mit:
+
+    ```bash
+    curl -s "https://api.trassets.ai/property/properties?limit=1000&offset=4000" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+  </Step>
+  <Step title="Zurücksetzen bei größeren Datenänderungen">
+    Wenn du eine Schema-Änderung, die Notwendigkeit eines vollständigen Neuladens oder eine große Lücke zwischen Syncs feststellst, setze deinen gespeicherten Offset auf `0` zurück und rufe den kompletten Datensatz erneut ab.
+  </Step>
+  <Step title="Vollständiges Python-Beispiel">
+    Ein vollständiges Skript, das jede Seite abruft und dabei von einem gespeicherten Offset aus fortsetzt. Erfordert das Paket [`requests`](https://pypi.org/project/requests/).
+
+    ```python sync_properties.py
+    import os
+    import requests
+
+    API_KEY = os.environ["TRASSETS_API_KEY"]
+    BASE_URL = "https://api.trassets.ai"
+    HEADERS = {"X-API-Key": API_KEY}
+
+
+    def sync_properties(start_offset: int = 0, page_size: int = 1000) -> list[dict]:
+        """Fetch all rows from /property/properties starting at start_offset.
+
+        Returns the combined rows and the offset to resume from on the next run.
+        """
+        rows: list[dict] = []
+        offset = start_offset
+
+        while True:
+            resp = requests.get(
+                f"{BASE_URL}/property/properties",
+                headers=HEADERS,
+                params={"limit": page_size, "offset": offset},
+                timeout=30,
+            )
+            resp.raise_for_status()
+            rows.extend(resp.json())
+
+            has_more = resp.headers.get("X-Has-More") == "true"
+            if not has_more:
+                break
+            offset = int(resp.headers["X-Next-Offset"])
+
+        return rows, offset
+
+
+    if __name__ == "__main__":
+        # On the next scheduled run, pass the returned offset back in as
+        # start_offset instead of 0 to avoid re-fetching rows you already have.
+        rows, next_offset = sync_properties(start_offset=0)
+        print(f"Fetched {len(rows)} rows, resume offset: {next_offset}")
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Bevor du einen vollständigen inkrementellen Abruf ausführst, prüfe den Endpunkt [`/changes`](/de/guides/delta-sync), um herauszufinden, welche Tabellen seit deinem letzten Sync aktualisiert wurden. Überspringe Tabellen, die sich nicht geändert haben, um Requests zu sparen und innerhalb des Rate-Limits von 500 Req/h zu bleiben.
+</Tip>

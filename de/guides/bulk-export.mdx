@@ -1,0 +1,145 @@
+---
+title: "Eine vollständige Tabelle mit Raw-Endpunkten exportieren"
+description: "Nutze /raw/{table_name}, um alle Zeilen einer Quelltabelle mithilfe Cursor-basierter Pagination und konsistenter Snapshots für Warehousing oder Analytics zu exportieren."
+sidebarTitle: "Bulk Export"
+---
+
+Exportiere eine komplette Quelltabelle aus der Trassets Data API in dein Warehouse oder deine Analytics-Pipeline. Raw-Endpunkte liefern ungefilterte Zeilen aus der zugrunde liegenden Datenbank mit Cursor-basierter Pagination und Headern für Snapshot-Konsistenz.
+
+<Steps>
+  <Step title="Verfügbare Tabellen auflisten">
+    Rufe `GET /raw/tables` auf, um herauszufinden, welche Tabellen verfügbar sind, ihre Primärschlüssel, Zeilenanzahlen und den Sync-Status.
+
+    ```bash
+    curl -s "https://api.trassets.ai/raw/tables" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Beispiel-Antwort:
+
+    ```json
+    [
+      {
+        "table_name": "ixhaus_contracts",
+        "primary_key": "contract_id",
+        "status": "synced",
+        "row_count": 12500,
+        "last_sync_at": "2026-04-10T08:00:00"
+      }
+    ]
+    ```
+  </Step>
+  <Step title="Den Export starten">
+    Fordere die erste Seite der gewünschten Tabelle an. Setze `limit` bis zum Maximum von `10000`.
+
+    ```bash
+    curl -s "https://api.trassets.ai/raw/ixhaus_contracts?limit=10000" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Beispiel-Antwort:
+
+    ```json
+    {
+      "data": [
+        { "contract_id": 1, "tenant": "Müller GmbH" }
+      ],
+      "count": 1,
+      "next_cursor": "eyJjb2wiOiAiY29udHJhY3RfaWQiLCAidmFsIjogMX0=",
+      "table_name": "ixhaus_contracts",
+      "total_rows": 12500
+    }
+    ```
+  </Step>
+  <Step title="Mit dem Cursor paginieren">
+    Übergib den Wert von `next_cursor` bei jedem folgenden Request im Query-Parameter `cursor`. Wiederhole dies, bis `next_cursor` `null` ist.
+
+    ```bash
+    #!/bin/bash
+    TABLE="ixhaus_contracts"
+    CURSOR=""
+    
+    while true; do
+      if [ -z "$CURSOR" ]; then
+        RESP=$(curl -s "https://api.trassets.ai/raw/${TABLE}?limit=10000" \
+          -H "X-API-Key: $TRASSETS_API_KEY")
+      else
+        RESP=$(curl -s "https://api.trassets.ai/raw/${TABLE}?limit=10000&cursor=${CURSOR}" \
+          -H "X-API-Key: $TRASSETS_API_KEY")
+      fi
+    
+      echo "$RESP" | jq '.data[]'
+    
+      CURSOR=$(echo "$RESP" | jq -r '.next_cursor')
+      if [ "$CURSOR" = "null" ] || [ -z "$CURSOR" ]; then
+        break
+      fi
+    done
+    ```
+  </Step>
+  <Step title="Snapshot-Konsistenz prüfen">
+    Prüfe bei jeder Seite den Response-Header `X-Snapshot-At`. Alle Zeilen innerhalb einer einzelnen Cursor-Sequenz sind zu diesem Zeitstempel konsistent. Wenn sich der Header zwischen den Seiten ändert, starte den Export neu, um eine einheitliche Snapshot-Sicht sicherzustellen.
+
+    ```bash
+    curl -sI "https://api.trassets.ai/raw/ixhaus_contracts?limit=10000" \
+      -H "X-API-Key: $TRASSETS_API_KEY" | grep -i x-snapshot-at
+    ```
+  </Step>
+  <Step title="Vollständiges Python-Beispiel">
+    Ein vollständiges Skript, das eine Tabelle Seite für Seite exportiert, dem Cursor folgt,
+    bis dieser erschöpft ist, und die Snapshot-Konsistenz über alle Seiten hinweg prüft.
+    Erfordert das Paket [`requests`](https://pypi.org/project/requests/).
+
+    ```python bulk_export.py
+    import os
+    import requests
+
+    API_KEY = os.environ["TRASSETS_API_KEY"]
+    BASE_URL = "https://api.trassets.ai"
+    HEADERS = {"X-API-Key": API_KEY}
+
+
+    def export_table(table_name: str, page_size: int = 10000) -> list[dict]:
+        """Export every row of a raw table, verifying a single consistent snapshot."""
+        rows: list[dict] = []
+        cursor = None
+        snapshot_at = None
+
+        while True:
+            params = {"limit": page_size}
+            if cursor:
+                params["cursor"] = cursor
+
+            resp = requests.get(
+                f"{BASE_URL}/raw/{table_name}", headers=HEADERS, params=params, timeout=60
+            )
+            resp.raise_for_status()
+
+            page_snapshot = resp.headers.get("X-Snapshot-At")
+            if snapshot_at is None:
+                snapshot_at = page_snapshot
+            elif page_snapshot != snapshot_at:
+                raise RuntimeError(
+                    f"Snapshot changed mid-export ({snapshot_at} -> {page_snapshot}); "
+                    "restart the export from the beginning."
+                )
+
+            body = resp.json()
+            rows.extend(body["data"])
+            cursor = body["next_cursor"]
+            if cursor is None:
+                break
+
+        return rows, snapshot_at
+
+
+    if __name__ == "__main__":
+        rows, snapshot_at = export_table("ixhaus_contracts")
+        print(f"Exported {len(rows)} rows as of snapshot {snapshot_at}")
+    ```
+  </Step>
+</Steps>
+
+<Note>
+  Cursor-Sequenzen bleiben auch bei gleichzeitigen Schreibvorgängen stabil. Da Raw-Tabellen während eines langen Exports Updates erhalten können, zeigt dir `X-Snapshot-At`, zu welcher Sync-Version jede Seite gehört. Für einen garantiert einheitlichen Snapshot-Export wiederhole den Vorgang von Anfang an, wenn sich der Snapshot-Zeitstempel zwischen den Seiten unterscheidet.
+</Note>

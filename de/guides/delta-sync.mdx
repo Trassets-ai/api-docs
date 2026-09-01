@@ -1,0 +1,108 @@
+---
+title: "Delta Sync nutzen, um geänderte Tabellen effizient zu erkennen"
+description: "Frage /changes mit dem Parameter since und ETags ab, um unnötige Abrufe zu vermeiden und herauszufinden, welche Tabellen seit deinem letzten Sync neue Daten haben."
+sidebarTitle: "Delta Sync"
+---
+
+Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne jeden Endpunkt abzurufen. Der Endpunkt `GET /changes` der Trassets Data API liefert Metadaten für geänderte Tabellen und unterstützt bedingte Requests über ETag, um Polling zu überspringen, wenn nichts Neues vorliegt.
+
+<Steps>
+  <Step title="Geänderte Tabellen abfragen">
+    Sende einen `GET`-Request an `/changes` mit einem ISO-8601-UTC-Zeitstempel `since`. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL.
+
+    ```bash
+    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Beispiel-Antwort:
+
+    ```json
+    [
+      {
+        "table_name": "properties",
+        "last_sync_at": "2026-07-07T06:00:00",
+        "category": "property",
+        "api_table_name": "properties",
+        "endpoint_url": "/property/properties"
+      },
+      {
+        "table_name": "ixhaus_contracts",
+        "last_sync_at": "2026-07-07T06:05:00",
+        "endpoint_url": "/raw/ixhaus_contracts"
+      }
+    ]
+    ```
+  </Step>
+  <Step title="Nur geänderte Tabellen abrufen">
+    Rufe für jedes von `/changes` zurückgegebene Element nur den entsprechenden Endpunkt ab. Überspringe jede Tabelle, die nicht in der Antwort enthalten ist. So vermeidest du unnötigen Datentransfer und schonst dein Rate-Limit-Budget von 500 Req/h.
+  </Step>
+  <Step title="Bedingtes GET bei nachfolgenden Abfragen nutzen">
+    Speichere den `ETag`-Header aus der ersten erfolgreichen `/changes`-Antwort. Sende ihn bei deiner nächsten Abfrage als `If-None-Match` zurück.
+
+    ```bash
+    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+      -H "X-API-Key: $TRASSETS_API_KEY" \
+      -H "If-None-Match: \"abc123\""
+    ```
+
+    Wenn sich seit der Ausstellung des ETag keine Tabellen geändert haben, liefert die API `304 Not Modified` mit leerem Body und zählt den Request nicht gegen die Abfragekosten für Change-Daten.
+  </Step>
+  <Step title="Den Parameter since fortschreiben">
+    Speichere nach einem erfolgreichen Sync den aktuellen Zeitstempel und nutze ihn als Wert für `since` bei der nächsten Abfrage. So entsteht ein gleitendes Zeitfenster, sodass jeder Lauf nur das Intervall seit dem vorherigen Lauf bewertet.
+  </Step>
+  <Step title="Vollständiges Python-Beispiel">
+    Ein vollständiger Poller, der den Zeitstempel `since` und den `ETag` zwischen den Läufen
+    verfolgt und nur Tabellen verarbeitet, die sich tatsächlich geändert haben. Erfordert das
+    Paket [`requests`](https://pypi.org/project/requests/).
+
+    ```python poll_changes.py
+    import os
+    from datetime import datetime, timezone
+
+    import requests
+
+    API_KEY = os.environ["TRASSETS_API_KEY"]
+    BASE_URL = "https://api.trassets.ai"
+    HEADERS = {"X-API-Key": API_KEY}
+
+
+    def poll_changes(since: str, etag: str | None = None):
+        """Poll /changes and return (changed_tables, new_etag, new_since).
+
+        changed_tables is an empty list on a 304 Not Modified response.
+        """
+        headers = dict(HEADERS)
+        if etag:
+            headers["If-None-Match"] = etag
+
+        resp = requests.get(
+            f"{BASE_URL}/changes", headers=headers, params={"since": since}, timeout=30
+        )
+
+        now = datetime.now(timezone.utc).isoformat()
+        if resp.status_code == 304:
+            return [], etag, now
+
+        resp.raise_for_status()
+        return resp.json(), resp.headers.get("ETag"), now
+
+
+    if __name__ == "__main__":
+        since = "2026-07-01T00:00:00Z"
+        etag = None
+
+        changed, etag, since = poll_changes(since, etag)
+        for table in changed:
+            print(f"Changed: {table['table_name']} -> {table['endpoint_url']}")
+        if not changed:
+            print("No changes since last poll.")
+
+        # Persist `since` and `etag` and pass them into the next scheduled run.
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+  Der Parameter `since` darf nicht älter als 30 Tage sein. Requests mit einem Zeitstempel jenseits dieses Rückblickfensters liefern einen Fehler. Führe einen vollständigen Tabellen-Refresh aus, wenn dein letzter erfolgreicher Sync mehr als 30 Tage zurückliegt.
+</Warning>

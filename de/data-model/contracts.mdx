@@ -1,0 +1,255 @@
+---
+title: "Contracts Datenmodell: Mietverhältnisse, Sollstellungen und Dienstleistungen"
+sidebarTitle: "Contracts"
+description: "Erkunde die Contracts-Domäne der Trassets Data API mit Mietsollstellungen, Sollstellungsabweichungen, Dienstleistungsverträgen und Vertragsenden — mit echten Feldnamen und Verknüpfungsschlüsseln."
+---
+
+Die Contracts-Domäne enthält Miet-, Sollstellungs- und Dienstleistungsvertragsdaten für
+deine Objekte. Nutze diese Endpunkte, um zeitreihenbasierte Sollstellungspositionen,
+monatliche Abweichungen, Details zu Dienstleistungsverträgen und Informationen zum
+Mietvertragsende abzurufen.
+
+## contract_debits
+
+`GET /contracts/contract_debits` — Mietsollstellungspositionen als Zeitreihe. Jeder
+Datensatz repräsentiert eine geplante Sollstellung mit einem Gültigkeitsintervall.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Referenziert die Einheit in `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="floor_area_person_id" type="integer">
+  Zusammengesetzter Schlüssel, der einen bestimmten Mieter in einer bestimmten Einheit
+  identifiziert.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Zusammengesetzter Schlüssel, der einen bestimmten Mieter auf Objektebene identifiziert.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Konto, auf das die Sollstellung gebucht wird.
+</ResponseField>
+
+<ResponseField name="debit_amount" type="number" required>
+  Der Sollstellungsbetrag für das Gültigkeitsintervall.
+</ResponseField>
+
+<ResponseField name="debit_type" type="string">
+  Kategorie der Sollstellung, zum Beispiel Miete oder Nebenkosten.
+</ResponseField>
+
+<ResponseField name="net_rent" type="number">
+  Nettomietanteil der Sollstellung.
+</ResponseField>
+
+<ResponseField name="side_costs" type="number">
+  Nebenkostenanteil der Sollstellung.
+</ResponseField>
+
+<ResponseField name="date_begin" type="date" required>
+  Beginn des Gültigkeitsintervalls.
+</ResponseField>
+
+<ResponseField name="date_end" type="date">
+  Ende des Gültigkeitsintervalls.
+</ResponseField>
+
+<ResponseField name="due_date_day" type="integer">
+  Tag des Monats, an dem die Sollstellung fällig ist.
+</ResponseField>
+
+<ResponseField name="state" type="string">
+  Status des Sollstellungsdatensatzes.
+</ResponseField>
+
+<Tip>
+  Nutze `floor_area_id`, um Sollstellungsdaten mit `Property.property_structure` zu
+  verknüpfen, oder `floor_area_person_id`/`property_id_person_id`, um sie mit einem
+  bestimmten Mietverhältnis in `Stakeholder.tenants` zu verknüpfen.
+</Tip>
+
+## contract_debit_diffs
+
+`GET /contracts/contract_debit_diffs` — monatliche Abweichungen zwischen dem
+Sollstellungsziel und den tatsächlichen Kontobewegungen. Nutze dies, um geplante
+Sollstellungen mit dem realisierten Zahlungsfluss abzugleichen.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Zusammengesetzter Schlüssel, der den Mieter identifiziert, auf den sich diese Abweichung
+  bezieht.
+</ResponseField>
+
+<ResponseField name="person_id" type="string">
+  Mieter-ID.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Konto, auf das sich die Abweichung bezieht.
+</ResponseField>
+
+<ResponseField name="valid_from" type="date" required>
+  Monat, auf den sich die Abweichung bezieht.
+</ResponseField>
+
+<ResponseField name="debit_diff_net_value" type="number">
+  Netto-Abweichungsbetrag für den Zeitraum.
+</ResponseField>
+
+<ResponseField name="debit_diff_tax_value" type="number">
+  Steueranteil der Abweichung.
+</ResponseField>
+
+<ResponseField name="debit_diff_gross_value" type="number">
+  Brutto-Abweichungsbetrag inklusive Steuer.
+</ResponseField>
+
+<ResponseField name="debit_diff_reminder_from" type="string">
+  Datum, von dem an eine Zahlungserinnerung für diese Abweichung gilt, falls vorhanden.
+</ResponseField>
+
+<ResponseField name="debit_diff_reminder_manual" type="string">
+  Manuell gesetzte Erinnerungs-Übersteuerung, falls vorhanden.
+</ResponseField>
+
+## service_contracts
+
+`GET /contracts/service_contracts` — Wartungs- und Dienstleistungsverträge.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer" required>
+  Identifiziert den Dienstleister. Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="creditor_name" type="string">
+  Anzeigename des Dienstleisters.
+</ResponseField>
+
+<ResponseField name="contract_id" type="integer" required>
+  Vertrags-ID.
+</ResponseField>
+
+<ResponseField name="contract_number" type="string">
+  Lesbare Vertragsnummer.
+</ResponseField>
+
+<ResponseField name="contract_name" type="string">
+  Vertragsname.
+</ResponseField>
+
+<ResponseField name="contract_category" type="string">
+  Vertragskategorie.
+</ResponseField>
+
+<ResponseField name="contract_type" type="string">
+  Vertragstyp.
+</ResponseField>
+
+<ResponseField name="contract_begin" type="date">
+  Vertragsbeginn.
+</ResponseField>
+
+<ResponseField name="contract_end" type="date">
+  Vertragsende.
+</ResponseField>
+
+<ResponseField name="contract_value" type="number">
+  Vertragswert.
+</ResponseField>
+
+<ResponseField name="contract_value_year" type="number">
+  Vertragswert, auf einen Jahreswert normalisiert.
+</ResponseField>
+
+<ResponseField name="contract_reasoning" type="string">
+  Begründungscode für den Vertrag.
+</ResponseField>
+
+<ResponseField name="contract_reasoning_comment" type="string">
+  Freitextkommentar zur Vertragsbegründung.
+</ResponseField>
+
+## contract_ends
+
+`GET /contracts/contract_ends` — Mietvertragsenden und die Handhabung von
+Verlängerungen/Optionen. Nutze dies, um anstehende Vertragsabläufe, Fristen für die
+Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Referenziert die Einheit in `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="floor_area_person_id" type="integer">
+  Zusammengesetzter Schlüssel, der das Mietverhältnis identifiziert, auf das sich dieser
+  Datensatz bezieht.
+</ResponseField>
+
+<ResponseField name="start_date" type="date">
+  Beginn des Mietverhältnisses.
+</ResponseField>
+
+<ResponseField name="end_date" type="date">
+  Vertragliches Ende des Mietverhältnisses.
+</ResponseField>
+
+<ResponseField name="contract_end_date" type="date">
+  Tatsächliches Vertragsende nach Anwendung jeglicher Optionslogik.
+</ResponseField>
+
+<ResponseField name="contract_end_new" type="date">
+  Neues Enddatum, falls das Mietverhältnis verlängert wurde.
+</ResponseField>
+
+<ResponseField name="request_date" type="date">
+  Datum, an dem der Mieter aufgefordert wurde, über eine Verlängerungsoption zu
+  entscheiden.
+</ResponseField>
+
+<ResponseField name="response_deadline" type="date">
+  Frist für die Antwort des Mieters.
+</ResponseField>
+
+<ResponseField name="tenant_response_date" type="date">
+  Datum, an dem der Mieter tatsächlich geantwortet hat.
+</ResponseField>
+
+<ResponseField name="response_type" type="string">
+  Wie der Mieter geantwortet hat (z. B. ausgeübt, abgelehnt).
+</ResponseField>
+
+<ResponseField name="option_deadline" type="date">
+  Frist, bis zu der eine Verlängerungsoption ausgeübt werden muss.
+</ResponseField>
+
+<ResponseField name="auto_use_option" type="boolean">
+  Ob die Option automatisch ausgeübt wird, wenn der Mieter nicht antwortet.
+</ResponseField>
+
+<ResponseField name="options_used" type="integer">
+  Anzahl der bereits genutzten Verlängerungsoptionen.
+</ResponseField>
+
+<ResponseField name="options_not_used" type="integer">
+  Anzahl der noch verfügbaren Verlängerungsoptionen.
+</ResponseField>
+
+<ResponseField name="controct_prolongation_months" type="integer">
+  Verlängerungsdauer in Monaten. Beachte, dass der Feldname das zugrunde liegende
+  Quellsystem widerspiegelt und eine Rechtschreibunregelmäßigkeit enthält (`controct`,
+  nicht `contract`) — dies ist kein Tippfehler in dieser Dokumentation.
+</ResponseField>
