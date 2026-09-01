@@ -1,0 +1,62 @@
+---
+title: "Requests an die Trassets Data API authentifizieren"
+sidebarTitle: "Authentifizierung"
+description: "Erfahre, wie du API-Keys für die Trassets Data API beantragst und nutzt, und verstehe die möglichen Authentifizierungsfehler."
+---
+
+Die Trassets Data API nutzt ein einfaches API-Key-Schema. Du übergibst deinen Key im `X-API-Key`-Header bei jedem Request. Der Key bestimmt, auf welchen Kunden-Scope und welche Datenstufen du zugreifen kannst.
+
+## Einen Key beantragen
+
+Registriere dich unter [portal.api.trassets.ai](https://portal.api.trassets.ai) und erzeuge einen API-Key über das Dashboard. Der Klartext-Key wird genau einmal angezeigt. Kopiere ihn sofort und speichere ihn in einem sicheren Secrets-Manager. Wenn du ihn verlierst, musst du den alten Key widerrufen und einen neuen erzeugen.
+
+## Den Key in Requests übergeben
+
+Füge den `X-API-Key`-Header bei jedem Call hinzu. Hier ein minimales curl-Beispiel:
+
+```bash
+curl "https://api.trassets.ai/v1/realestates/objects?limit=1" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+```
+
+## Speicherung und Sicherheit des Keys
+
+Trassets speichert deinen API-Key niemals im Klartext. Auf unseren Servern wird nur ein HMAC-SHA-256-Hash zur Verifikation aufbewahrt. Das bedeutet: Wir können einen Key nach der Erstellung nicht wiederherstellen oder erneut anzeigen.
+
+Behandle deinen Key wie ein Passwort:
+
+- Committe ihn nicht in die Versionskontrolle.
+- Rotiere Keys regelmäßig über das Portal.
+- Beschränke jeden Key auf die minimal nötige Zugriffsstufe für deine Integration.
+
+## Authentifizierungsfehler
+
+Wenn der Key fehlt, ungültig ist oder nicht die erforderliche Zugriffsstufe hat, liefert die API eine RFC-7807-Problem-Antwort.
+
+### 401 Unauthorized
+
+```json
+{
+  "type": "about:blank",
+  "title": "Unauthorized",
+  "status": 401,
+  "detail": "API key required",
+  "instance": "/realestates/objects"
+}
+```
+
+Das bedeutet, dass der Request keinen gültigen `X-API-Key`-Header enthielt oder der übergebene Key deaktiviert ist.
+
+### 403 Forbidden
+
+```json
+{
+  "type": "about:blank",
+  "title": "Forbidden",
+  "status": 403,
+  "detail": "Invalid or disabled API key",
+  "instance": "/realestates/objects"
+}
+```
+
+Eine 403-Antwort zeigt an, dass der Key existiert, der angeforderte Endpunkt oder die Datenstufe aber nicht in deinem Abonnement enthalten ist. Kontaktiere deinen Account-Administrator oder upgrade deinen Plan im Portal.
