@@ -1,0 +1,35 @@
+---
+title: "Trassets Data Model: Entities and Relationships"
+sidebarTitle: "Overview"
+description: "Explore the five data domains of the Trassets Data API and how entities relate through property_id and floor_area_id across real estate, contracts, accounting, meters, and market data."
+---
+
+The Trassets Data API organises real-estate data into five domains. Each domain contains normalised tables you can query through category endpoints, or you can access the underlying raw tables directly. The domains share common identifiers so you can join data across categories to build a complete view of your portfolio.
+
+<CardGroup cols={2}>
+  <Card title="Real Estates" icon="building" href="/data-model/real-estates">
+    Properties, objects, units, and floor-area structures.
+  </Card>
+
+  <Card title="Contracts" icon="file-contract" href="/data-model/contracts">
+    Rental debits, debit diffs, service contracts, and lease ends.
+  </Card>
+
+  <Card title="Accounting" icon="book" href="/data-model/accounting">
+    Ledger accounts, booking headers, positions, budgets, and account mapping.
+  </Card>
+
+  <Card title="Meters" icon="gauge" href="/data-model/meters">
+    Utility meter readings and consumption data.
+  </Card>
+
+  <Card title="Market Data" icon="chart-line" href="/data-model/market-data">
+    Benchmarks and comparable market data for assets.
+  </Card>
+</CardGroup>
+
+## Join keys
+
+`property_id` is the primary join key across all domains. Use it to link real-estate objects with contract debits, accounting bookings, and meter readings that belong to the same property.
+
+`floor_area_id` references the property structure table and connects units and floor areas to other records such as contract debits and booking headers. This lets you aggregate financial or consumption data at the level of an individual unit or floor area.

@@ -1,0 +1,58 @@
+---
+title: "Use delta sync to detect changed tables efficiently"
+description: "Poll /changes with the since parameter and ETags to avoid unnecessary fetches and discover which tables have new data since your last sync."
+sidebarTitle: "Delta Sync"
+---
+
+Discover which tables have been updated since your last sync without fetching every endpoint. The Trassets Data API `GET /changes` endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
+
+<Steps>
+  <Step title="Poll for changed tables">
+    Send a `GET` request to `/changes` with an ISO-8601 UTC `since` timestamp. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL.
+
+    ```bash
+    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Example response:
+
+    ```json
+    [
+      {
+        "table_name": "properties",
+        "last_sync_at": "2026-07-07T06:00:00",
+        "category": "realestates",
+        "api_table_name": "objects",
+        "endpoint_url": "/realestates/objects"
+      },
+      {
+        "table_name": "ixhaus_contracts",
+        "last_sync_at": "2026-07-07T06:05:00",
+        "endpoint_url": "/raw/ixhaus_contracts"
+      }
+    ]
+    ```
+  </Step>
+  <Step title="Fetch only changed tables">
+    For each item returned by `/changes`, request the corresponding endpoint only. Skip any table that is absent from the response. This avoids unnecessary data transfer and preserves your 500 req/h rate limit budget.
+  </Step>
+  <Step title="Use conditional GET on subsequent polls">
+    Store the `ETag` header from the first successful `/changes` response. On your next poll, send it back as `If-None-Match`.
+
+    ```bash
+    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
+      -H "X-API-Key: $TRASSETS_API_KEY" \
+      -H "If-None-Match: \"abc123\""
+    ```
+
+    If no tables have changed since the ETag was issued, the API returns `304 Not Modified` with an empty body and does not count the request against the change-data query cost.
+  </Step>
+  <Step title="Advance the since parameter">
+    After a successful sync, store the current timestamp and use it as the `since` value for the next poll. This creates a sliding window so each run evaluates only the interval since the previous run.
+  </Step>
+</Steps>
+
+<Warning>
+  The `since` parameter must not be older than 30 days. Requests with a timestamp beyond this lookback window return an error. Run a full table refresh if your last successful sync was more than 30 days ago.
+</Warning>

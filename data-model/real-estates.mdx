@@ -1,0 +1,42 @@
+---
+title: "Real Estates Data Model: Objects and Units"
+sidebarTitle: "Real Estates"
+description: "Understand the Real Estates data model for properties, objects, and units in the Trassets Data API, including key fields and join identifiers."
+---
+
+The Real Estates domain contains the structural and address data for properties in your portfolio. Use these endpoints to retrieve property objects, their units, and floor-area references. Data from this domain is the foundation for joining with Contracts, Accounting, and Meters.
+
+## Objects
+
+The `/realestates/objects` endpoint returns property objects. Each object represents a distinct property with address information and a stable identifier you can use to join with other domains.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier. This is the primary join key across all data domains.
+</ResponseField>
+
+<ResponseField name="entrance" type="string">
+  Street name and house number, e.g. Musterstrasse 12.
+</ResponseField>
+
+<ResponseField name="address" type="string">
+  Postal code and city as a comma-separated value, e.g. 10115, Berlin.
+</ResponseField>
+
+## Units
+
+The `/realestates/units` endpoint returns the units and floor areas that belong to each property. Use this data to understand the internal structure of a building and to join with records that reference individual floor areas.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier. Joins the unit to its parent object and to other domains.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="string">
+  References floor\_area\_id in the property\_structure table. Use this to join with contract debits, booking headers, and other domain records.
+</ResponseField>
+
+## Example request
+
+```bash
+curl -X GET "https://api.trassets.ai/realestates/objects?limit=1" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+```

@@ -1,0 +1,23 @@
+---
+title: "Field Glossary for the Trassets Data API"
+sidebarTitle: "Field Glossary"
+description: "Reference guide to common field names across the Trassets Data API, including entrance, address, floor_area_id, property_id, and pagination cursors."
+---
+
+This glossary defines field names that appear across multiple endpoints in the Trassets Data API. Use it as a quick reference when mapping API responses to your own data models or when designing joins across domains.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `entrance` | string | Street name and house number, e.g. Musterstrasse 12 |
+| `address` | string | Comma-separated postal code and city, e.g. 10115, Berlin |
+| `name` | string | Full name as a single field. No separate first or last name is available. |
+| `floor_area_id` | string | References floor\_area\_id in the property\_structure table |
+| `property_id` | integer | Unique property identifier; primary join key across all domains |
+| `person_id` | string | Identifies a tenant or contact person |
+| `creditor_id` | string | Identifies a creditor (vendor or service provider) |
+| `booking_date` | date | ISO-8601 date of the ledger booking |
+| `next_cursor` | string | Opaque cursor for Raw endpoint pagination; null when all rows are fetched |
+
+<Note>
+  Fields prefixed with `sk_` are internal surrogate keys used for joins in the underlying data warehouse. They are not stable identifiers for external use and should not be relied on in your integrations.
+</Note>
