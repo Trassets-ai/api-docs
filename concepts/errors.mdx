@@ -1,0 +1,47 @@
+---
+title: "Error Responses in the Trassets Data API"
+sidebarTitle: "Errors"
+description: "Trassets Data API returns RFC 7807 problem+json errors. Learn the format, status codes, and how to handle each one when integrating the API."
+---
+
+The Trassets Data API returns errors in the RFC 7807 format (`application/problem+json`). Every error response includes a consistent set of fields so you can programmatically detect the problem, log the details, and decide how to retry or correct the request.
+
+## Problem JSON Format
+
+Every error response body contains these fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `type` | string | A URI that identifies the error type. Defaults to `about:blank` for generic errors. |
+| `title` | string | A short, human-readable summary of the error type. |
+| `status` | integer | The HTTP status code. |
+| `detail` | string | A detailed, human-readable explanation of this specific occurrence. |
+| `instance` | string | The request path that produced the error. |
+
+Example error response for an invalid API key:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Forbidden",
+  "status": 403,
+  "detail": "Invalid or disabled API key",
+  "instance": "/realestates/objects"
+}
+```
+
+## Status Codes
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| **400** | Missing required filter | Check the endpoint documentation for required query parameters and add them to the request. |
+| **401** | Invalid API key | Verify that you are sending the `X-API-Key` header and that the key has not been revoked. |
+| **403** | Missing access tier | Your API key does not have permission for this endpoint or table. Contact Trassets support to upgrade your access tier. |
+| **404** | Unknown endpoint | Verify the URL path and the category or table name. |
+| **422** | Validation error | A query parameter did not pass validation. Check the `detail` field for the exact parameter and constraint. |
+| **429** | Rate limit exceeded | You have exceeded the 500 requests per hour limit. Back off and retry after the current window resets. |
+| **500** | Internal error | A server-side error occurred. Retry the request after a short delay, and contact support if it persists. |
+
+<Warning>
+  A **403** response means your API key is valid but lacks the required access tier for the requested resource. It is not the same as a 401, which means the key itself is missing or invalid.
+</Warning>
