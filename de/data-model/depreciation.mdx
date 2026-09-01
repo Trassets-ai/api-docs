@@ -1,0 +1,94 @@
+---
+title: "Depreciation-Datenmodell: Anlagegüter und Abschreibungsbuchungen"
+sidebarTitle: "Depreciation"
+description: "Verstehe die Depreciation-Domäne der Trassets Data API: Anlagegüter und ihre Abschreibungsbuchungen."
+---
+
+Die Depreciation-Domäne enthält Stammdaten zu Anlagegütern und die einzelnen
+Abschreibungsbuchungen, die für jedes Anlagegut gebucht werden.
+
+## assets
+
+`GET /depreciation/assets` — Stammdaten zu Anlagegütern.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="asset_hdr_id" type="integer" required>
+  Eindeutige Anlagegut-ID. `depreciation`-Buchungen referenzieren dieses Feld.
+</ResponseField>
+
+<ResponseField name="asset_id" type="string">
+  Anlagegut-Nummer.
+</ResponseField>
+
+<ResponseField name="asset_name" type="string">
+  Name des Anlagegutes.
+</ResponseField>
+
+<ResponseField name="acquisition_date" type="date">
+  Datum des Erwerbs des Anlagegutes.
+</ResponseField>
+
+<ResponseField name="built_date" type="date">
+  Datum der Inbetriebnahme des Anlagegutes.
+</ResponseField>
+
+<ResponseField name="begin_afa" type="date">
+  Startdatum des Abschreibungsplans.
+</ResponseField>
+
+<ResponseField name="end_afa" type="date">
+  Enddatum des Abschreibungsplans.
+</ResponseField>
+
+<ResponseField name="afa_duration" type="string">
+  Abschreibungsdauer.
+</ResponseField>
+
+<ResponseField name="afa_method" type="string">
+  Angewandte Abschreibungsmethode.
+</ResponseField>
+
+<ResponseField name="depreciation_active" type="string">
+  Ob die Abschreibung für dieses Anlagegut derzeit aktiv ist.
+</ResponseField>
+
+## depreciation
+
+`GET /depreciation/depreciation` — einzelne Abschreibungsbuchungen, eine Zeile pro Buchung.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="asset_hdr_id" type="integer" required>
+  Referenziert das Anlagegut in `assets.asset_hdr_id`.
+</ResponseField>
+
+<ResponseField name="asset_id" type="string">
+  Anlagegut-Nummer.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date" required>
+  Datum der Abschreibungsbuchung.
+</ResponseField>
+
+<ResponseField name="booking_date_text" type="string">
+  Anzeigetext für das Buchungsdatum.
+</ResponseField>
+
+<ResponseField name="booking_net_value" type="number" required>
+  Nettowert, der in dieser Abschreibungsbuchung erfasst wird.
+</ResponseField>
+
+<ResponseField name="booking_text" type="string">
+  Freitext-Beschreibung der Buchung.
+</ResponseField>
+
+<Tip>
+  Eine `assets`-Zeile hat über ihre Nutzungsdauer typischerweise viele `depreciation`-Zeilen
+  — verknüpfe über `asset_hdr_id`, um den vollständigen Abschreibungsplan für ein Anlagegut
+  zu erstellen.
+</Tip>

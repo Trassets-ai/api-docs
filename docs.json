@@ -20,41 +20,41 @@
               {
                 "group": "Get Started",
                 "pages": [
+                  "authentication",
                   "index",
-                  "quickstart",
-                  "authentication"
+                  "quickstart"
                 ]
               },
               {
                 "group": "Core Concepts",
                 "pages": [
                   "concepts/endpoint-types",
-                  "concepts/pagination",
-                  "concepts/sync-cycle",
                   "concepts/errors",
+                  "concepts/pagination",
                   "concepts/rate-limits",
+                  "concepts/sync-cycle",
                   "concepts/versioning"
                 ]
               },
               {
                 "group": "Guides",
                 "pages": [
-                  "guides/incremental-sync",
                   "guides/bulk-export",
-                  "guides/delta-sync"
+                  "guides/delta-sync",
+                  "guides/incremental-sync"
                 ]
               },
               {
                 "group": "Data Model",
                 "pages": [
+                  "data-model/accounting",
+                  "data-model/contracts",
+                  "data-model/depreciation",
+                  "data-model/field-glossary",
+                  "data-model/operations",
                   "data-model/overview",
                   "data-model/property",
-                  "data-model/contracts",
-                  "data-model/accounting",
-                  "data-model/depreciation",
-                  "data-model/operations",
-                  "data-model/stakeholder",
-                  "data-model/field-glossary"
+                  "data-model/stakeholder"
                 ]
               }
             ]
@@ -80,14 +80,57 @@
         "language": "de",
         "tabs": [
           {
-            "tab": "Documentation",
+            "tab": "Dokumentation",
             "groups": [
               {
                 "group": "Erste Schritte",
                 "pages": [
-                  "de/index",
+                  "de/authentication",
                   "de/quickstart",
-                  "de/authentication"
+                  "de/index"
+                ]
+              },
+              {
+                "group": "Kernkonzepte",
+                "pages": [
+                  "de/concepts/endpoint-types",
+                  "de/concepts/errors",
+                  "de/concepts/pagination",
+                  "de/concepts/rate-limits",
+                  "de/concepts/sync-cycle",
+                  "de/concepts/versioning"
+                ]
+              },
+              {
+                "group": "Anleitungen",
+                "pages": [
+                  "de/guides/bulk-export",
+                  "de/guides/delta-sync",
+                  "de/guides/incremental-sync"
+                ]
+              },
+              {
+                "group": "Datenmodell",
+                "pages": [
+                  "de/data-model/accounting",
+                  "de/data-model/contracts",
+                  "de/data-model/depreciation",
+                  "de/data-model/field-glossary",
+                  "de/data-model/operations",
+                  "de/data-model/property",
+                  "de/data-model/stakeholder",
+                  "de/data-model/overview"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API-Referenz",
+            "groups": [
+              {
+                "group": "Übersicht",
+                "pages": [
+                  "de/api-reference/introduction"
                 ]
               }
             ]

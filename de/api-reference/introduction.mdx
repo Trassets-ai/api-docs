@@ -1,0 +1,80 @@
+---
+title: "Trassets Data API Referenz: Endpunkt-Übersicht"
+sidebarTitle: "Introduction"
+description: "Überblick über die Trassets Data API: Basis-URL, Authentifizierung, Endpunkt-Typen, Pagination, Fehler und Versionierung."
+---
+
+Die Trassets Data API ist eine REST-Schnittstelle für Immobilien- und Marktdaten. Basis-URL: `https://api.trassets.ai`. Sende deinen API-Key im `X-API-Key`-Header bei jedem Request. Alle Antworten sind JSON, sofern nicht anders angegeben.
+
+## Endpunkt-Typen
+
+Die API bietet zwei Endpunkt-Familien. Wähle die, die zu deinem Anwendungsfall passt.
+
+| Typ | Pfad-Muster | Pagination | Anwendungsfall |
+| --- | --- | --- | --- |
+| Category-Endpunkte | `/{category}/{api_table}` | Offset-basiert (`limit` / `offset`) plus Cursor-Unterstützung | Business-Abfragen, Dashboards, inkrementelle Abrufe |
+| Raw-Endpunkte | `/raw/{table_name}` | Cursor-basiert (`cursor` aus `next_cursor` im Body) | Bulk-Sync, vollständige Exporte, Data Warehousing |
+
+### Category-Endpunkte
+
+Category-Endpunkte liefern normalisierte, geschäftsfertige Daten. Sie unterstützen die Query-Parameter `limit` und `offset`, mit Metadaten in den Response-Headern:
+
+- `X-Total-Count` — Gesamtzahl der Zeilen, die zur Abfrage passen
+- `X-Has-More` — `"true"` oder `"false"`
+- `X-Next-Offset` — der Offset für die nächste Seite
+- `X-Next-Cursor` — ein opaker Cursor, wenn eine volle Seite zurückgegeben wird
+
+### Raw-Endpunkte
+
+Raw-Endpunkte legen vollständige Quelltabellen ungefiltert offen. Die Pagination ist Cursor-basiert über den Query-Parameter `cursor`, entnommen aus dem Feld `next_cursor` im Response-Body. Die maximale Seitengröße beträgt 10.000 Zeilen. Der Header `X-Snapshot-At` gibt den Zeitstempel des letzten erfolgreichen Syncs für diese Tabelle an, sodass jede Zeile innerhalb einer Cursor-Sequenz zu diesem Snapshot konsistent ist.
+
+## Fehlerformat
+
+Fehler folgen [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`application/problem+json`). Jedes Fehlerobjekt enthält `type`, `title`, `status`, `detail` und `instance`. Siehe [Fehler](/de/concepts/errors) für eine vollständige Liste der Status-Codes und Hinweise zu Wiederholungsversuchen.
+
+## Versionierung
+
+Die API liegt derzeit auf dem Basis-Pfad. URL-Versionierung unter `/v1/` ist geplant, aber noch nicht verbindlich. Solange die Versionierung nicht aktiv ist, können Breaking Changes auftreten. Wir empfehlen, deine Integration am dokumentierten Verhalten auszurichten und den Changelog auf Updates zu beobachten.
+
+## Endpunkt-Gruppen
+
+<CardGroup cols={2}>
+  <Card title="Property" icon="building">
+    Objekte, Strukturbaum, technische Objekte und Kreditoren-Dienstleistungszuordnungen — siehe die Gruppe **Property** in der Seitenleiste.
+  </Card>
+
+  <Card title="Contracts" icon="file-contract">
+    Mietsollstellungen, Dienstleistungsverträge und Vertragslaufzeiten — siehe die Gruppe **Contracts** in der Seitenleiste.
+  </Card>
+
+  <Card title="Accounting" icon="calculator">
+    Buchungen, Budgets und Kontenmappings — siehe die Gruppe **Accounting** in der Seitenleiste.
+  </Card>
+
+  <Card title="Depreciation" icon="chart-line-down">
+    Anlagegüter und Abschreibungsbuchungen — siehe die Gruppe **Depreciation** in der Seitenleiste.
+  </Card>
+
+  <Card title="Operations" icon="clipboard-list">
+    Meldungen, Angebote, Aufträge und Projekte — siehe die Gruppe **Operations** in der Seitenleiste.
+  </Card>
+
+  <Card title="Stakeholder" icon="users">
+    Kreditoren, Mitarbeiter, Eigentümer und Mieter — siehe die Gruppe **Stakeholder** in der Seitenleiste.
+  </Card>
+
+  <Card title="Raw Data" icon="database" href="/api-reference/raw-data/list-available-raw-tables-for-the-authenticated-customer">
+    Vollständige Quelltabellen für Bulk-Exporte.
+  </Card>
+
+  <Card title="Delta Sync" icon="arrows-rotate">
+    Erkenne geänderte Tabellen seit einem Zeitstempel — siehe die Gruppe **Delta Sync** in der Seitenleiste.
+  </Card>
+</CardGroup>
+
+<Note>
+  Es gibt keine Kategorie "Meters" oder "Market Data". Falls du diese Namen in einer
+  früheren Version dieser Dokumentation gesehen hast: Sie beschrieben geplante
+  Funktionalität, die nie implementiert wurde — siehe [Data Model Overview](/data-model/overview)
+  (Englisch) für die aktuelle, live Kategorienliste.
+</Note>

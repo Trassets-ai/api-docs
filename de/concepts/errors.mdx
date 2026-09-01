@@ -1,0 +1,47 @@
+---
+title: "Fehlerantworten in der Trassets Data API"
+sidebarTitle: "Fehler"
+description: "Die Trassets Data API liefert RFC-7807-problem+json-Fehler. Erfahre das Format, die Statuscodes und den richtigen Umgang mit jedem einzelnen bei der Integration der API."
+---
+
+Die Trassets Data API liefert Fehler im RFC-7807-Format (`application/problem+json`). Jede Fehlerantwort enthält einen konsistenten Satz von Feldern, sodass du das Problem programmatisch erkennen, die Details protokollieren und entscheiden kannst, wie du den Request wiederholst oder korrigierst.
+
+## Problem-JSON-Format
+
+Jeder Fehlerantwort-Body enthält diese Felder:
+
+| Feld | Typ | Beschreibung |
+| --- | --- | --- |
+| `type` | string | Eine URI, die den Fehlertyp identifiziert. Standardmäßig `about:blank` für generische Fehler. |
+| `title` | string | Eine kurze, menschenlesbare Zusammenfassung des Fehlertyps. |
+| `status` | integer | Der HTTP-Statuscode. |
+| `detail` | string | Eine detaillierte, menschenlesbare Erklärung dieses konkreten Vorfalls. |
+| `instance` | string | Der Request-Pfad, der den Fehler ausgelöst hat. |
+
+Beispiel-Fehlerantwort für einen ungültigen API-Key:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Forbidden",
+  "status": 403,
+  "detail": "Invalid or disabled API key",
+  "instance": "/property/properties"
+}
+```
+
+## Statuscodes
+
+| Status | Bedeutung | Was zu tun ist |
+| --- | --- | --- |
+| **400** | Erforderlicher Filter fehlt | Prüfe die Endpunkt-Dokumentation auf erforderliche Query-Parameter und ergänze sie im Request. |
+| **401** | Ungültiger API-Key | Stelle sicher, dass du den `X-API-Key`-Header sendest und dass der Key nicht widerrufen wurde. |
+| **403** | Zugriffsstufe fehlt | Dein API-Key hat keine Berechtigung für diesen Endpunkt oder diese Tabelle. Kontaktiere den Trassets-Support, um deine Zugriffsstufe hochzustufen. |
+| **404** | Unbekannter Endpunkt | Überprüfe den URL-Pfad sowie den Category- oder Tabellennamen. |
+| **422** | Validierungsfehler | Ein Query-Parameter hat die Validierung nicht bestanden. Prüfe das `detail`-Feld für den genauen Parameter und die Einschränkung. |
+| **429** | Rate-Limit überschritten | Du hast das Limit von 500 Requests pro Stunde überschritten. Warte ab und versuche es erneut, nachdem das aktuelle Zeitfenster zurückgesetzt wurde. |
+| **500** | Interner Fehler | Ein serverseitiger Fehler ist aufgetreten. Wiederhole den Request nach einer kurzen Verzögerung und kontaktiere den Support, falls das Problem weiterhin besteht. |
+
+<Warning>
+  Eine **403**-Antwort bedeutet, dass dein API-Key gültig ist, aber nicht über die erforderliche Zugriffsstufe für die angeforderte Ressource verfügt. Das ist nicht dasselbe wie ein 401, der bedeutet, dass der Key selbst fehlt oder ungültig ist.
+</Warning>

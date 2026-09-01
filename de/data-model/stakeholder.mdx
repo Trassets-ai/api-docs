@@ -1,0 +1,187 @@
+---
+title: "Stakeholder-Datenmodell: Kreditoren, Mitarbeiter, Eigentümer und Mieter"
+sidebarTitle: "Stakeholder"
+description: "Verstehe die Stakeholder-Domäne der Trassets Data API: Kreditoren, Mitarbeiter, Objekteigentümer und Mieter."
+---
+
+Die Stakeholder-Domäne enthält Stammdaten zu jeder Person oder Organisation, die mit einem
+Objekt in Verbindung steht: die Lieferanten, die du bezahlst (`creditor`), dein eigenes
+Team (`employees`), die Eigentümer (`owner`) und die Mieter (`tenants`).
+
+## creditor
+
+`GET /stakeholder/creditor` — Lieferanten- und Kreditoren-Stammdaten. Dies ist der einzige
+Stakeholder-Endpunkt ohne `property_id`-Spalte — ein Kreditor ist eine eigenständige
+Entität, die mehrere Objekte bedienen kann; die Beziehung wird über `creditor_id` in
+anderen Domänen ausgedrückt (`Property.property_creditor_services`,
+`Contracts.service_contracts`, `Property.technical_objects`,
+`Accounting.booking_header`/`booking_positions`, `Operations.offers`/`orders`/`projects`),
+nicht umgekehrt.
+
+<ResponseField name="creditor_id" type="integer" required>
+  Eindeutige Kreditor-ID.
+</ResponseField>
+
+<ResponseField name="name_1" type="string">
+  Erste Namenszeile (Firma oder Nachname).
+</ResponseField>
+
+<ResponseField name="name_2" type="string">
+  Zweite Namenszeile.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Kreditor-Typ.
+</ResponseField>
+
+<ResponseField name="address_line_1" type="string">
+  Adresszeile.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="phone_1" type="string">
+  Primäre Telefonnummer.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  IBAN des Bankkontos.
+</ResponseField>
+
+<ResponseField name="tax_id" type="string">
+  Steuer-Identifikationsnummer.
+</ResponseField>
+
+## employees
+
+`GET /stakeholder/employees` — das für ein Objekt verantwortliche Property-Management-Team.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="team" type="string">
+  Name des für das Objekt verantwortlichen Teams.
+</ResponseField>
+
+<ResponseField name="first_name" type="string">
+  Vorname des Mitarbeiters.
+</ResponseField>
+
+<ResponseField name="last_name" type="string">
+  Nachname des Mitarbeiters.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Vollständiger Name des Mitarbeiters als einzelnes Feld.
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  Kontakt-Telefonnummer.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Kontakt-E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="inactive" type="boolean">
+  Ob der Mitarbeiter-Datensatz inaktiv ist.
+</ResponseField>
+
+<Note>
+  Dieser Endpunkt liefert eine Zeile pro Objekt mit dem verantwortlichen Team/Mitarbeiter —
+  er ist kein allgemeines Mitarbeiterverzeichnis.
+</Note>
+
+## owner
+
+`GET /stakeholder/owner` — Stammdaten zu Objekteigentümern, einschließlich des
+Eigentumsanteils bei Objekten mit mehreren Eigentümern.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="debitor_id" type="integer" required>
+  Eigentümer-ID.
+</ResponseField>
+
+<ResponseField name="share" type="number" required>
+  Eigentumsanteil in Prozent. Ein Objekt kann mehrere `owner`-Zeilen haben, deren Summe den
+  gesamten Anteil ergibt.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Name des Eigentümers (Privatperson oder Firma).
+</ResponseField>
+
+<ResponseField name="salutation" type="string">
+  Anrede/Titel.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Kontakt-E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  IBAN des Bankkontos.
+</ResponseField>
+
+## tenants
+
+`GET /stakeholder/tenants` — Mieter-Stammdaten und aktuelle Mietkonditionen.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer" required>
+  Einheit, die der Mieter belegt. Referenziert `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="floor_area_person_id" type="integer" required>
+  Zusammengesetzter Schlüssel, der diese spezifische Mieter-Einheit-Beziehung identifiziert.
+  Wird von `Contracts.contract_debits` und `Contracts.contract_ends` verwendet, um ein
+  Mietverhältnis zu referenzieren.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Zusammengesetzter Schlüssel, der den Mieter auf Objektebene identifiziert.
+</ResponseField>
+
+<ResponseField name="person_id" type="string" required>
+  Mieter-ID.
+</ResponseField>
+
+<ResponseField name="person_name" type="string">
+  Vollständiger Name des Mieters als einzelnes Feld. Kein separater Vor-/Nachname
+  verfügbar.
+</ResponseField>
+
+<ResponseField name="address" type="string">
+  Kontaktadresse des Mieters, falls abweichend von der Adresse der Einheit.
+</ResponseField>
+
+<ResponseField name="contract_begin" type="date">
+  Beginn des Mietverhältnisses.
+</ResponseField>
+
+<ResponseField name="contract_end" type="date">
+  Ende des Mietverhältnisses.
+</ResponseField>
+
+<ResponseField name="contract_end_option" type="date">
+  Ende des Mietverhältnisses, falls eine Verlängerungsoption ausgeübt wird.
+</ResponseField>
+
+<ResponseField name="contract_end_actual" type="date">
+  Tatsächliches/wirksames Ende des Mietverhältnisses.
+</ResponseField>
+
+<Tip>
+  Für den vollständigen Lebenszyklus von Verlängerungsoptionen und Fristen rund um ein
+  Mietende siehe `Contracts.contract_ends`, das über `floor_area_person_id` mit dieser
+  Tabelle verknüpft ist.
+</Tip>

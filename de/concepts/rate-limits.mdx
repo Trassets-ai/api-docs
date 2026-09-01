@@ -1,0 +1,36 @@
+---
+title: "Rate-Limits für die Trassets Data API"
+sidebarTitle: "Rate-Limits"
+description: "Die Trassets Data API erlaubt 500 Requests pro Stunde pro API-Key. Erfahre, wie du mit 429-Antworten umgehst und unnötige Requests mit Delta Sync minimierst."
+---
+
+Die Trassets Data API erzwingt ein Rate-Limit von **500 Requests pro Stunde pro API-Key**. Jeder Request zählt auf dieses Limit, einschließlich Wiederholungen und Polling-Aufrufen. Wenn du das Limit überschreitest, liefert die API einen 429-Statuscode, und du musst warten, bis das aktuelle Stundenfenster zurückgesetzt wird, bevor du weitere Requests stellen kannst.
+
+## Beispiel einer 429-Antwort
+
+Wenn du das Rate-Limit erreichst, antwortet die API mit einem RFC-7807-Problem-JSON-Body:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Too Many Requests",
+  "status": 429,
+  "detail": "Rate limit exceeded: 500 per 1 hour",
+  "instance": "/property/properties"
+}
+```
+
+## Umgang mit Rate-Limits
+
+Wenn du eine 429-Antwort erhältst, implementiere eine Exponential-Backoff-Strategie:
+
+1. Stoppe sofort das Senden neuer Requests.
+2. Warte mindestens 60 Sekunden vor dem ersten erneuten Versuch.
+3. Verdopple die Wartezeit bei jedem weiteren Versuch, falls der 429-Fehler weiterhin auftritt.
+4. Nimm den normalen Request-Abstand wieder auf, sobald Requests wieder erfolgreich sind.
+
+Bei lang laufenden Sync-Jobs verteile die Requests gleichmäßig über die Stunde, statt sie am Anfang zu bündeln. Ein Job, der beispielsweise alle 7 Sekunden einen Request stellt, bleibt sicher unter dem Limit von 500 Requests.
+
+<Tip>
+  Nutze den [Delta-Sync-Endpunkt](/de/guides/delta-sync) (`GET /changes`), um auf geänderte Tabellen zu pollen, statt wiederholt jeden Endpunkt abzufragen. So kannst du Endpunkte überspringen, die sich seit deinem letzten Sync nicht geändert haben, und reduzierst dein gesamtes Request-Volumen.
+</Tip>

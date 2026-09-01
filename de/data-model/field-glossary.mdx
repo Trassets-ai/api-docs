@@ -1,0 +1,28 @@
+---
+title: "Field Glossary für die Trassets Data API"
+sidebarTitle: "Field Glossary"
+description: "Referenzleitfaden zu gängigen Feldnamen in der Trassets Data API, einschließlich entrance, address, floor_area_id, property_id und Pagination-Cursorn."
+---
+
+Dieses Glossar definiert Feldnamen, die in mehreren Endpunkten der Trassets Data API
+vorkommen. Nutze es als schnelle Referenz, wenn du API-Antworten auf deine eigenen
+Datenmodelle abbildest oder Verknüpfungen über Domänen hinweg gestaltest.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `entrance` | string | Straßenname und Hausnummer, z. B. Musterstrasse 12 |
+| `address` | string | Postleitzahl und Stadt, durch Komma getrennt, z. B. 10115, Berlin |
+| `name` | string | Vollständiger Name als einzelnes Feld. Kein separater Vor- oder Nachname verfügbar. |
+| `floor_area_id` | string | Referenziert floor\_area\_id in der Tabelle property\_structure |
+| `property_id` | integer | Eindeutige Objekt-ID; primärer Verknüpfungsschlüssel über alle Domänen hinweg |
+| `person_id` | string | Identifiziert einen Mieter oder eine Kontaktperson |
+| `creditor_id` | string | Identifiziert einen Kreditor (Lieferant oder Dienstleister) |
+| `booking_date` | date | ISO-8601-Datum der Buchhaltungsbuchung |
+| `next_cursor` | string | Undurchsichtiger Cursor für die Pagination des Raw-Endpunkts; null, wenn alle Zeilen abgerufen wurden |
+
+<Note>
+  Felder mit dem Präfix `sk_` sind interne Surrogatschlüssel, die für Verknüpfungen im
+  zugrunde liegenden Data Warehouse verwendet werden. Sie sind keine stabilen
+  Identifikatoren für die externe Nutzung und sollten in deinen Integrationen nicht
+  verwendet werden.
+</Note>

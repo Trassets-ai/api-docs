@@ -1,0 +1,197 @@
+---
+title: "Operations-Datenmodell: Meldungen, Angebote, Aufträge und Projekte"
+sidebarTitle: "Operations"
+description: "Verstehe die Operations-Domäne der Trassets Data API: Wartungsmeldungen, Angebote, Aufträge und Investitionsprojekte."
+---
+
+Die Operations-Domäne deckt den Wartungs- und Beschaffungs-Workflow ab: Ein Mieter oder
+Techniker meldet ein Problem (`notifications`), ein Kreditor gibt ein Preisangebot ab
+(`offers`), Arbeiten werden beauftragt (`orders`), und größere Vorhaben werden als
+`projects` erfasst.
+
+<Note>
+  `orders` und `projects` stellen im Live-Schema jeweils über 60 Felder bereit
+  (Rechnungsbeträge, Hierarchieebenen, Kontaktdaten und mehr). Diese Seite dokumentiert nur
+  die wichtigsten Identifikations- und Verknüpfungsfelder — die vollständige, automatisch
+  generierte Feldliste findest du im Tab **API Reference**.
+</Note>
+
+## notifications
+
+`GET /operations/notifications` — Wartungsmeldungen und Schadensmeldungen.
+
+<ResponseField name="report_hdr_id" type="integer" required>
+  Eindeutige Meldungs-ID.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="to_hdr_id" type="integer">
+  Technisches Objekt, auf das sich die Meldung bezieht. Referenziert
+  `Property.technical_objects.to_id`.
+</ResponseField>
+
+<ResponseField name="person_id" type="integer">
+  Meldende Person.
+</ResponseField>
+
+<ResponseField name="report_type" type="string">
+  Art der Meldung.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Aktueller Status der Meldung.
+</ResponseField>
+
+<ResponseField name="priority_text" type="string">
+  Prioritätsstufe.
+</ResponseField>
+
+<ResponseField name="report_date" type="date">
+  Datum der Erstellung der Meldung.
+</ResponseField>
+
+## offers
+
+`GET /operations/offers` — Preisangebote, die Kreditoren für eine Arbeit einreichen.
+
+<ResponseField name="offer_hdr_id" type="integer" required>
+  Eindeutige Angebots-ID. `orders` referenziert dies als `offer_hdr_id`.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer" required>
+  Kreditor, der das Angebot einreicht. Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="string">
+  Einheit, auf die sich das Angebot bezieht, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="offer_value" type="number">
+  Gesamtwert des Angebots.
+</ResponseField>
+
+<ResponseField name="offer_type" type="string">
+  Art des Angebots.
+</ResponseField>
+
+<ResponseField name="status_text" type="string">
+  Aktueller Status des Angebots.
+</ResponseField>
+
+<ResponseField name="offer_accepted" type="boolean">
+  Ob das Angebot angenommen wurde.
+</ResponseField>
+
+## orders
+
+`GET /operations/orders` — beauftragte Arbeitsaufträge.
+
+<ResponseField name="order_id" type="integer" required>
+  Eindeutige Auftrags-ID.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="offer_hdr_id" type="integer">
+  Angebot, aus dem dieser Auftrag erstellt wurde. Referenziert `offers.offer_hdr_id`.
+</ResponseField>
+
+<ResponseField name="creditor_number" type="integer">
+  Kreditor, der die Arbeit ausführt.
+</ResponseField>
+
+<ResponseField name="to_hdr_id" type="integer">
+  Technisches Objekt, auf das sich der Auftrag bezieht, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="report_hdr_id" type="integer">
+  Ursprüngliche Meldung, falls der Auftrag aus einer solchen erstellt wurde.
+</ResponseField>
+
+<ResponseField name="order_type" type="string">
+  Auftragsart.
+</ResponseField>
+
+<ResponseField name="total_net" type="number">
+  Gesamter Nettowert des Auftrags.
+</ResponseField>
+
+<ResponseField name="total_gross" type="number">
+  Gesamter Bruttowert des Auftrags.
+</ResponseField>
+
+<ResponseField name="cost_center_id" type="string">
+  Kostenstelle, gegen die der Auftrag gebucht wird.
+</ResponseField>
+
+<ResponseField name="invoice_status" type="string">
+  Rechnungsstatus des Auftrags.
+</ResponseField>
+
+## projects
+
+`GET /operations/projects` — Investitionsprojekte und größere Vorhaben mit mehreren
+Aufträgen.
+
+<ResponseField name="project_hdr_id" type="integer" required>
+  Eindeutige Projekt-ID.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Hauptkreditor für das Projekt.
+</ResponseField>
+
+<ResponseField name="offer_hdr_id" type="integer">
+  Zugehöriges Angebot, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="to_hdr_id" type="integer">
+  Zugehöriges technisches Objekt, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="project_id" type="string">
+  Projektnummer.
+</ResponseField>
+
+<ResponseField name="project_type" type="string">
+  Projektart.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Aktueller Projektstatus.
+</ResponseField>
+
+<ResponseField name="project_budget" type="number">
+  Gesamtes Budget für das Projekt.
+</ResponseField>
+
+<ResponseField name="percentage_completed" type="number">
+  Fertigstellungsgrad in Prozent.
+</ResponseField>
+
+<ResponseField name="project_begin_date" type="date">
+  Startdatum des Projekts.
+</ResponseField>
+
+<ResponseField name="project_end_date" type="date">
+  Enddatum des Projekts.
+</ResponseField>
+
+<Tip>
+  `hierarchy_1` bis `hierarchy_20` beschreiben die Position des Projekts in einer
+  Kostenaufschlüsselungs-Hierarchie — die meisten Integrationen benötigen nur
+  `hierarchy_1`/`hierarchy_2` für die Gruppierung auf oberster Ebene.
+</Tip>

@@ -1,0 +1,81 @@
+---
+title: "Pagination in der Trassets Data API"
+sidebarTitle: "Pagination"
+description: "Die Trassets Data API nutzt Offset-Pagination für Category-Endpunkte und Cursor-Pagination für Raw-Endpunkte. Erfahre, wie du zuverlässig durch große Datensätze paginierst."
+---
+
+Die Trassets Data API nutzt zwei Pagination-Strategien, abhängig vom Endpunkt-Typ. Category-Endpunkte unterstützen Offset-basierte Pagination, die für Dashboards und inkrementelle Abrufe einfach und vorhersehbar ist. Raw-Endpunkte nutzen Cursor-basierte Pagination, die auch dann stabil bleibt, wenn sich die zugrunde liegenden Daten während eines Bulk-Exports ändern.
+
+## Pagination für Category-Endpunkte
+
+Category-Endpunkte akzeptieren die Query-Parameter `limit` und `offset`. Die API liefert Pagination-Metadaten in Response-Headern, sodass du Links zur nächsten und vorherigen Seite bauen kannst, ohne den Response-Body zu parsen.
+
+<ResponseField name="X-Total-Count" type="integer">
+  Gesamtzahl der Zeilen, die der Query entsprechen, unabhängig von `limit` und `offset`.
+</ResponseField>
+
+<ResponseField name="X-Has-More" type="string">
+  `"true"` oder `"false"` — gibt an, ob über die aktuelle Seite hinaus weitere Zeilen existieren.
+</ResponseField>
+
+<ResponseField name="X-Next-Offset" type="integer">
+  Der Offset für die nächste Seite. Nur vorhanden, wenn `X-Has-More` gleich `"true"` ist.
+</ResponseField>
+
+<ResponseField name="X-Next-Cursor" type="string">
+  Ein undurchsichtiger Cursor für die nächste Seite. Nur vorhanden, wenn eine vollständige Seite zurückgegeben wurde. Du kannst diesen anstelle von `offset` als `cursor`-Query-Parameter im nächsten Request übergeben.
+</ResponseField>
+
+Dieses Beispiel ruft Seite 2 mit einem Offset von 100 ab:
+
+```bash
+curl -G "https://api.trassets.ai/property/properties" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=100" \
+  -d "offset=100"
+```
+
+## Pagination für Raw-Endpunkte
+
+Raw-Endpunkte nutzen Cursor-basierte Pagination über den Query-Parameter `cursor`. Der Cursor-Wert stammt aus dem `next_cursor`-Feld im Response-Body. Cursor sind stabil gegenüber gleichzeitigen Schreibvorgängen, sodass Zeilen, die während eines Bulk-Exports hinzugefügt oder entfernt werden, keine Duplikate oder Lücken verursachen.
+
+Der Response-Body enthält diese Felder:
+
+<ResponseField name="data" type="array">
+  Das Array der Zeilen für die aktuelle Seite.
+</ResponseField>
+
+<ResponseField name="count" type="integer">
+  Anzahl der Zeilen auf der aktuellen Seite.
+</ResponseField>
+
+<ResponseField name="next_cursor" type="string | null">
+  Der Cursor, der für die nächste Seite übergeben werden soll. Wenn `null`, wurden alle Zeilen abgerufen.
+</ResponseField>
+
+<ResponseField name="total_rows" type="integer">
+  Gesamtzahl der Zeilen in der Tabelle.
+</ResponseField>
+
+Die Antwort enthält außerdem einen `X-Snapshot-At`-Header mit dem ISO-8601-Zeitstempel des letzten erfolgreichen Syncs für diese Tabelle.
+
+Dieses Beispiel ruft die erste Seite ab und nutzt dann den Cursor, um fortzufahren:
+
+```bash
+# First page
+curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=5000"
+
+# Next page (use the next_cursor value from the previous response)
+curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=5000" \
+  -d "cursor=eyJjb2wiOiAiY29udHJhY3RfaWQiLCAidmFsIjogMX0="
+```
+
+Wenn `next_cursor` `null` ist, ist der Export abgeschlossen.
+
+<Note>
+  Der maximale Offset für Category-Endpunkte beträgt 500.000. Wenn du mehr Zeilen exportieren musst, als das erlaubt, wechsle zu einem Raw-Endpunkt oder wende Filter an, um die Ergebnismenge zu reduzieren.
+</Note>

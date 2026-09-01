@@ -1,0 +1,226 @@
+---
+title: "Accounting Datenmodell: Hauptbuch- und Budget-Entitäten"
+sidebarTitle: "Accounting"
+description: "Erkunde die fünf Accounting-Tabellen der Trassets Data API — Konten, Buchungsköpfe, Buchungspositionen, Budgets und Kontenmapping-Bereiche — mit echten Feldnamen."
+---
+
+Die Accounting-Domäne enthält die Hauptbuch- und Budgetdaten für dein Portfolio. Nutze
+diese Endpunkte, um Kontenplan-Informationen, einzelne Buchungen, Budgetpläne und
+Kontenmapping-Bereiche abzurufen.
+
+## accounts
+
+`GET /accounting/accounts` — der Kontenplan.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="account_hdr_id" type="integer" required>
+  Interne Konto-ID. Wird von `booking_positions` und `budgets` als `account_hdr_id`
+  referenziert.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Kontonummer.
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Kontoname.
+</ResponseField>
+
+<ResponseField name="account_id_name_concat" type="string">
+  Kombinierte Kontonummer und -name für die Anzeige.
+</ResponseField>
+
+<ResponseField name="category" type="string">
+  Kontokategorie.
+</ResponseField>
+
+<ResponseField name="account_type_name" type="string">
+  Lesbarer Kontotyp.
+</ResponseField>
+
+<ResponseField name="account_group" type="string">
+  Kontogruppenzuordnung. Steht in Beziehung zu `kontenmapping_ranges`, wird aber nicht
+  daraus abgeleitet.
+</ResponseField>
+
+<ResponseField name="account_balance_type" type="string">
+  Bilanzseiten-Code für das Konto.
+</ResponseField>
+
+<ResponseField name="account_balance_type_name" type="string">
+  Lesbare Bilanzseite (Aktiva vs. Passiva).
+</ResponseField>
+
+<ResponseField name="cashflow" type="string">
+  Cashflow-Klassifizierung des Kontos.
+</ResponseField>
+
+## booking_header
+
+`GET /accounting/booking_header` — Hauptbuch-Buchungsköpfe. Jeder Kopf gruppiert
+zusammengehörige Positionen.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="bko_hdr_id" type="integer" required>
+  Eindeutige ID des Buchungskopfs. `booking_positions` referenziert dies als
+  `booking_hdr_id`.
+</ResponseField>
+
+<ResponseField name="booking_nr" type="string">
+  Buchungsnummer.
+</ResponseField>
+
+<ResponseField name="join_key" type="string">
+  Verbindet diese Buchung mit einer Kostenstelle oder Einheit in
+  `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="person_id" type="string">
+  Mit der Buchung verknüpfter Mieter oder Ansprechpartner.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Datum der Buchung.
+</ResponseField>
+
+<ResponseField name="booking_value" type="number">
+  Gesamtwert des Buchungskopfs.
+</ResponseField>
+
+<ResponseField name="m2" type="number">
+  Mit der Buchung verbundene Fläche in Quadratmetern, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="booking_text" type="string">
+  Freitextbeschreibung der Buchung.
+</ResponseField>
+
+## booking_positions
+
+`GET /accounting/booking_positions` — einzelne Buchungspositionen. Jede Position gehört
+über `booking_hdr_id` zu genau einem Buchungskopf.
+
+<ResponseField name="booking_position_hdr_id" type="integer" required>
+  Eindeutige ID der Position.
+</ResponseField>
+
+<ResponseField name="booking_hdr_id" type="integer" required>
+  ID des übergeordneten Buchungskopfs. Verknüpft sich mit `booking_header.bko_hdr_id`.
+</ResponseField>
+
+<ResponseField name="account_hdr_id" type="integer" required>
+  Konto, auf das die Position gebucht wird. Verknüpft sich mit `accounts.account_hdr_id`.
+</ResponseField>
+
+<ResponseField name="contra_account_id" type="string">
+  Gegenkonto für die Buchung.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Zusammengesetzter Schlüssel, der den Mieter identifiziert, auf den sich diese Buchung
+  bezieht.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="join_key" type="string">
+  Verbindet diese Buchung mit einer Kostenstelle oder Einheit in
+  `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="booking_sum_net" type="number">
+  Nettobetrag der Position.
+</ResponseField>
+
+<ResponseField name="booking_sum_tax" type="number">
+  Steuerbetrag der Position.
+</ResponseField>
+
+<ResponseField name="booking_sum_gross" type="number">
+  Bruttobetrag inklusive Steuer.
+</ResponseField>
+
+<ResponseField name="net_m2" type="number">
+  Nettobetrag, pro Quadratmeter normalisiert.
+</ResponseField>
+
+<ResponseField name="gross_m2" type="number">
+  Bruttobetrag, pro Quadratmeter normalisiert.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Datum der Buchung.
+</ResponseField>
+
+## budgets
+
+`GET /accounting/budgets` — Budgetbeträge, eine Zeile pro Objekt, Konto und Monat.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="account_hdr_id" type="integer" required>
+  Konto, auf das sich das Budget bezieht. Verknüpft sich mit `accounts.account_hdr_id`.
+</ResponseField>
+
+<ResponseField name="account_id" type="string">
+  Kontonummer.
+</ResponseField>
+
+<ResponseField name="date" type="date" required>
+  Monat, auf den sich die Budgetzeile bezieht.
+</ResponseField>
+
+<ResponseField name="budget" type="number" required>
+  Budgetbetrag für den spezifischen Monat und das Konto.
+</ResponseField>
+
+## kontenmapping_ranges
+
+`GET /accounting/kontenmapping_ranges` — Kontenbereich-zu-Position-Mappings, die zur
+Gruppierung von Konten für das Reporting genutzt werden.
+
+<ResponseField name="property_min" type="integer" required>
+  Untere Grenze des Objektbereichs, für den dieses Mapping gilt.
+</ResponseField>
+
+<ResponseField name="property_max" type="integer" required>
+  Obere Grenze des Objektbereichs, für den dieses Mapping gilt.
+</ResponseField>
+
+<ResponseField name="start_konto" type="integer" required>
+  Beginn des Kontonummernbereichs (inklusive).
+</ResponseField>
+
+<ResponseField name="end_konto" type="integer" required>
+  Ende des Kontonummernbereichs (inklusive).
+</ResponseField>
+
+<ResponseField name="position" type="string">
+  Reporting-Position, unter der der Kontenbereich gruppiert wird.
+</ResponseField>
+
+<Note>
+  Dieser Endpunkt liefert Bereichsdefinitionen, keine einzelnen Konten. Er beantwortet
+  „zu welcher Reporting-Position gehört Konto X für Objekt Y" über eine
+  Bereichssuche (`start_konto <= account <= end_konto` und
+  `property_min <= property_id <= property_max`), nicht über eine direkte
+  Fremdschlüssel-Verknüpfung.
+</Note>

@@ -1,0 +1,156 @@
+---
+title: "Property Datenmodell: Objekte, Struktur und technische Anlagen"
+sidebarTitle: "Property"
+description: "Verstehe die Property-Domäne der Trassets Data API: Objekte, den Objektstrukturbaum, Objekt-Kreditor-Dienstleistungen und technische Objekte."
+---
+
+Die Property-Domäne ist das strukturelle Fundament der API. Jede Zeile jeder anderen Domäne
+führt `property_id`, das sich auf einen Datensatz in `properties` zurückführen lässt. Nutze
+diese Domäne, um Objekte, ihre interne Struktur (Einheiten, Kostenstellen), zugewiesene
+Dienstleister und technische/gemessene Objekte abzurufen.
+
+## properties
+
+`GET /property/properties` — eine Zeile pro Objekt.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID. Der primäre Verknüpfungsschlüssel über alle Domänen hinweg.
+</ResponseField>
+
+<ResponseField name="sk_properties" type="integer">
+  Interner Surrogatschlüssel. Nicht stabil über Daten-Reloads hinweg — verknüpfe über
+  `property_id`, nicht über dieses Feld.
+</ResponseField>
+
+<ResponseField name="property_id_name" type="string">
+  Kombiniertes Anzeigelabel: Objekt-ID und Name.
+</ResponseField>
+
+<ResponseField name="obj_name" type="string">
+  Objektname.
+</ResponseField>
+
+<ResponseField name="entrance_1" type="string">
+  Primäre Gebäudeeingangs-/Straßenadresskomponente. Es gibt bis zu fünf Eingangsfelder
+  (`entrance_1`–`entrance_5`) für Objekte mit mehreren Eingängen.
+</ResponseField>
+
+<ResponseField name="adr1_combined" type="string">
+  Kombinierte Adresszeile.
+</ResponseField>
+
+<ResponseField name="postcode" type="string">
+  Postleitzahl.
+</ResponseField>
+
+<ResponseField name="city" type="string">
+  Stadt.
+</ResponseField>
+
+```bash Example request
+curl "https://api.trassets.ai/property/properties?limit=1" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+```
+
+## property_structure
+
+`GET /property/property_structure` — der Hierarchiebaum, der Gebäude, Kostenstellen und
+Flächen verbindet. Dies ist die Bridge-Tabelle für den Rest der API: Buchungs- und
+Mietvertragsdaten verknüpfen sich über `join_key` mit einer bestimmten Einheit oder
+Kostenstelle, nicht direkt über `floor_area_id`.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="join_key" type="string" required>
+  Bridge-Key. Entspricht `account_id` für Kostenstellenknoten oder `floor_area_id` für
+  Flächenknoten. `Accounting.booking_header` und `Accounting.booking_positions` verknüpfen
+  sich über `join_key` mit dieser Tabelle.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Flächen-ID, wenn dieser Knoten eine Einheit statt einer Kostenstelle repräsentiert.
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Anzeigename des Strukturknotens (Kostenstellen- oder Einheitenname).
+</ResponseField>
+
+<ResponseField name="account_type" type="string">
+  Knotentyp — unterscheidet Kostenstellen von Flächen.
+</ResponseField>
+
+<Tip>
+  `property_structure` hat selbst keinen natürlichen einspaltigen Primärschlüssel —
+  `join_key` ist pro Objekt eindeutig, behandle also `(property_id, join_key)` als effektiven
+  Schlüssel bei Deduplizierung oder Verknüpfung.
+</Tip>
+
+## property_creditor_services
+
+`GET /property/property_creditor_services` — welcher Kreditor welche Dienstleistung für ein
+Objekt erbringt und ob diese Zuweisung exklusiv ist.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer" required>
+  Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="service_id" type="integer" required>
+  Identifiziert den Dienstleistungstyp.
+</ResponseField>
+
+<ResponseField name="service" type="string">
+  Name der Dienstleistung (z. B. Reinigung, Aufzugswartung).
+</ResponseField>
+
+<ResponseField name="exclusivity" type="string">
+  Ob der Kreditor eine exklusive Zuweisung für diese Dienstleistung bei diesem Objekt hält.
+</ResponseField>
+
+## technical_objects
+
+`GET /property/technical_objects` — technische/gemessene Installationen an einem Objekt
+(Aufzüge, Heizungsanlagen, Zähler und ähnliche Anlagen).
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Fläche, in der das technische Objekt installiert ist, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Für das Objekt verantwortlicher Wartungskreditor. Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="to_id" type="integer" required>
+  ID des technischen Objekts.
+</ResponseField>
+
+<ResponseField name="to_nr" type="string">
+  Nummer des technischen Objekts.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Objektname.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Objekttyp.
+</ResponseField>
+
+<ResponseField name="built_date" type="date">
+  Installations-/Baudatum.
+</ResponseField>
+
+<Note>
+  Es gibt keinen separaten Endpunkt für Zählerstände. Eine `technical_objects`-Zeile kann
+  einen Zähler repräsentieren, aber dieser Endpunkt liefert nur die Stammdaten des Objekts
+  (Typ, Standort, verantwortlicher Kreditor) — keine Verbrauchsablesungen.
+</Note>

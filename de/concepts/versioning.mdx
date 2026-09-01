@@ -1,0 +1,35 @@
+---
+title: "API-Versionierungsrichtlinie für die Trassets Data API"
+sidebarTitle: "Versionierung"
+description: "Die Trassets Data API nutzt aktuell eine Basis-URL ohne Versionspräfix. URL-Versionierung unter /v1/ ist geplant, aber bis dahin können Breaking Changes auftreten."
+---
+
+Die Trassets Data API wird derzeit über den Basis-Pfad ohne Versionspräfix bereitgestellt. URL-Versionierung unter `/v1/` ist für ein kommendes Release geplant; ab diesem Zeitpunkt werden Breaking Changes nur noch unter einem neuen Versionspfad eingeführt. Bis die Versionierung vollständig durchgesetzt ist, kann die API Breaking Changes ohne separaten Versionspfad erhalten.
+
+## Aktueller Stand
+
+Heute sind alle Endpunkte direkt unter der Basis-URL verfügbar:
+
+```text
+https://api.trassets.ai/accounting/accounts
+https://api.trassets.ai/raw/ixhaus_contracts
+https://api.trassets.ai/changes
+```
+
+Die OpenAPI-Spezifikation referenziert in einigen Beispielen bereits `/v1/`, aber das versionierte Präfix wird auf Gateway-Ebene noch nicht erzwungen.
+
+## Kommende Versionierung
+
+Sobald die URL-Versionierung live ist, wird der Standardpfad zu:
+
+```text
+https://api.trassets.ai/v1/accounting/accounts
+```
+
+Breaking Changes (wie umbenannte Felder, entfernte Query-Parameter oder veränderte Response-Formate) werden dann unter einem neuen Präfix wie `/v2/` eingeführt. Bestehende Integrationen auf älteren Versionen funktionieren weiterhin ohne Änderungen.
+
+<Warning>
+  Bis `/v1/` erzwungen wird, können Breaking Changes auf den aktuellen Basis-Pfaden auftreten. Beobachte die Release Notes und teste deine Integrationen nach jedem angekündigten Update. Kontaktiere den Trassets-Support, falls du Migrationshilfe für einen Breaking Change benötigst.
+</Warning>
+
+Um vorbereitet zu bleiben, abonniere die Trassets Release Notes und halte deinen Integrationscode flexibel genug, um sich an neue Felder oder Parameteränderungen anzupassen.
