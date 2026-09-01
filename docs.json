@@ -30,6 +30,7 @@
                 "pages": [
                   "concepts/endpoint-types",
                   "concepts/pagination",
+                  "concepts/sync-cycle",
                   "concepts/errors",
                   "concepts/rate-limits",
                   "concepts/versioning"
