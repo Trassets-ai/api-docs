@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "luma",
   "name": "Trassets Data API",
   "colors": {
     "primary": "#5D18A7",
@@ -11,34 +11,75 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
-        "pages": [
-          "index",
-          "quickstart",
-          "authentication",
-          "endpoint-types",
-          "pagination",
-          "errors",
-          "versioning",
-          "field-glossary",
-          "get-api-key"
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "index",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/endpoint-types",
+              "concepts/pagination",
+              "concepts/errors",
+              "concepts/rate-limits",
+              "concepts/versioning"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/incremental-sync",
+              "guides/bulk-export",
+              "guides/delta-sync"
+            ]
+          },
+          {
+            "group": "Data Model",
+            "pages": [
+              "data-model/overview",
+              "data-model/real-estates",
+              "data-model/contracts",
+              "data-model/accounting",
+              "data-model/meters",
+              "data-model/market-data",
+              "data-model/field-glossary"
+            ]
+          }
         ]
       },
       {
         "tab": "API Reference",
-        "openapi": "https://api.trassets.ai/openapi.json"
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "https://api.trassets.ai/openapi.json"
+          }
+        ]
       }
     ]
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/images/trassets-logo.0ewzc69h3t_z_.svg",
+    "dark": "/images/trassets-logo-dark.svg",
+    "href": "https://www.trassets.ai/"
   },
   "navbar": {
     "links": [
       {
-        "label": "Portal",
-        "href": "https://portal.api.trassets.ai"
+        "href": "https://portal.api.trassets.ai",
+        "label": "Portal"
       }
     ],
     "primary": {

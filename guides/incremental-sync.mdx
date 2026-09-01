@@ -1,0 +1,44 @@
+---
+title: "Incrementally sync real-estate data with Trassets"
+description: "Fetch only changed data using offset pagination and category endpoints to keep a local copy of Trassets data up to date without re-fetching everything."
+sidebarTitle: "Incremental Sync"
+---
+
+Use the Trassets Data API category endpoints to maintain a continuously updated local copy of your data without transferring every row on each run. Offset-based pagination provides predictable resumption points across scheduled syncs.
+
+<Steps>
+  <Step title="Fetch the first page">
+    Start with `limit=1000` and `offset=0`. The example uses the `/realestates/objects` endpoint, but the pattern works for any category endpoint.
+
+    ```bash
+    curl -s "https://api.trassets.ai/v1/realestates/objects?limit=1000&offset=0" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+  </Step>
+  <Step title="Check the pagination headers">
+    Inspect the response headers after each request:
+
+    - `X-Has-More`: `"true"` if additional pages exist
+    - `X-Next-Offset`: the offset to use for the next page (present only when `X-Has-More` is `"true"`)
+    - `X-Total-Count`: total rows available for the current query
+
+    If `X-Has-More` is `"true"`, increment the offset by your limit and repeat until you reach the end.
+  </Step>
+  <Step title="Store the next offset for the next run">
+    Persist the value of `X-Next-Offset` from the last successful request. On the next scheduled sync, start from this stored offset instead of zero to avoid re-fetching rows you already have.
+
+    For example, if the previous run ended at offset `4000`, your next run begins with:
+
+    ```bash
+    curl -s "https://api.trassets.ai/v1/realestates/objects?limit=1000&offset=4000" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+  </Step>
+  <Step title="Reset when the data changes significantly">
+    If you detect a schema change, a full reload requirement, or a large gap between syncs, reset your stored offset to `0` and pull the full dataset again.
+  </Step>
+</Steps>
+
+<Tip>
+  Before running a full incremental fetch, check the [`/changes`](/guides/delta-sync) endpoint to discover which tables have been updated since your last sync. Skip any tables that have not changed to save requests and stay within the 500 req/h rate limit.
+</Tip>

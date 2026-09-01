@@ -1,0 +1,13 @@
+---
+title: "Meters Data Model: Utility Readings and Consumption"
+sidebarTitle: "Meters"
+description: "Understand the Meters data model in the Trassets Data API, covering utility meter readings and consumption linked to property_id and floor_area_id."
+---
+
+The Meters domain contains utility meter readings and consumption data for your properties. Use this data to track energy, water, or other utility consumption across your portfolio and to attribute usage to individual units or floor areas.
+
+Meter records are linked to properties and units through the same join keys used across the API. `property_id` identifies the property a meter belongs to, and `floor_area_id` (referencing the property\_structure table) lets you connect consumption data to specific units or floor areas for granular reporting.
+
+<Note>
+  The exact endpoint names and response schemas for Meters are defined in the OpenAPI specification. See the **API Reference** tab for the full list of Meters endpoints, request parameters, and response fields.
+</Note>

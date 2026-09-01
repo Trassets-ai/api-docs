@@ -1,0 +1,35 @@
+---
+title: "API Versioning Policy for the Trassets Data API"
+sidebarTitle: "Versioning"
+description: "Trassets Data API currently uses a base URL without a version prefix. URL versioning under /v1/ is planned, but breaking changes may occur until then."
+---
+
+The Trassets Data API is currently served from the base path without a version prefix. URL versioning under `/v1/` is planned for an upcoming release, at which point breaking changes will only be introduced under a new version path. Until versioning is fully enforced, the API may receive breaking changes without a separate version path.
+
+## Current State
+
+Today, all endpoints are available directly under the base URL:
+
+```text
+https://api.trassets.ai/accounting/accounts
+https://api.trassets.ai/raw/ixhaus_contracts
+https://api.trassets.ai/changes
+```
+
+The OpenAPI spec already references `/v1/` in some examples, but the versioned prefix is not yet enforced at the gateway level.
+
+## Upcoming Versioning
+
+Once URL versioning is live, the standard path will become:
+
+```text
+https://api.trassets.ai/v1/accounting/accounts
+```
+
+Breaking changes (such as renamed fields, removed query parameters, or altered response shapes) will then be introduced under a new prefix such as `/v2/`. Existing integrations on older versions will continue to work without modification.
+
+<Warning>
+  Until `/v1/` is enforced, breaking changes may occur on the current base paths. Monitor release notes and test integrations after any announced update. Contact Trassets support if you need migration guidance for a breaking change.
+</Warning>
+
+To stay prepared, subscribe to the Trassets release notes and keep your integration code flexible enough to adapt to field additions or parameter changes.

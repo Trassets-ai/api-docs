@@ -1,0 +1,92 @@
+---
+title: "Bulk export a full table with Raw endpoints"
+description: "Use /raw/{table_name} to export all rows from a source table for warehousing or analytics using cursor-based pagination and consistent snapshots."
+sidebarTitle: "Bulk Export"
+---
+
+Export an entire source table from the Trassets Data API into your warehouse or analytics pipeline. Raw endpoints return unfiltered rows from the underlying database with cursor-based pagination and snapshot consistency headers.
+
+<Steps>
+  <Step title="List available tables">
+    Call `GET /raw/tables` to discover which tables are available, their primary keys, row counts, and sync status.
+
+    ```bash
+    curl -s "https://api.trassets.ai/v1/raw/tables" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Example response:
+
+    ```json
+    [
+      {
+        "table_name": "ixhaus_contracts",
+        "primary_key": "contract_id",
+        "status": "synced",
+        "row_count": 12500,
+        "last_sync_at": "2026-04-10T08:00:00"
+      }
+    ]
+    ```
+  </Step>
+  <Step title="Start the export">
+    Request the first page of the table you want. Set `limit` up to the maximum of `10000`.
+
+    ```bash
+    curl -s "https://api.trassets.ai/v1/raw/ixhaus_contracts?limit=10000" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Example response:
+
+    ```json
+    {
+      "data": [
+        { "contract_id": 1, "tenant": "Müller GmbH" }
+      ],
+      "count": 1,
+      "next_cursor": "eyJjb2wiOiAiY29udHJhY3RfaWQiLCAidmFsIjogMX0=",
+      "table_name": "ixhaus_contracts",
+      "total_rows": 12500
+    }
+    ```
+  </Step>
+  <Step title="Paginate with the cursor">
+    Pass the `next_cursor` value into the `cursor` query parameter for each subsequent request. Repeat until `next_cursor` is `null`.
+
+    ```bash
+    #!/bin/bash
+    TABLE="ixhaus_contracts"
+    CURSOR=""
+    
+    while true; do
+      if [ -z "$CURSOR" ]; then
+        RESP=$(curl -s "https://api.trassets.ai/v1/raw/${TABLE}?limit=10000" \
+          -H "X-API-Key: $TRASSETS_API_KEY")
+      else
+        RESP=$(curl -s "https://api.trassets.ai/v1/raw/${TABLE}?limit=10000&cursor=${CURSOR}" \
+          -H "X-API-Key: $TRASSETS_API_KEY")
+      fi
+    
+      echo "$RESP" | jq '.data[]'
+    
+      CURSOR=$(echo "$RESP" | jq -r '.next_cursor')
+      if [ "$CURSOR" = "null" ] || [ -z "$CURSOR" ]; then
+        break
+      fi
+    done
+    ```
+  </Step>
+  <Step title="Verify snapshot consistency">
+    Check the `X-Snapshot-At` response header on every page. All rows within a single cursor sequence are consistent as of that timestamp. If the header changes between pages, start the export over to ensure a single snapshot view.
+
+    ```bash
+    curl -sI "https://api.trassets.ai/v1/raw/ixhaus_contracts?limit=10000" \
+      -H "X-API-Key: $TRASSETS_API_KEY" | grep -i x-snapshot-at
+    ```
+  </Step>
+</Steps>
+
+<Note>
+  Cursor sequences remain stable under concurrent writes. Because raw tables can receive updates during a long export, `X-Snapshot-At` tells you which sync version each page belongs to. For a guaranteed single-snapshot export, retry from the beginning if the snapshot timestamp differs across pages.
+</Note>

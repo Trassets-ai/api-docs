@@ -1,0 +1,53 @@
+---
+title: "Category and Raw Endpoints Explained"
+sidebarTitle: "Endpoint Types"
+description: "Trassets Data API offers two endpoint types: normalized category endpoints for dashboards and raw endpoints for bulk warehouse syncs. Choose the right one for your use case."
+---
+
+The Trassets Data API exposes your real-estate data through two distinct endpoint types. Each type is optimized for a different integration pattern: category endpoints serve normalized, business-ready data that you can query directly, while raw endpoints expose full source tables for bulk replication and data warehousing.
+
+## Category Endpoints
+
+Category endpoints follow the path pattern `/{category}/{api_table}` and return denormalized, business-ready data that is pre-filtered to your customer scope.
+
+Use these endpoints for day-to-day integrations, dashboards, and incremental data fetches. They support [offset-based pagination](/concepts/pagination) with `limit` and `offset` query parameters, and they return pagination metadata in response headers such as `X-Total-Count`, `X-Has-More`, `X-Next-Offset`, and `X-Next-Cursor`.
+
+Example request to a category endpoint:
+
+```bash
+curl -G "https://api.trassets.ai/realestates/objects" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=10" \
+  -d "offset=0"
+```
+
+## Raw Endpoints
+
+Raw endpoints follow the path pattern `/raw/{table_name}` and return full, unfiltered source tables exactly as they exist in the replication layer.
+
+Use these endpoints for bulk synchronization, full-table exports, and loading data into a data warehouse. They support [cursor-based pagination](/concepts/pagination) via the `cursor` query parameter and a `next_cursor` field in the response body. The maximum page size is 10,000 rows. The response includes an `X-Snapshot-At` header that tells you the sync timestamp for the current snapshot.
+
+Example request to a raw endpoint:
+
+```bash
+curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=5000"
+```
+
+To continue paginating, pass the `next_cursor` value from the previous response as the `cursor` parameter on the next request. When `next_cursor` is `null`, you have fetched every row in the table.
+
+## Comparison
+
+| Aspect | Category Endpoints | Raw Endpoints |
+| --- | --- | --- |
+| Path | `/{category}/{api_table}` | `/raw/{table_name}` |
+| Data | Normalized, business-ready | Full source table, unfiltered |
+| Pagination | Offset-based (`limit`/`offset`) | Cursor-based (`cursor`/`next_cursor`) |
+| Max page size | 100,000 rows | 10,000 rows |
+| Best for | Dashboards, incremental fetches | Bulk sync, data warehousing |
+| Headers | `X-Total-Count`, `X-Has-More`, `X-Next-Offset`, `X-Next-Cursor` | `X-Snapshot-At` |
+
+<Tip>
+  Use category endpoints for day-to-day operational queries and raw endpoints for full-table replication into your data warehouse. If you only need a subset of records, category endpoints will be faster and easier to paginate.
+</Tip>

@@ -1,14 +1,44 @@
 ---
-title: "Quickstart"
-description: "Vom API-Key zum ersten erfolgreichen Request"
+title: "Get started with the Trassets Data API"
+description: "Learn how to request an API key and make your first call to the Trassets Data API in three steps."
+sidebarTitle: "Quickstart"
 ---
 
-```bash
-export TRASSETS_API_KEY="sk_live_…"
-curl "https://api.trassets.ai/v1/realestates/objects?limit=1" \
-  -H "X-API-Key: $TRASSETS_API_KEY"
-```
+This guide gets you from zero to a successful API call in a few minutes. You need a Unix-like shell with curl installed.
 
-<Note>
-  Noch keinen API-Key? Siehe [API-Key beantragen](/get-api-key).
-</Note>
+<Steps>
+  <Step title="Request an API key">
+    Visit [portal.api.trassets.ai](https://portal.api.trassets.ai) and create an account. Generate an API key and store it securely. The plaintext key is shown only once.
+  </Step>
+  <Step title="Make your first request">
+    Set your key as an environment variable and query the real-estate objects endpoint with a small page size.
+
+    ```bash
+    export TRASSETS_API_KEY="sk_live_…"
+    curl "https://api.trassets.ai/v1/realestates/objects?limit=1" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    The API returns a JSON array of objects. A typical response looks like this:
+
+    ```json
+    [
+      {
+        "property_id": 42,
+        "entrance": "Musterstrasse 12",
+        "address": "10115, Berlin",
+        "floor_area_id": "fa-123",
+        "property_type": "residential",
+        "construction_year": 2010
+      }
+    ]
+    ```
+
+    Success! You have authenticated and fetched your first row of real-estate data.
+  </Step>
+  <Step title="Next steps">
+    - Read [Authentication](/authentication) for key management and access tiers.
+    - Explore [Endpoint Types](/concepts/endpoint-types) to learn when to use category endpoints versus raw endpoints.
+    - Browse the [API Reference Overview](/api-reference/introduction) for the full endpoint list.
+  </Step>
+</Steps>
