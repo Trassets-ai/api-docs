@@ -1,0 +1,8 @@
+---
+title: "Authentication"
+description: "X-API-Key Header und Scope"
+---
+
+Send your API key on every request as the `X-API-Key` header.
+The key determines the customer scope and access tiers.
+Trassets stores only an HMAC-SHA-256 hash — the plaintext key is never shown again after creation.
