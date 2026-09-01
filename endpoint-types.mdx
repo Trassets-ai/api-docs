@@ -1,0 +1,20 @@
+---
+title: "Endpoint Types"
+description: "Category Endpoints vs. Raw Endpoints"
+---
+
+## Category Endpoints — `/{category}/{api_table}`
+
+Normalized master data and business queries. Use these for day-to-day integrations.
+
+- **Pagination:** Offset-based (`limit` / `offset` query parameters)
+- **Data character:** Normalized, business-ready data
+- **Use case:** Business queries, dashboards, incremental data fetches
+
+## Raw Endpoints — `/raw/{table_name}`
+
+Full table access for bulk sync and export.
+
+- **Pagination:** Cursor-based (`cursor` query parameter from `next_cursor` in response)
+- **Data character:** Raw source data, unfiltered
+- **Use case:** Bulk sync, full exports, data warehousing
