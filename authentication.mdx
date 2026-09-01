@@ -1,0 +1,62 @@
+---
+title: "Authenticate requests to the Trassets Data API"
+sidebarTitle: "Authentication"
+description: "Learn how to obtain and use API keys for the Trassets Data API, and understand the authentication errors you may encounter."
+---
+
+The Trassets Data API uses a simple API-key scheme. You pass your key in the `X-API-Key` header on every request. The key determines which customer scope and data tiers you can access.
+
+## Obtaining a key
+
+Sign up at [portal.api.trassets.ai](https://portal.api.trassets.ai) and generate an API key from the dashboard. The plaintext key is displayed exactly once. Copy it immediately and store it in a secure secrets manager. If you lose it, you must revoke the old key and create a new one.
+
+## Passing the key in requests
+
+Include the `X-API-Key` header on every call. Here is a minimal curl example:
+
+```bash
+curl "https://api.trassets.ai/v1/realestates/objects?limit=1" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+```
+
+## Key storage and security
+
+Trassets never stores your API key in plaintext. Only an HMAC-SHA-256 hash is retained on our servers for verification. This means we cannot recover or display a key after creation.
+
+Treat your key like a password:
+
+- Do not commit it to version control.
+- Rotate keys regularly from the portal.
+- Scope each key to the minimum access tier your integration needs.
+
+## Authentication errors
+
+If the key is missing, invalid, or does not have the required access tier, the API returns an RFC 7807 problem response.
+
+### 401 Unauthorized
+
+```json
+{
+  "type": "about:blank",
+  "title": "Unauthorized",
+  "status": 401,
+  "detail": "API key required",
+  "instance": "/realestates/objects"
+}
+```
+
+This means the request did not include a valid `X-API-Key` header, or the supplied key is disabled.
+
+### 403 Forbidden
+
+```json
+{
+  "type": "about:blank",
+  "title": "Forbidden",
+  "status": 403,
+  "detail": "Invalid or disabled API key",
+  "instance": "/realestates/objects"
+}
+```
+
+A 403 response indicates that the key exists but the requested endpoint or data tier is not included in your subscription. Contact your account administrator or upgrade your plan in the portal.

@@ -1,0 +1,36 @@
+---
+title: "Rate Limits for the Trassets Data API"
+sidebarTitle: "Rate Limits"
+description: "Trassets Data API allows 500 requests per hour per API key. Learn how to handle 429 responses and minimize unnecessary requests with delta sync."
+---
+
+The Trassets Data API enforces a rate limit of **500 requests per hour per API key**. Every request counts toward this limit, including retries and polling calls. When you exceed the limit, the API returns a 429 status code and you must wait until the current hour window resets before making additional requests.
+
+## 429 Response Example
+
+When you hit the rate limit, the API responds with an RFC 7807 problem JSON body:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Too Many Requests",
+  "status": 429,
+  "detail": "Rate limit exceeded: 500 per 1 hour",
+  "instance": "/realestates/objects"
+}
+```
+
+## Handling Rate Limits
+
+If you receive a 429 response, implement an exponential backoff strategy:
+
+1. Stop sending new requests immediately.
+2. Wait at least 60 seconds before the first retry.
+3. Double the wait time on each subsequent retry if the 429 persists.
+4. Resume normal request spacing once requests succeed again.
+
+For long-running sync jobs, spread requests evenly across the hour instead of bursting at the start. For example, a job that issues one request every 7 seconds will stay safely under the 500 request limit.
+
+<Tip>
+  Use the [Delta Sync endpoint](/guides/delta-sync) (`GET /changes`) to poll for changed tables instead of repeatedly querying every endpoint. This lets you skip endpoints that have not changed since your last sync, reducing your overall request volume.
+</Tip>

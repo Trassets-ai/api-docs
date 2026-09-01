@@ -1,0 +1,69 @@
+---
+title: "Trassets Data API Reference: Endpoints Overview"
+sidebarTitle: "Introduction"
+description: "Overview of the Trassets Data API: base URL, authentication, endpoint types, pagination, errors, and versioning."
+---
+
+The Trassets Data API is a REST interface for real-estate and market data. Base URL: `https://api.trassets.ai`. Send your API key in the `X-API-Key` header on every request. All responses are JSON unless noted otherwise.
+
+## Endpoint types
+
+The API offers two endpoint families. Choose the one that fits your use case.
+
+| Type | Path pattern | Pagination | Use case |
+| --- | --- | --- | --- |
+| Category endpoints | `/{category}/{api_table}` | Offset-based (`limit` / `offset`) plus cursor support | Business queries, dashboards, incremental fetches |
+| Raw endpoints | `/raw/{table_name}` | Cursor-based (`cursor` from `next_cursor` in body) | Bulk sync, full exports, data warehousing |
+
+### Category endpoints
+
+Category endpoints return normalized, business-ready data. They support `limit` and `offset` query parameters, with metadata returned in response headers:
+
+- `X-Total-Count` — total rows matching the query
+- `X-Has-More` — `"true"` or `"false"`
+- `X-Next-Offset` — the offset for the next page
+- `X-Next-Cursor` — an opaque cursor when a full page is returned
+
+### Raw endpoints
+
+Raw endpoints expose full source tables, unfiltered. Pagination is cursor-based via the `cursor` query parameter, taken from the `next_cursor` field in the response body. Maximum page size is 10,000 rows. The `X-Snapshot-At` header tells you the timestamp of the last successful sync for that table, so every row in a cursor sequence is consistent as of that snapshot.
+
+## Error format
+
+Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`application/problem+json`). Every error object contains `type`, `title`, `status`, `detail`, and `instance`. See [Errors](/concepts/errors) for a full list of status codes and retry guidance.
+
+## Versioning
+
+The API currently lives at the base path. URL versioning under `/v1/` is planned but not enforced yet. Until versioning is active, breaking changes may occur. We recommend pinning your integration to the documented behavior and monitoring the changelog for updates.
+
+## Endpoint groups
+
+<CardGroup cols={2}>
+  <Card title="Real Estates" icon="building" href="/api-reference/real-estates">
+    Properties, units, and structural data.
+  </Card>
+
+  <Card title="Contracts" icon="file-contract" href="/api-reference/contracts">
+    Rental debits, service contracts, and lease terms.
+  </Card>
+
+  <Card title="Accounting" icon="calculator" href="/api-reference/accounting">
+    Bookings, budgets, and account mappings.
+  </Card>
+
+  <Card title="Meters" icon="bolt" href="/api-reference/meters">
+    Utility and consumption metering data.
+  </Card>
+
+  <Card title="Market Data" icon="chart-line" href="/api-reference/market-data">
+    External market indicators and benchmarks.
+  </Card>
+
+  <Card title="Raw Data" icon="database" href="/api-reference/raw-data">
+    Full source tables for bulk export.
+  </Card>
+
+  <Card title="Delta Sync" icon="arrows-rotate" href="/api-reference/delta-sync">
+    Detect changed tables since a timestamp.
+  </Card>
+</CardGroup>

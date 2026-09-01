@@ -1,0 +1,87 @@
+---
+title: "Contracts Data Model: Leases, Debits, and Services"
+sidebarTitle: "Contracts"
+description: "Explore the Contracts domain in the Trassets Data API, covering rental debits, debit diffs, service contracts, and contract ends with key fields and usage notes."
+---
+
+The Contracts domain contains rental, debit, and service contract data for your properties. Use these endpoints to retrieve time-series debit positions, monthly deviations, service agreement details, and lease end information.
+
+## contract\_debits
+
+The `/contracts/contract_debits` endpoint returns rental debit positions as a time series. Each record represents a scheduled debit with a validity interval and links to the floor area it applies to.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier. Filter and join key across domains.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="string">
+  References floor\_area\_id in the property\_structure table. Use to join with unit data.
+</ResponseField>
+
+<ResponseField name="debit_type" type="string">
+  Category of the debit, for example rent or ancillary charges.
+</ResponseField>
+
+<ResponseField name="amount" type="number">
+  The debit amount for the validity interval.
+</ResponseField>
+
+<Tip>
+  Use floor\_area\_id to join debit data with the property structure so you can aggregate debits by unit or floor area.
+</Tip>
+
+## contract\_debit\_diffs
+
+The `/contracts/contract_debit_diffs` endpoint returns monthly deviations between the debit target and the actual account movements. Use this to reconcile planned debits against realised cash flow.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="net_amount" type="number">
+  Net deviation amount for the period.
+</ResponseField>
+
+<ResponseField name="tax_amount" type="number">
+  Tax portion of the deviation.
+</ResponseField>
+
+<ResponseField name="gross_amount" type="number">
+  Gross deviation amount including tax.
+</ResponseField>
+
+## service\_contracts
+
+The `/contracts/service_contracts` endpoint returns maintenance and service contracts, expanded to monthly rows. Each row represents a month of contract duration with financial and counterparty details.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string">
+  Identifies the service provider or vendor.
+</ResponseField>
+
+<ResponseField name="contract_value" type="number">
+  Monthly or periodic contract value depending on the row granularity.
+</ResponseField>
+
+## contract\_ends
+
+The `/contracts/contract_ends` endpoint returns lease end dates and extension options. Use this to track upcoming expiries, deadlines for exercising options, and the current exercise status.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="valid_from" type="date">
+  Start of the validity interval for the lease end record.
+</ResponseField>
+
+<ResponseField name="valid_until" type="date">
+  End of the validity interval for the lease end record.
+</ResponseField>
+
+<ResponseField name="exercise_status" type="string">
+  Indicates whether an extension option has been exercised, declined, or is still pending.
+</ResponseField>

@@ -1,0 +1,81 @@
+---
+title: "Pagination in the Trassets Data API"
+sidebarTitle: "Pagination"
+description: "Trassets Data API uses offset pagination for category endpoints and cursor pagination for raw endpoints. Learn how to paginate through large datasets reliably."
+---
+
+The Trassets Data API uses two pagination strategies depending on the endpoint type. Category endpoints support offset-based pagination, which is simple and predictable for dashboards and incremental fetches. Raw endpoints use cursor-based pagination, which stays stable even when the underlying data changes during a bulk export.
+
+## Category Endpoint Pagination
+
+Category endpoints accept `limit` and `offset` query parameters. The API returns pagination metadata in response headers so you can build next and previous page links without parsing the response body.
+
+<ResponseField name="X-Total-Count" type="integer">
+  Total number of rows matching the query, ignoring `limit` and `offset`.
+</ResponseField>
+
+<ResponseField name="X-Has-More" type="string">
+  `"true"` or `"false"` — indicates whether more rows exist beyond the current page.
+</ResponseField>
+
+<ResponseField name="X-Next-Offset" type="integer">
+  The offset to use for the next page. Only present when `X-Has-More` is `"true"`.
+</ResponseField>
+
+<ResponseField name="X-Next-Cursor" type="string">
+  An opaque cursor for the next page. Present only when a full page was returned. You can pass this as the `cursor` query parameter on the next request instead of using `offset`.
+</ResponseField>
+
+This example fetches page 2 with an offset of 100:
+
+```bash
+curl -G "https://api.trassets.ai/realestates/objects" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=100" \
+  -d "offset=100"
+```
+
+## Raw Endpoint Pagination
+
+Raw endpoints use cursor-based pagination via the `cursor` query parameter. The cursor value comes from the `next_cursor` field in the response body. Cursors are stable under concurrent writes, so rows added or removed during a bulk export will not cause duplicates or gaps.
+
+The response body contains these fields:
+
+<ResponseField name="data" type="array">
+  The array of rows for the current page.
+</ResponseField>
+
+<ResponseField name="count" type="integer">
+  Number of rows in the current page.
+</ResponseField>
+
+<ResponseField name="next_cursor" type="string | null">
+  The cursor to pass for the next page. When `null`, all rows have been fetched.
+</ResponseField>
+
+<ResponseField name="total_rows" type="integer">
+  Total number of rows in the table.
+</ResponseField>
+
+The response also includes an `X-Snapshot-At` header with the ISO-8601 timestamp of the last successful sync for this table.
+
+This example fetches the first page and then uses the cursor to continue:
+
+```bash
+# First page
+curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=5000"
+
+# Next page (use the next_cursor value from the previous response)
+curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=5000" \
+  -d "cursor=eyJjb2wiOiAiY29udHJhY3RfaWQiLCAidmFsIjogMX0="
+```
+
+When `next_cursor` is `null`, the export is complete.
+
+<Note>
+  The maximum offset for category endpoints is 500,000. If you need to export more rows than that, switch to a raw endpoint or apply filters to reduce the result set.
+</Note>
