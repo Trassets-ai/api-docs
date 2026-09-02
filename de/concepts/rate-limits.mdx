@@ -22,10 +22,12 @@ Wenn du das Rate-Limit erreichst, antwortet die API mit einem RFC-7807-Problem-J
 
 ## Umgang mit Rate-Limits
 
-Wenn du eine 429-Antwort erhältst, implementiere eine Exponential-Backoff-Strategie:
+Jede Antwort enthält die Header `X-RateLimit-Limit` und `X-RateLimit-Remaining`, mit denen du proaktiv drosseln kannst, statt auf einen 429 zu warten.
+
+Wenn du dennoch eine 429-Antwort erhältst, nutze den `Retry-After`-Header, statt eine Wartezeit zu schätzen:
 
 1. Stoppe sofort das Senden neuer Requests.
-2. Warte mindestens 60 Sekunden vor dem ersten erneuten Versuch.
+2. Lies den `Retry-After`-Header — er gibt die genaue Anzahl Sekunden bis zum Zurücksetzen des aktuellen Fensters an. Warte mindestens so lange, bevor du es erneut versuchst.
 3. Verdopple die Wartezeit bei jedem weiteren Versuch, falls der 429-Fehler weiterhin auftritt.
 4. Nimm den normalen Request-Abstand wieder auf, sobald Requests wieder erfolgreich sind.
 

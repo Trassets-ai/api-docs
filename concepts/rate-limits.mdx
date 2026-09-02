@@ -22,10 +22,12 @@ When you hit the rate limit, the API responds with an RFC 7807 problem JSON body
 
 ## Handling Rate Limits
 
-If you receive a 429 response, implement an exponential backoff strategy:
+Every response includes `X-RateLimit-Limit` and `X-RateLimit-Remaining` headers so you can throttle proactively instead of waiting for a 429.
+
+If you do receive a 429 response, use the `Retry-After` header instead of guessing a wait time:
 
 1. Stop sending new requests immediately.
-2. Wait at least 60 seconds before the first retry.
+2. Read the `Retry-After` header — it gives the exact number of seconds until the current window resets. Wait at least that long before retrying.
 3. Double the wait time on each subsequent retry if the 429 persists.
 4. Resume normal request spacing once requests succeed again.
 

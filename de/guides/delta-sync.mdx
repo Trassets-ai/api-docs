@@ -6,6 +6,10 @@ sidebarTitle: "Delta Sync"
 
 Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne jeden Endpunkt abzurufen. Der Endpunkt `GET /changes` der Trassets Data API liefert Metadaten für geänderte Tabellen und unterstützt bedingte Requests über ETag, um Polling zu überspringen, wenn nichts Neues vorliegt.
 
+<Tip>
+  Frage `/changes` alle 15–60 Minuten ab. Der zugrunde liegende Sync läuft als täglicher Batch — häufigeres Abfragen liefert keine neueren Daten, sondern verbraucht nur mehr von deinem 500-Requests/h-Budget. Kombiniere das mit dem `since`/ETag-Muster weiter unten, damit unveränderte Abfragen günstig bleiben.
+</Tip>
+
 <Steps>
   <Step title="Geänderte Tabellen abfragen">
     Sende einen `GET`-Request an `/changes` mit einem ISO-8601-UTC-Zeitstempel `since`. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL.

@@ -6,6 +6,10 @@ sidebarTitle: "Delta Sync"
 
 Discover which tables have been updated since your last sync without fetching every endpoint. The Trassets Data API `GET /changes` endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
 
+<Tip>
+  Poll `/changes` every 15–60 minutes. The underlying sync runs as a daily batch, so polling more often will not surface newer data — it only spends more of your 500 req/h budget. Combine this with the `since`/ETag pattern below so unchanged polls stay cheap.
+</Tip>
+
 <Steps>
   <Step title="Poll for changed tables">
     Send a `GET` request to `/changes` with an ISO-8601 UTC `since` timestamp. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL.
