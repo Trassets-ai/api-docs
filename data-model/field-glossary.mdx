@@ -17,6 +17,12 @@ This glossary defines field names that appear across multiple endpoints in the T
 | `creditor_id` | string | Identifies a creditor (vendor or service provider) |
 | `booking_date` | date | ISO-8601 date of the ledger booking |
 | `next_cursor` | string | Opaque cursor for Raw endpoint pagination; null when all rows are fetched |
+| `join_key` | string | Bridge key produced by `property_structure`; equals `account_id` for cost-centre nodes or `floor_area_id` for floor-area nodes. Used to join bookings and tenancy data to a specific unit or cost centre. |
+| `floor_area_person_id` | integer | Composite key identifying a specific tenant in a specific unit. Appears in `Contracts.contract_debits` and `Contracts.contract_ends`. |
+| `property_id_person_id` | integer | Composite key identifying a specific tenant at property level, without unit granularity. Appears in `Contracts.contract_debits` and `Contracts.contract_debit_diffs`. |
+| `account_id` | string | Ledger account reference. Links `Contracts` debit records to `Accounting`. |
+| `contract_id` | integer | Contract identifier. Appears in `Contracts.service_contracts` and related contract records. |
+| `controct_prolongation_months` | integer | Extension length in months, in `Contracts.contract_ends`. The field name reflects a spelling irregularity in the underlying source system (`controct`, not `contract`) — not a typo in this documentation. |
 
 <Note>
   Fields prefixed with `sk_` are internal surrogate keys used for joins in the underlying data warehouse. They are not stable identifiers for external use and should not be relied on in your integrations.
