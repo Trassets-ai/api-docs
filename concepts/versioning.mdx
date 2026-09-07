@@ -1,7 +1,7 @@
 ---
 title: "API Versioning Policy for the Trassets Data API"
 sidebarTitle: "Versioning"
-description: "Trassets Data API currently uses a base URL without a version prefix. URL versioning under /v1/ is planned, but breaking changes may occur until then."
+description: "Trassets Data API currently uses a base URL without a version prefix. URL versioning under /v1/ is planned; unversioned paths will be deprecated with a sunset window once /v1/ ships."
 ---
 
 The Trassets Data API is currently served from the base path without a version prefix. URL versioning under `/v1/` is planned for an upcoming release, at which point breaking changes will only be introduced under a new version path. Until versioning is fully enforced, the API may receive breaking changes without a separate version path.
@@ -26,10 +26,10 @@ Once URL versioning is live, the standard path will become:
 https://api.trassets.ai/v1/accounting/accounts
 ```
 
-Breaking changes (such as renamed fields, removed query parameters, or altered response shapes) will then be introduced under a new prefix such as `/v2/`. Existing integrations on older versions will continue to work without modification.
+The current unversioned paths will keep working for a deprecation window after `/v1/` ships, then be sunset {/* TODO: sunset date, pending API team rollout confirmation */}. Breaking changes (such as renamed fields, removed query parameters, or altered response shapes) will then be introduced only under a new prefix such as `/v2/`, never on an already-shipped version.
 
 <Warning>
-  Until `/v1/` is enforced, breaking changes may occur on the current base paths. Monitor release notes and test integrations after any announced update. Contact Trassets support if you need migration guidance for a breaking change.
+  Until `/v1/` is enforced, breaking changes may occur on the current base paths. Monitor release notes and test integrations after any announced update. Once `/v1/` ships, migrate before the sunset date — unversioned paths will stop working, not redirect. Contact Trassets support if you need migration guidance.
 </Warning>
 
 To stay prepared, subscribe to the Trassets release notes and keep your integration code flexible enough to adapt to field additions or parameter changes.
