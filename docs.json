@@ -9,7 +9,11 @@
   },
   "favicon": "/favicon.ico",
   "navigation": {
-    "languages": [
+    "versions": [
+      {
+        "version": "Current",
+        "default": true,
+        "languages": [
       {
         "language": "en",
         "default": true,
@@ -136,6 +140,47 @@
               {
                 "group": "Endpunkte",
                 "openapi": "https://api.trassets.ai/openapi.json"
+              }
+            ]
+          }
+        ]
+      }
+        ]
+      },
+      {
+        "version": "v1",
+        "tag": "Preview",
+        "languages": [
+          {
+            "language": "en",
+            "default": true,
+            "tabs": [
+              {
+                "tab": "Documentation",
+                "groups": [
+                  {
+                    "group": "Overview",
+                    "pages": [
+                      "v1/overview"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "language": "de",
+            "tabs": [
+              {
+                "tab": "Dokumentation",
+                "groups": [
+                  {
+                    "group": "Übersicht",
+                    "pages": [
+                      "de/v1/overview"
+                    ]
+                  }
+                ]
               }
             ]
           }
