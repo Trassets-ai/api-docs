@@ -171,7 +171,10 @@
                 "groups": [
                   {
                     "group": "Endpoints",
-                    "openapi": "https://api.trassets.ai/openapi-v1.json"
+                    "openapi": {
+                      "source": "https://api.trassets.ai/openapi-v1.json",
+                      "directory": "v1/api-reference"
+                    }
                   }
                 ]
               }
@@ -196,7 +199,10 @@
                 "groups": [
                   {
                     "group": "Endpunkte",
-                    "openapi": "https://api.trassets.ai/openapi-v1.json"
+                    "openapi": {
+                      "source": "https://api.trassets.ai/openapi-v1.json",
+                      "directory": "v1/api-reference"
+                    }
                   }
                 ]
               }
