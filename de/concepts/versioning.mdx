@@ -1,7 +1,7 @@
 ---
 title: "API-Versionierungsrichtlinie für die Trassets Data API"
 sidebarTitle: "Versionierung"
-description: "Die Trassets Data API nutzt aktuell eine Basis-URL ohne Versionspräfix. URL-Versionierung unter /v1/ ist geplant, aber bis dahin können Breaking Changes auftreten."
+description: "Die Trassets Data API nutzt aktuell eine Basis-URL ohne Versionspräfix. URL-Versionierung unter /v1/ ist geplant; unversionierte Pfade werden mit einem Sunset-Fenster abgekündigt, sobald /v1/ live ist."
 ---
 
 Die Trassets Data API wird derzeit über den Basis-Pfad ohne Versionspräfix bereitgestellt. URL-Versionierung unter `/v1/` ist für ein kommendes Release geplant; ab diesem Zeitpunkt werden Breaking Changes nur noch unter einem neuen Versionspfad eingeführt. Bis die Versionierung vollständig durchgesetzt ist, kann die API Breaking Changes ohne separaten Versionspfad erhalten.
@@ -26,10 +26,10 @@ Sobald die URL-Versionierung live ist, wird der Standardpfad zu:
 https://api.trassets.ai/v1/accounting/accounts
 ```
 
-Breaking Changes (wie umbenannte Felder, entfernte Query-Parameter oder veränderte Response-Formate) werden dann unter einem neuen Präfix wie `/v2/` eingeführt. Bestehende Integrationen auf älteren Versionen funktionieren weiterhin ohne Änderungen.
+Die aktuellen unversionierten Pfade funktionieren nach dem Start von `/v1/` noch für ein Deprecation-Fenster weiter und werden danach abgeschaltet {/* TODO: Sunset-Datum, sobald API-Team Rollout bestätigt */}. Breaking Changes (wie umbenannte Felder, entfernte Query-Parameter oder veränderte Response-Formate) werden danach ausschließlich unter einem neuen Präfix wie `/v2/` eingeführt, nie auf einer bereits veröffentlichten Version.
 
 <Warning>
-  Bis `/v1/` erzwungen wird, können Breaking Changes auf den aktuellen Basis-Pfaden auftreten. Beobachte die Release Notes und teste deine Integrationen nach jedem angekündigten Update. Kontaktiere den Trassets-Support, falls du Migrationshilfe für einen Breaking Change benötigst.
+  Bis `/v1/` erzwungen wird, können Breaking Changes auf den aktuellen Basis-Pfaden auftreten. Beobachte die Release Notes und teste deine Integrationen nach jedem angekündigten Update. Sobald `/v1/` live ist: Migriere vor dem Sunset-Datum — unversionierte Pfade werden dann abgeschaltet, nicht weitergeleitet. Kontaktiere den Trassets-Support, falls du Migrationshilfe benötigst.
 </Warning>
 
 Um vorbereitet zu bleiben, abonniere die Trassets Release Notes und halte deinen Integrationscode flexibel genug, um sich an neue Felder oder Parameteränderungen anzupassen.
