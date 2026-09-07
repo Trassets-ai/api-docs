@@ -165,6 +165,15 @@
                     ]
                   }
                 ]
+              },
+              {
+                "tab": "API Reference",
+                "groups": [
+                  {
+                    "group": "Endpoints",
+                    "openapi": "https://api.trassets.ai/openapi-v1.json"
+                  }
+                ]
               }
             ]
           },
@@ -179,6 +188,15 @@
                     "pages": [
                       "de/v1/overview"
                     ]
+                  }
+                ]
+              },
+              {
+                "tab": "API-Referenz",
+                "groups": [
+                  {
+                    "group": "Endpunkte",
+                    "openapi": "https://api.trassets.ai/openapi-v1.json"
                   }
                 ]
               }
