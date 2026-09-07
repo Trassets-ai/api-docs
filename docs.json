@@ -132,6 +132,10 @@
                 "pages": [
                   "de/api-reference/introduction"
                 ]
+              },
+              {
+                "group": "Endpunkte",
+                "openapi": "https://api.trassets.ai/openapi.json"
               }
             ]
           }
@@ -145,12 +149,7 @@
     "href": "https://www.trassets.ai/"
   },
   "navbar": {
-    "links": [
-      {
-        "href": "https://portal.api.trassets.ai",
-        "label": "Portal"
-      }
-    ],
+    "links": [],
     "primary": {
       "type": "button",
       "label": "API-Key beantragen",
