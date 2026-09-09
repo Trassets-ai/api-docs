@@ -74,7 +74,10 @@
               },
               {
                 "group": "Endpoints",
-                "openapi": "https://api.trassets.ai/openapi.json"
+                "openapi": {
+                  "source": "https://api.trassets.ai/openapi.json",
+                  "overlays": ["overlays/add-servers.yaml"]
+                }
               }
             ]
           }
@@ -139,7 +142,10 @@
               },
               {
                 "group": "Endpunkte",
-                "openapi": "https://api.trassets.ai/openapi.json"
+                "openapi": {
+                  "source": "https://api.trassets.ai/openapi.json",
+                  "overlays": ["overlays/add-servers.yaml"]
+                }
               }
             ]
           }
@@ -173,7 +179,8 @@
                     "group": "Endpoints",
                     "openapi": {
                       "source": "https://api.trassets.ai/openapi-v1.json",
-                      "directory": "v1/api-reference"
+                      "directory": "v1/api-reference",
+                      "overlays": ["overlays/add-servers.yaml"]
                     }
                   }
                 ]
@@ -201,7 +208,8 @@
                     "group": "Endpunkte",
                     "openapi": {
                       "source": "https://api.trassets.ai/openapi-v1.json",
-                      "directory": "v1/api-reference"
+                      "directory": "v1/api-reference",
+                      "overlays": ["overlays/add-servers.yaml"]
                     }
                   }
                 ]
