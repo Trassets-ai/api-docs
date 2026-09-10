@@ -1,7 +1,7 @@
 overlay: 1.0.0
 info:
   title: Add live server to Trassets Data API specs
-  version: 1.0.0
+  version: 1.0.1
 actions:
   - target: "$"
     description: Point the "Try it out" playground at the live API host
