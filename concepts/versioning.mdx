@@ -25,7 +25,7 @@ https://api.trassets.ai/v1/accounting/budgets
 A table only gets a `/v1/` route once it has passed review against the [response shape conventions](/v1/overview) — check the **API Reference** tab under the `v1` version selector (generated from the live `openapi-v1.json`) for the current list, rather than assuming a table is already migrated.
 
 <Warning>
-  Because most tables are still unversioned, breaking changes (renamed fields, removed query parameters, altered response shapes) can still occur on base paths that have no `/v1/` counterpart yet. Once a table has a `/v1/` route, it is treated as versioned: further breaking changes to that table land only under a new prefix such as `/v2/`, never on an already-shipped path.
+  Because most tables are still unversioned, breaking changes (renamed fields, removed query parameters, altered response shapes) can still occur on base paths that have no `/v1/` counterpart yet. Once a table has a `/v1/` route, the intent is to treat it as versioned — further breaking changes would land under a new prefix such as `/v2/`, not on the already-shipped path. That intent has not yet been tested against a real case, so treat it as the goal rather than a guarantee for now.
 </Warning>
 
 ## Migrating incrementally
@@ -34,6 +34,6 @@ There is no bulk cutover planned. Migrate table by table, as each one appears un
 
 1. Check whether `/v1/{category}/{api_table}` exists for the table you use.
 2. If it does, switch to it — the response shape may differ from the base path (see [Response Shape Conventions](/v1/overview#response-shape-conventions)).
-3. If it doesn't yet, keep using the base path; it continues to work unchanged until a `/v1/` route is published for that table.
+3. If it doesn't yet, keep using the base path for now — no bulk cutover is planned, but breaking changes remain possible there (see the Warning above) until a `/v1/` route is published for that table.
 
 To stay prepared, subscribe to the Trassets release notes and keep your integration code flexible enough to adapt to field additions, parameter changes, and — for tables not yet under `/v1/` — occasional response shape changes without a version bump.
