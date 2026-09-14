@@ -34,7 +34,7 @@ Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versioning
 
-The API currently lives at the base path. URL versioning under `/v1/` is planned but not enforced yet. Once `/v1/` ships, the unversioned base path keeps working for a limited deprecation window before it is sunset — see [Versioning](/concepts/versioning) for the full policy. Until versioning is active, breaking changes may occur. We recommend pinning your integration to the documented behavior and monitoring the changelog for updates.
+Tables are migrated to `/v1/` one at a time, alongside the unversioned base path — both work today, with no redirect and no confirmed sunset date for unversioned paths yet. See [Versioning](/concepts/versioning) for the current rollout state and how to migrate incrementally. On base paths without a `/v1/` counterpart, breaking changes may still occur.
 
 ## Endpoint groups
 

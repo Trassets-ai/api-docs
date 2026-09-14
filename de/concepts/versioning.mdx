@@ -25,7 +25,7 @@ https://api.trassets.ai/v1/accounting/budgets
 Eine Tabelle bekommt erst dann eine `/v1/`-Route, wenn sie das Review gegen die [Konventionen für die Response-Struktur](/de/v1/overview) durchlaufen hat — die aktuelle Liste steht im Tab **API-Referenz** unter dem `v1`-Versionsumschalter (generiert aus der Live-`openapi-v1.json`), nicht einfach annehmen, dass eine Tabelle bereits migriert ist.
 
 <Warning>
-  Da die meisten Tabellen noch unversioniert sind, können auf Basis-Pfaden ohne `/v1/`-Pendant weiterhin Breaking Changes auftreten (umbenannte Felder, entfernte Query-Parameter, veränderte Response-Formate). Sobald eine Tabelle eine `/v1/`-Route hat, gilt sie als versioniert: weitere Breaking Changes für diese Tabelle landen dann nur noch unter einem neuen Präfix wie `/v2/`, nie auf einem bereits veröffentlichten Pfad.
+  Da die meisten Tabellen noch unversioniert sind, können auf Basis-Pfaden ohne `/v1/`-Pendant weiterhin Breaking Changes auftreten (umbenannte Felder, entfernte Query-Parameter, veränderte Response-Formate). Sobald eine Tabelle eine `/v1/`-Route hat, ist die Absicht, sie als versioniert zu behandeln: weitere Breaking Changes würden dann unter einem neuen Präfix wie `/v2/` landen, nicht auf dem bereits veröffentlichten Pfad. Diese Absicht wurde noch nicht an einem echten Fall getestet — aktuell eher Zielbild als Garantie.
 </Warning>
 
 ## Schrittweise migrieren
@@ -34,6 +34,6 @@ Es ist keine Sammel-Umstellung geplant. Migriere Tabelle für Tabelle, sobald si
 
 1. Prüfen, ob `/v1/{category}/{api_table}` für die genutzte Tabelle existiert.
 2. Falls ja: umstellen — die Response-Struktur kann vom Basis-Pfad abweichen (siehe die Konventionen-Tabelle auf der [v1-Übersichtsseite](/de/v1/overview)).
-3. Falls noch nicht: weiterhin den Basis-Pfad nutzen — er funktioniert unverändert weiter, bis eine `/v1/`-Route für diese Tabelle veröffentlicht wird.
+3. Falls noch nicht: vorerst weiterhin den Basis-Pfad nutzen — eine Sammel-Umstellung ist nicht geplant, aber Breaking Changes bleiben dort möglich (siehe Warnhinweis oben), bis eine `/v1/`-Route für diese Tabelle veröffentlicht wird.
 
 Um vorbereitet zu bleiben, abonniere die Trassets Release Notes und halte deinen Integrationscode flexibel genug, um sich an neue Felder, Parameteränderungen und — bei noch nicht auf `/v1/` migrierten Tabellen — gelegentliche Response-Struktur-Änderungen ohne Versionssprung anzupassen.

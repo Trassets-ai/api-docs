@@ -34,7 +34,7 @@ Fehler folgen [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versionierung
 
-Die API liegt derzeit auf dem Basis-Pfad. URL-Versionierung unter `/v1/` ist geplant, aber noch nicht verbindlich. Sobald `/v1/` live ist, funktioniert der unversionierte Basis-Pfad noch für ein begrenztes Deprecation-Fenster weiter, bevor er abgeschaltet wird — siehe [Versionierung](/de/concepts/versioning) für die vollständige Richtlinie. Solange die Versionierung nicht aktiv ist, können Breaking Changes auftreten. Wir empfehlen, deine Integration am dokumentierten Verhalten auszurichten und den Changelog auf Updates zu beobachten.
+Tabellen werden schrittweise nach `/v1/` migriert, parallel zum unversionierten Basis-Pfad — beide funktionieren heute, ohne Weiterleitung und ohne bestätigtes Sunset-Datum für unversionierte Pfade. Siehe [Versionierung](/de/concepts/versioning) für den aktuellen Rollout-Stand und die schrittweise Migration. Auf Basis-Pfaden ohne `/v1/`-Pendant können weiterhin Breaking Changes auftreten.
 
 ## Endpunkt-Gruppen
 
