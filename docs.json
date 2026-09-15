@@ -165,7 +165,7 @@
                 "tab": "Documentation",
                 "groups": [
                   {
-                    "group": "Overview",
+                    "group": "Get Started",
                     "pages": [
                       "v1/overview"
                     ]
@@ -214,7 +214,7 @@
                 "tab": "Dokumentation",
                 "groups": [
                   {
-                    "group": "Übersicht",
+                    "group": "Erste Schritte",
                     "pages": [
                       "de/v1/overview"
                     ]
