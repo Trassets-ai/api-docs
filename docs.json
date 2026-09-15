@@ -167,8 +167,7 @@
                   {
                     "group": "Overview",
                     "pages": [
-                      "v1/overview",
-                      "index"
+                      "v1/overview"
                     ]
                   },
                   {
@@ -217,8 +216,7 @@
                   {
                     "group": "Übersicht",
                     "pages": [
-                      "de/v1/overview",
-                      "de/index"
+                      "de/v1/overview"
                     ]
                   },
                   {
