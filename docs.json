@@ -167,7 +167,28 @@
                   {
                     "group": "Overview",
                     "pages": [
-                      "v1/overview"
+                      "v1/overview",
+                      "index"
+                    ]
+                  },
+                  {
+                    "group": "Core Concepts",
+                    "pages": [
+                      "concepts/errors",
+                      "concepts/rate-limits",
+                      "concepts/sync-cycle"
+                    ]
+                  },
+                  {
+                    "group": "Data Model",
+                    "pages": [
+                      "data-model/accounting",
+                      "data-model/contracts",
+                      "data-model/depreciation",
+                      "data-model/field-glossary",
+                      "data-model/operations",
+                      "data-model/overview",
+                      "data-model/stakeholder"
                     ]
                   }
                 ]
@@ -196,7 +217,28 @@
                   {
                     "group": "Übersicht",
                     "pages": [
-                      "de/v1/overview"
+                      "de/v1/overview",
+                      "de/index"
+                    ]
+                  },
+                  {
+                    "group": "Kernkonzepte",
+                    "pages": [
+                      "de/concepts/errors",
+                      "de/concepts/rate-limits",
+                      "de/concepts/sync-cycle"
+                    ]
+                  },
+                  {
+                    "group": "Datenmodell",
+                    "pages": [
+                      "de/data-model/accounting",
+                      "de/data-model/contracts",
+                      "de/data-model/depreciation",
+                      "de/data-model/field-glossary",
+                      "de/data-model/operations",
+                      "de/data-model/stakeholder",
+                      "de/data-model/overview"
                     ]
                   }
                 ]
