@@ -173,6 +173,7 @@
                   {
                     "group": "Core Concepts",
                     "pages": [
+                      "v1/response-shape-conventions",
                       "concepts/errors",
                       "concepts/rate-limits",
                       "concepts/sync-cycle"
@@ -222,6 +223,7 @@
                   {
                     "group": "Kernkonzepte",
                     "pages": [
+                      "de/v1/response-shape-conventions",
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
                       "de/concepts/sync-cycle"
