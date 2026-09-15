@@ -1,0 +1,22 @@
+---
+title: "Response Shape Conventions for /v1/"
+sidebarTitle: "Response Shape Conventions"
+description: "Target response shape conventions for /v1/ tables — period and amount objects, arrays instead of numbered columns, code+label pairs, and flat ID fields."
+---
+
+The unversioned API returns database tables largely as-is — flat rows with sync-pipeline artifacts, numbered repeating columns, and inconsistent field types. `/v1/` is moving away from that, one reviewed table at a time. These are the target conventions; **most `/v1/` tables do not fully follow them yet** (see the note below).
+
+| Convention | Before | After |
+|---|---|---|
+| Date ranges become a `period` object | `"date_begin": "2013-04-01", "date_end": "2017-01-31"` | `"period": {"start": "2013-04-01", "end": "2017-01-31"}` |
+| Money fields become an `amount` object | `"booking_sum_net": 327.0, "booking_sum_tax": 0.0, "booking_sum_gross": 327.0` | `"amount": {"net": 327.0, "tax": 0.0, "gross": 327.0}` |
+| Numbered repeating columns become an array | `"hierarchy_1": "17 10 01", "hierarchy_2": "17 10 01.06", "hierarchy_3": null, …` | `"hierarchy": ["17 10 01", "17 10 01.06"]` |
+| Code+label pairs become one object | `"exclusivity_id": 0, "exclusivity": "Vorschlag"` | `"exclusivity": {"code": 0, "label": "Vorschlag"}` |
+| Sync-pipeline artifacts are dropped | `"recommended_join_key": "1204"`, `"property_id_account_number": 1101410500` | removed entirely — join on the real ID fields instead |
+| ID fields stay flat, always | — | `property_id`, `account_id`, `floor_area_id`, etc. are never nested, in any table — this is what keeps records joinable across endpoints |
+
+The last row is the one guarantee that holds across every other change: whatever else gets restructured, the ID fields you already use to cross-reference records between endpoints stay exactly where they are.
+
+<Note>
+  Full rationale and open questions: [ADR-0003](https://github.com/Trassets-ai/trassets-data-api/pull/192) (status: Proposed) in the `trassets-data-api` repository.
+</Note>

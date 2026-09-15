@@ -165,7 +165,7 @@
                 "tab": "Documentation",
                 "groups": [
                   {
-                    "group": "Overview",
+                    "group": "Get Started",
                     "pages": [
                       "v1/overview"
                     ]
@@ -173,6 +173,7 @@
                   {
                     "group": "Core Concepts",
                     "pages": [
+                      "v1/response-shape-conventions",
                       "concepts/errors",
                       "concepts/rate-limits",
                       "concepts/sync-cycle"
@@ -214,7 +215,7 @@
                 "tab": "Dokumentation",
                 "groups": [
                   {
-                    "group": "Übersicht",
+                    "group": "Erste Schritte",
                     "pages": [
                       "de/v1/overview"
                     ]
@@ -222,6 +223,7 @@
                   {
                     "group": "Kernkonzepte",
                     "pages": [
+                      "de/v1/response-shape-conventions",
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
                       "de/concepts/sync-cycle"
