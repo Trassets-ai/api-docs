@@ -1,14 +1,14 @@
 ---
 title: "API-Versionierungsrichtlinie für die Trassets Data API"
 sidebarTitle: "Versionierung"
-description: "Die Trassets Data API nutzt aktuell eine Basis-URL ohne Versionspräfix. URL-Versionierung unter /v1/ ist geplant; unversionierte Pfade werden mit einem Sunset-Fenster abgekündigt, sobald /v1/ live ist."
+description: "Die Trassets Data API rollt /v1/-Pfadversionierung schrittweise pro Tabelle aus, parallel zur bestehenden unversionierten Basis-URL. Für unversionierte Pfade steht noch kein Sunset-Datum fest."
 ---
 
-Die Trassets Data API wird derzeit über den Basis-Pfad ohne Versionspräfix bereitgestellt. URL-Versionierung unter `/v1/` ist für ein kommendes Release geplant; ab diesem Zeitpunkt werden Breaking Changes nur noch unter einem neuen Versionspfad eingeführt. Bis die Versionierung vollständig durchgesetzt ist, kann die API Breaking Changes ohne separaten Versionspfad erhalten.
+Die Trassets Data API wird über zwei Pfadfamilien gleichzeitig bereitgestellt: den ursprünglichen Basis-Pfad (ohne Versionspräfix) und `/v1/`, das schrittweise Tabelle für Tabelle ausgerollt wird. Beide funktionieren aktuell nebeneinander — es gibt keine Weiterleitung zwischen ihnen und noch kein bestätigtes Sunset-Datum für die unversionierten Pfade.
 
 ## Aktueller Stand
 
-Heute sind alle Endpunkte direkt unter der Basis-URL verfügbar:
+Jede Tabelle bleibt über die Basis-URL verfügbar:
 
 ```text
 https://api.trassets.ai/accounting/accounts
@@ -16,20 +16,24 @@ https://api.trassets.ai/raw/ixhaus_contracts
 https://api.trassets.ai/changes
 ```
 
-Die OpenAPI-Spezifikation referenziert in einigen Beispielen bereits `/v1/`, aber das versionierte Präfix wird auf Gateway-Ebene noch nicht erzwungen.
-
-## Kommende Versionierung
-
-Sobald die URL-Versionierung live ist, wird der Standardpfad zu:
+Eine wachsende Teilmenge der Tabellen ist zusätzlich unter `/v1/` verfügbar, z.B.:
 
 ```text
-https://api.trassets.ai/v1/accounting/accounts
+https://api.trassets.ai/v1/accounting/budgets
 ```
 
-Die aktuellen unversionierten Pfade funktionieren nach dem Start von `/v1/` noch für ein Deprecation-Fenster weiter und werden danach abgeschaltet {/* TODO: Sunset-Datum, sobald API-Team Rollout bestätigt */}. Breaking Changes (wie umbenannte Felder, entfernte Query-Parameter oder veränderte Response-Formate) werden danach ausschließlich unter einem neuen Präfix wie `/v2/` eingeführt, nie auf einer bereits veröffentlichten Version.
+Eine Tabelle bekommt erst dann eine `/v1/`-Route, wenn sie das Review gegen die [Konventionen für die Response-Struktur](/de/v1/overview) durchlaufen hat — die aktuelle Liste steht im Tab **API-Referenz** unter dem `v1`-Versionsumschalter (generiert aus der Live-`openapi-v1.json`), nicht einfach annehmen, dass eine Tabelle bereits migriert ist.
 
 <Warning>
-  Bis `/v1/` erzwungen wird, können Breaking Changes auf den aktuellen Basis-Pfaden auftreten. Beobachte die Release Notes und teste deine Integrationen nach jedem angekündigten Update. Sobald `/v1/` live ist: Migriere vor dem Sunset-Datum — unversionierte Pfade werden dann abgeschaltet, nicht weitergeleitet. Kontaktiere den Trassets-Support, falls du Migrationshilfe benötigst.
+  Da die meisten Tabellen noch unversioniert sind, können auf Basis-Pfaden ohne `/v1/`-Pendant weiterhin Breaking Changes auftreten (umbenannte Felder, entfernte Query-Parameter, veränderte Response-Formate). Sobald eine Tabelle eine `/v1/`-Route hat, ist die Absicht, sie als versioniert zu behandeln: weitere Breaking Changes würden dann unter einem neuen Präfix wie `/v2/` landen, nicht auf dem bereits veröffentlichten Pfad. Diese Absicht wurde noch nicht an einem echten Fall getestet — aktuell eher Zielbild als Garantie.
 </Warning>
 
-Um vorbereitet zu bleiben, abonniere die Trassets Release Notes und halte deinen Integrationscode flexibel genug, um sich an neue Felder oder Parameteränderungen anzupassen.
+## Schrittweise migrieren
+
+Es ist keine Sammel-Umstellung geplant. Migriere Tabelle für Tabelle, sobald sie unter `/v1/` erscheint:
+
+1. Prüfen, ob `/v1/{category}/{api_table}` für die genutzte Tabelle existiert.
+2. Falls ja: umstellen — die Response-Struktur kann vom Basis-Pfad abweichen (siehe die Konventionen-Tabelle auf der [v1-Übersichtsseite](/de/v1/overview)).
+3. Falls noch nicht: vorerst weiterhin den Basis-Pfad nutzen — eine Sammel-Umstellung ist nicht geplant, aber Breaking Changes bleiben dort möglich (siehe Warnhinweis oben), bis eine `/v1/`-Route für diese Tabelle veröffentlicht wird.
+
+Um vorbereitet zu bleiben, abonniere die Trassets Release Notes und halte deinen Integrationscode flexibel genug, um sich an neue Felder, Parameteränderungen und — bei noch nicht auf `/v1/` migrierten Tabellen — gelegentliche Response-Struktur-Änderungen ohne Versionssprung anzupassen.

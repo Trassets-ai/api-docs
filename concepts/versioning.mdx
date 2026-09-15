@@ -1,14 +1,14 @@
 ---
 title: "API Versioning Policy for the Trassets Data API"
 sidebarTitle: "Versioning"
-description: "Trassets Data API currently uses a base URL without a version prefix. URL versioning under /v1/ is planned; unversioned paths will be deprecated with a sunset window once /v1/ ships."
+description: "The Trassets Data API is rolling out /v1/ path versioning table by table, alongside the existing unversioned base path. No sunset date is set yet for unversioned paths."
 ---
 
-The Trassets Data API is currently served from the base path without a version prefix. URL versioning under `/v1/` is planned for an upcoming release, at which point breaking changes will only be introduced under a new version path. Until versioning is fully enforced, the API may receive breaking changes without a separate version path.
+The Trassets Data API is served from two path families at once: the original base path (no version prefix) and `/v1/`, which is being rolled out one reviewed table at a time. Both currently work side by side — there is no redirect between them and no confirmed sunset date for the unversioned paths yet.
 
 ## Current State
 
-Today, all endpoints are available directly under the base URL:
+Every table remains available under the base URL:
 
 ```text
 https://api.trassets.ai/accounting/accounts
@@ -16,20 +16,24 @@ https://api.trassets.ai/raw/ixhaus_contracts
 https://api.trassets.ai/changes
 ```
 
-The OpenAPI spec already references `/v1/` in some examples, but the versioned prefix is not yet enforced at the gateway level.
-
-## Upcoming Versioning
-
-Once URL versioning is live, the standard path will become:
+A growing subset of tables is additionally available under `/v1/`, e.g.:
 
 ```text
-https://api.trassets.ai/v1/accounting/accounts
+https://api.trassets.ai/v1/accounting/budgets
 ```
 
-The current unversioned paths will keep working for a deprecation window after `/v1/` ships, then be sunset {/* TODO: sunset date, pending API team rollout confirmation */}. Breaking changes (such as renamed fields, removed query parameters, or altered response shapes) will then be introduced only under a new prefix such as `/v2/`, never on an already-shipped version.
+A table only gets a `/v1/` route once it has passed review against the [response shape conventions](/v1/overview) — check the **API Reference** tab under the `v1` version selector (generated from the live `openapi-v1.json`) for the current list, rather than assuming a table is already migrated.
 
 <Warning>
-  Until `/v1/` is enforced, breaking changes may occur on the current base paths. Monitor release notes and test integrations after any announced update. Once `/v1/` ships, migrate before the sunset date — unversioned paths will stop working, not redirect. Contact Trassets support if you need migration guidance.
+  Because most tables are still unversioned, breaking changes (renamed fields, removed query parameters, altered response shapes) can still occur on base paths that have no `/v1/` counterpart yet. Once a table has a `/v1/` route, the intent is to treat it as versioned — further breaking changes would land under a new prefix such as `/v2/`, not on the already-shipped path. That intent has not yet been tested against a real case, so treat it as the goal rather than a guarantee for now.
 </Warning>
 
-To stay prepared, subscribe to the Trassets release notes and keep your integration code flexible enough to adapt to field additions or parameter changes.
+## Migrating incrementally
+
+There is no bulk cutover planned. Migrate table by table, as each one appears under `/v1/`:
+
+1. Check whether `/v1/{category}/{api_table}` exists for the table you use.
+2. If it does, switch to it — the response shape may differ from the base path (see [Response Shape Conventions](/v1/overview#response-shape-conventions)).
+3. If it doesn't yet, keep using the base path for now — no bulk cutover is planned, but breaking changes remain possible there (see the Warning above) until a `/v1/` route is published for that table.
+
+To stay prepared, subscribe to the Trassets release notes and keep your integration code flexible enough to adapt to field additions, parameter changes, and — for tables not yet under `/v1/` — occasional response shape changes without a version bump.
