@@ -102,9 +102,8 @@ graph LR
 </Note>
 
 <Warning>
-  `property_id` und `creditor_id` kommen bei den meisten Endpunkten als JSON-String zurück,
-  bei `booking_positions` und `projects` dagegen als Zahl; `person_id` ist bei `tenants` und
-  `booking_header` ein String, bei `booking_positions` eine Zahl. Vor einem Join über diese
-  Grenzen hinweg auf einen gemeinsamen Typ casten — ein strikter Gleichheitsvergleich auf den
-  Rohwerten liefert stillschweigend keine Zeilen.
+  `person_id` kommt bei `tenants` und `booking_header` als JSON-String zurück, bei
+  `booking_positions` dagegen als Zahl. Vor einem Join über diese Grenze hinweg auf einen
+  gemeinsamen Typ casten — ein strikter Gleichheitsvergleich auf den Rohwerten liefert
+  stillschweigend keine Zeilen.
 </Warning>

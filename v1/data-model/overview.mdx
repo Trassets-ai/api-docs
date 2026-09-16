@@ -98,9 +98,7 @@ graph LR
 </Note>
 
 <Warning>
-  `property_id` and `creditor_id` come back as JSON strings on most endpoints but as numbers
-  on `booking_positions` and `projects`, and `person_id` is a string on `tenants` and
-  `booking_header` but a number on `booking_positions`. Cast to a common type before joining
-  across those boundaries — a strict equality check on the raw values silently returns no
-  rows.
+  `person_id` comes back as a JSON string on `tenants` and `booking_header` but as a number on
+  `booking_positions`. Cast to a common type before joining across that boundary — a strict
+  equality check on the raw values silently returns no rows.
 </Warning>

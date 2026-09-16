@@ -11,9 +11,9 @@ tables, which is exactly why they're worth checking here first.
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `property_id` | string or integer | Unique property identifier; primary join key across every `/v1/` table, and it resolves against `properties` on all of them. **The JSON type is not uniform:** a string everywhere except `booking_positions` and `projects`, where it's a number. Compare as strings when joining across that boundary. |
+| `property_id` | string | Unique property identifier; primary join key across every `/v1/` table, and it resolves against `properties` on all of them. |
 | `person_id` | string or integer | Identifies a tenant or contact person. `booking_header`, `booking_positions`, and `tenants` share one identifier space, scoped per property — join on `property_id` **and** `person_id` together, and cast `booking_positions.person_id` (a number) to a string first. `notifications.person_id` is a separate sequence from another subsystem and does not belong to that space. |
-| `creditor_id` | string or integer | Identifies a creditor (vendor or service provider). References `Stakeholder.creditor` — see the [Stakeholder field reference](/v1/data-model/stakeholder). A string everywhere except `booking_positions` and `projects`, where it's a number; cast before joining. Unreliable on `projects`; see the [Operations field reference](/v1/data-model/operations). |
+| `creditor_id` | string | Identifies a creditor (vendor or service provider). References `Stakeholder.creditor` — see the [Stakeholder field reference](/v1/data-model/stakeholder). Unreliable on `projects`; see the [Operations field reference](/v1/data-model/operations). |
 | `floor_area_id` | integer | References `Property.property_structure`, which has no `/v1/` endpoint yet — fetch it via the unversioned path. Appears on `technical_objects` and `tenants`. |
 | `account_id` | integer | Internal account identifier. One consistent join key — `booking_positions.account_id` and `budgets.account_id` both join to `accounts.account_id`; see the [Accounting field reference](/v1/data-model/accounting). |
 | `account_number` | string | Human-readable account number on `accounts` and `budgets` — don't confuse it with `account_id` above, which is a different (internal) value. |

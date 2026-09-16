@@ -11,9 +11,9 @@ Bedeutungen, genau deshalb lohnt sich der Blick hierher.
 
 | Feld | Typ | Beschreibung |
 | --- | --- | --- |
-| `property_id` | string oder integer | Eindeutige Objekt-ID; primärer Verknüpfungsschlüssel über jede `/v1/`-Tabelle und auf allen gegen `properties` auflösbar. **Der JSON-Typ ist nicht einheitlich:** überall ein String außer bei `booking_positions` und `projects`, dort eine Zahl. Über diese Grenze hinweg als String vergleichen. |
+| `property_id` | string | Eindeutige Objekt-ID; primärer Verknüpfungsschlüssel über jede `/v1/`-Tabelle und auf allen gegen `properties` auflösbar. |
 | `person_id` | string oder integer | Identifiziert einen Mieter oder eine Kontaktperson. `booking_header`, `booking_positions` und `tenants` teilen einen ID-Raum, der pro Objekt vergeben wird — über `property_id` **und** `person_id` gemeinsam verknüpfen und `booking_positions.person_id` (eine Zahl) vorher in einen String casten. `notifications.person_id` ist eine separate Sequenz aus einem anderen Subsystem und gehört nicht in diesen ID-Raum. |
-| `creditor_id` | string oder integer | Identifiziert einen Kreditor (Lieferant oder Dienstleister). Referenziert `Stakeholder.creditor` — siehe die [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Überall ein String außer bei `booking_positions` und `projects`, dort eine Zahl; vor dem Join casten. Bei `projects` unzuverlässig; siehe die [Operations-Feldreferenz](/de/v1/data-model/operations). |
+| `creditor_id` | string | Identifiziert einen Kreditor (Lieferant oder Dienstleister). Referenziert `Stakeholder.creditor` — siehe die [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Bei `projects` unzuverlässig; siehe die [Operations-Feldreferenz](/de/v1/data-model/operations). |
 | `floor_area_id` | integer | Referenziert `Property.property_structure`, das noch keinen `/v1/`-Endpunkt hat — bis dahin über den unversionierten Pfad abrufen. Kommt bei `technical_objects` und `tenants` vor. |
 | `account_id` | integer | Interne Konto-ID. Ein einheitlicher Join-Key — `booking_positions.account_id` und `budgets.account_id` verknüpfen sich beide mit `accounts.account_id`; siehe die [Accounting-Feldreferenz](/de/v1/data-model/accounting). |
 | `account_number` | string | Lesbare Kontonummer bei `accounts` und `budgets` — nicht mit `account_id` oben verwechseln, das ist ein anderer (interner) Wert. |

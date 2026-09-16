@@ -149,9 +149,8 @@ join keys.
 `GET /v1/accounting/booking_positions` — individual booking line items, joined to a header
 via `booking_header_id`.
 
-<ResponseField name="property_id" type="integer" required>
-  Unique property identifier. A number here, while `properties.property_id` and most other
-  tables return it as a string — compare the two as strings.
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
 </ResponseField>
 
 <ResponseField name="booking_position_id" type="integer" required>
@@ -175,10 +174,9 @@ via `booking_header_id`.
   `accounts` — the two don't correspond.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
+<ResponseField name="creditor_id" type="string">
   Creditor linked to the posting. References `Stakeholder.creditor` — see the
-  [Stakeholder field reference](/v1/data-model/stakeholder). A number here, while
-  `creditor.creditor_id` is a string, so cast before joining.
+  [Stakeholder field reference](/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
