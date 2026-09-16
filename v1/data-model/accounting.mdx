@@ -1,17 +1,18 @@
 ---
 title: "v1 Accounting Data Model: Accounts, Booking Header, Positions, and Budgets"
 sidebarTitle: "Accounting"
-description: "Field-level reference for the v1 Accounting tables accounts, booking_header, booking_positions, and budgets, reshaped with period, amount, and amount_per_sqm objects."
+description: "Field-level reference for the v1 Accounting tables accounts, booking_header, booking_positions, and budgets, including the period, amount, and amount_per_sqm objects."
 ---
 
-The v1 Accounting domain currently covers four tables: `accounts`, `booking_header`,
-`booking_positions`, and `budgets`. All four follow the [response shape
-conventions](/v1/response-shape-conventions) — nested `period`/`amount` objects and stable
+The v1 Accounting domain covers four tables: `accounts`, `booking_header`,
+`booking_positions`, and `budgets`. All four follow the [response
+structure](/v1/response-shape-conventions) rules — nested `period`/`amount` objects and flat
 join keys.
 
 <Note>
-  `kontenmapping_ranges` isn't live under `/v1/` yet — use the unversioned
-  [`Accounting.kontenmapping_ranges`](/data-model/accounting#kontenmapping_ranges) for now.
+  `kontenmapping_ranges` has no `/v1/` endpoint yet — fetch it via
+  [`Accounting.kontenmapping_ranges`](/data-model/accounting#kontenmapping_ranges) in the
+  meantime.
 </Note>
 
 ## accounts
@@ -19,17 +20,16 @@ join keys.
 `GET /v1/accounting/accounts` — the chart of accounts.
 
 <ResponseField name="property_id" type="string" required>
-  Unique property identifier. A string here, where the unversioned equivalent is an integer.
+  Unique property identifier.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
-  Internal account identifier. Renamed from the unversioned `account_hdr_id` — referenced by
-  `booking_positions` and `budgets` as `account_id`.
+  Internal account identifier. Referenced by `booking_positions` and `budgets` as
+  `account_id`.
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  Account number. Renamed from the unversioned `account_id`. `null` on some rows (e.g.
-  summary/total accounts).
+  Human-readable account number. `null` on some rows (e.g. summary/total accounts).
 </ResponseField>
 
 <ResponseField name="account_name" type="string">
@@ -38,8 +38,7 @@ join keys.
 
 <ResponseField name="account_balance_type" type="object">
   Balance-side code for the account — `{code, label}` (e.g. `{"code": 1, "label":
-  "Aufwandskonto"}`). Replaces the unversioned plain string field, per the [response shape
-  conventions](/v1/response-shape-conventions). `label` is absent for some `code` values.
+  "Aufwandskonto"}`). `label` is absent for some `code` values.
 </ResponseField>
 
 <ResponseField name="account_type_name" type="string">
@@ -47,22 +46,21 @@ join keys.
 </ResponseField>
 
 <ResponseField name="account_group" type="string">
-  Account group assignment. Related to, but not derived through, the unversioned
-  `kontenmapping_ranges`.
+  Account group assignment. Related to, but not derived from, `kontenmapping_ranges`.
 </ResponseField>
 
 <ResponseField name="accounting_entity" type="string">
-  Meaning not yet confirmed with the source system — may be the same join concept as
-  `Property.properties.accounting_property_id`, but this isn't verified. Don't build a join
-  on it without confirming first.
+  Undocumented. It may carry the same join concept as
+  `Property.properties.accounting_property_id` — contact support before building a join on
+  it.
 </ResponseField>
 
 <ResponseField name="account_tax_code" type="integer">
-  Meaning not yet confirmed with the source system.
+  Undocumented tax code. Contact support before relying on it.
 </ResponseField>
 
 <ResponseField name="account_tax_appliance" type="integer">
-  Meaning not yet confirmed with the source system.
+  Undocumented tax code. Contact support before relying on it.
 </ResponseField>
 
 ## booking_header
@@ -228,10 +226,9 @@ via `booking_header_id`.
 
 <ResponseField name="HNDL" type="string">
   Decimal value serialized as a string (e.g. `"0.0000"`), not a JSON number — cast before
-  doing arithmetic on it. Meaning not yet confirmed with the source system. About 99.2% of
-  rows are `"0.0000"`; where non-zero, the value is often close to `amount.net` and
-  concentrated in specific booking types tied to recoverable operating costs — consistent
-  with a correction field, but not confirmed. Don't rename or reinterpret it.
+  doing arithmetic on it. Undocumented: about 99.2% of rows are `"0.0000"`, and where
+  non-zero the value tends to sit close to `amount.net` on booking types tied to recoverable
+  operating costs. Contact support before relying on it.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
@@ -248,13 +245,12 @@ via `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
-  Account the budget applies to. Same rename as on `accounts` — joins to `accounts.account_id`
-  above.
+  Account the budget applies to. Joins to `accounts.account_id` above.
 </ResponseField>
 
 <ResponseField name="account_number" type="integer">
-  Account number. An integer here, where the unversioned equivalent (`accounts.account_id`)
-  is a string.
+  Human-readable account number. An integer here, while `accounts.account_number` is a
+  string — compare them as strings if you need to match rows across the two tables.
 </ResponseField>
 
 <ResponseField name="date" type="date" required>

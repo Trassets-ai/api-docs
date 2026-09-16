@@ -23,6 +23,6 @@ There is no range, wildcard, or `OR` syntax — a query parameter matches rows w
 
 ## Column filtering (vertical)
 
-Which fields an entity's response includes can be restricted per API key. An admin configures this in the Trassets portal, per key and per entity — a key without explicit configuration returns the full column set documented in the **API Reference**. Changes take effect immediately, without an API redeploy.
+Which fields an entity's response includes can be restricted per API key. An admin configures this in the Trassets portal, per key and per entity — a key without explicit configuration returns the full column set documented in the **API Reference**. Changes take effect immediately.
 
 This is not something you control via the request itself — there is no `fields` or `select` query parameter. If a field you expect is missing from a response even though it's listed in the API Reference for that entity, your API key's column configuration is the likely cause; contact Trassets support to review or change it.

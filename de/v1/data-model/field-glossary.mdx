@@ -1,6 +1,6 @@
 ---
-title: "v1 Field Glossary"
-sidebarTitle: "Field Glossary"
+title: "v1 Feldglossar"
+sidebarTitle: "Feldglossar"
 description: "Referenzleitfaden zu Feldnamen, die über mehrere /v1/-Tabellen hinweg vorkommen, einschließlich property_id, person_id, creditor_id und dem mehrdeutigen account_name."
 ---
 
@@ -9,23 +9,22 @@ dokumentierten `/v1/`-Tabelle vorkommen. Nutze es als schnelle Referenz beim Ver
 `/v1/`-Tabellen hinweg — mehrere dieser Felder haben je nach Tabelle unterschiedliche
 Bedeutungen, genau deshalb lohnt sich der Blick hierher.
 
-| Field | Type | Description |
+| Feld | Typ | Beschreibung |
 | --- | --- | --- |
 | `property_id` | integer oder string | Eindeutige Objekt-ID; primärer Verknüpfungsschlüssel über jede `/v1/`-Tabelle. Typ variiert je Tabelle — integer bei `booking_header`, `booking_positions`, `budgets`, `notifications`, `projects` und `technical_objects`; string bei `tenants`. |
 | `person_id` | integer oder string | Identifiziert einen Mieter oder eine Kontaktperson. **Kein einheitlicher ID-Raum** — `booking_header.person_id`, `booking_positions.person_id`, `notifications.person_id` und `tenants.person_id` stammen aus unterschiedlichen Subsystemen. Nicht allein über dieses Feld verknüpfen. |
 | `creditor_id` | integer oder string | Identifiziert einen Kreditor (Lieferant oder Dienstleister). Referenziert `Stakeholder.creditor` — siehe die [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Bei `projects` unzuverlässig; siehe die [Operations-Feldreferenz](/de/v1/data-model/operations). |
-| `floor_area_id` | integer | Referenziert das unversionierte `Property.property_structure` — es gibt noch keinen `/v1/`-property_structure-Endpunkt. Kommt bei `technical_objects` und `tenants` vor. |
+| `floor_area_id` | integer | Referenziert `Property.property_structure`, das noch keinen `/v1/`-Endpunkt hat — bis dahin über den unversionierten Pfad abrufen. Kommt bei `technical_objects` und `tenants` vor. |
 | `account_id` | integer | Interne Konto-ID. Ein einheitlicher Join-Key — `booking_positions.account_id` und `budgets.account_id` verknüpfen sich beide mit `accounts.account_id`; siehe die [Accounting-Feldreferenz](/de/v1/data-model/accounting). |
-| `account_number` | string | Lesbare Kontonummer. Umbenannt aus dem unversionierten `account_id`, sowohl bei `accounts` als auch bei `budgets` — nicht mit `account_id` oben verwechseln, das ist ein anderer (interner) Wert. |
+| `account_number` | string | Lesbare Kontonummer bei `accounts` und `budgets` — nicht mit `account_id` oben verwechseln, das ist ein anderer (interner) Wert. |
 | `account_name` | string | **Mehrdeutig über Tabellen hinweg — kein einheitliches Konzept.** Bei `accounts` der Name des Kontos im Kontenplan. Bei `depreciation/assets` die Rechnungslegungsgrundlage, unter der eine Abschreibung gebucht ist (z. B. `"Handelsrecht"` vs. `"Steuerrecht"`) — unabhängig von der Konten-Tabelle. |
-| `property_structure_account_id` | string | Bedingter Fallback-Fremdschlüssel auf das unversionierte `Property.property_structure`, neu in v1. Kommt bei `booking_header`, `booking_positions` und `technical_objects` vor — nur befüllt, wenn der primäre Join-Key der Tabelle die Zeile nicht abdeckt. |
+| `property_structure_account_id` | string | Bedingter Fallback-Fremdschlüssel auf `Property.property_structure`. Kommt bei `booking_header`, `booking_positions` und `technical_objects` vor — nur befüllt, wenn der primäre Join-Key der Tabelle die Zeile nicht abdeckt. |
 | `cost_center_id` | string | Kostenstellen-Referenz. Kommt bei `notifications` und `projects` vor; es gibt noch keinen `/v1/`-Kostenstellen-Endpunkt, um sie aufzulösen. |
 | `booking_date` | date | ISO-8601-Datum der Buchhaltungsbuchung. Kommt bei `booking_header` und `booking_positions` vor. |
 | `dms_link` | string | Link zum zugehörigen Dokument im Dokumentenmanagementsystem, falls vorhanden. Kommt bei `booking_header`, `creditor`, `properties` und `tenants` vor. |
 
 <Note>
-  Felder mit dem Präfix `sk_` sind interne Surrogatschlüssel, die für Verknüpfungen im
-  zugrunde liegenden Data Warehouse verwendet werden. Keine der aktuell unter `/v1/`
-  dokumentierten Tabellen legt einen solchen offen, aber falls dir im Tab **API Reference**
+  Felder mit dem Präfix `sk_` sind interne Surrogatschlüssel. Keine der aktuell unter `/v1/`
+  dokumentierten Tabellen legt einen solchen offen, aber falls dir im Tab **API-Referenz**
   einer begegnet: nicht als stabilen Identifikator verwenden.
 </Note>

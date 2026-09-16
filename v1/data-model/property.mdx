@@ -4,12 +4,12 @@ sidebarTitle: "Property"
 description: "Field-level reference for the v1 Property tables properties, property_creditor_services, and technical_objects, including the entrances array, mandate_period object, and the conditional property_structure_account_id fallback."
 ---
 
-The v1 Property domain currently covers three tables: `properties`,
-`property_creditor_services`, and `technical_objects`.
+The v1 Property domain covers three tables: `properties`, `property_creditor_services`, and
+`technical_objects`.
 
 <Note>
-  `property_structure` isn't live under `/v1/` yet — use the unversioned
-  [`Property.property_structure`](/data-model/property#property_structure) for now.
+  `property_structure` has no `/v1/` endpoint yet — fetch it via
+  [`Property.property_structure`](/data-model/property#property_structure) in the meantime.
 </Note>
 
 ## properties
@@ -17,26 +17,20 @@ The v1 Property domain currently covers three tables: `properties`,
 `GET /v1/property/properties` — one row per property object.
 
 <ResponseField name="property_id" type="string" required>
-  Unique property identifier. A string here, where the unversioned equivalent
-  (`Property.properties.property_id`) is an integer.
+  Unique property identifier.
 </ResponseField>
 
 <ResponseField name="entrances" type="string[]">
-  Building entrance / street address components. Replaces the unversioned
-  `entrance_1`–`entrance_5` numbered columns with a single array, per the [response shape
-  conventions](/v1/response-shape-conventions).
+  Building entrances / street address components, as an array with one entry per entrance.
 </ResponseField>
 
 <ResponseField name="mandate_period" type="object">
-  Management mandate period — `{start, end}` (date strings). Replaces the unversioned
-  separate `begin_mandate`/`end_mandate` fields.
+  Management mandate period — `{start, end}` (date strings).
 </ResponseField>
 
 <ResponseField name="accounting_property_id" type="string">
-  Verified join key into the accounting-side property reference. Renamed from a
-  sync-pipeline field on the unversioned table; the exact target table isn't documented
-  elsewhere yet, so treat it as a stable identifier rather than deriving further structure
-  from it.
+  Join key into the accounting-side property reference. Treat it as an opaque identifier —
+  don't derive further structure from its value.
 </ResponseField>
 
 <ResponseField name="obj_name" type="string">
@@ -52,8 +46,7 @@ The v1 Property domain currently covers three tables: `properties`,
 </ResponseField>
 
 <ResponseField name="city" type="string">
-  City. Distinct from `adr_city` — which of the two to use for display isn't confirmed with
-  the source system.
+  City. Distinct from `adr_city`; contact support before picking one of the two for display.
 </ResponseField>
 
 <ResponseField name="country" type="string">
@@ -98,13 +91,12 @@ The v1 Property domain currently covers three tables: `properties`,
 a property, and whether that assignment is exclusive.
 
 <ResponseField name="property_id" type="string" required>
-  Unique property identifier. A string here, where the unversioned equivalent is an integer.
+  Unique property identifier.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string" required>
   References `Stakeholder.creditor` — see the [Stakeholder field
-  reference](/v1/data-model/stakeholder). A string here, where the unversioned equivalent is
-  an integer.
+  reference](/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="service" type="string">
@@ -113,8 +105,8 @@ a property, and whether that assignment is exclusive.
 
 <ResponseField name="exclusivity" type="object">
   Whether the creditor holds an exclusive assignment for this service at this property —
-  `{code, label}` (e.g. `{"code": 1, "label": "Exklusiv"}`). Replaces the unversioned plain
-  string field, per the [response shape conventions](/v1/response-shape-conventions).
+  `{code, label}` (e.g. `{"code": 1, "label": "Exklusiv"}`), per the [response
+  structure](/v1/response-shape-conventions) rules.
 </ResponseField>
 
 ## technical_objects
@@ -123,9 +115,9 @@ a property, and whether that assignment is exclusive.
 (elevators, heating systems, meters, and similar equipment).
 
 <Note>
-  `technical_objects` exposes 20+ fields in the live v1 schema (warranty, inspection, and
-  maintenance dates and flags). This page documents the key identifying, join, and reshaped
-  fields — see the **API Reference** tab for the complete, auto-generated field list.
+  `technical_objects` returns 20+ fields (warranty, inspection, and maintenance dates and
+  flags). This page covers the identifying, join, and structured fields — the **API
+  Reference** tab lists every field the endpoint returns.
 </Note>
 
 <ResponseField name="to_id" type="integer" required>
@@ -166,9 +158,9 @@ a property, and whether that assignment is exclusive.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Foreign key into `Property.property_structure`. New in v1, and populated conditionally:
-  only set for rows without a `floor_area_id` (currently a small minority); everywhere else
-  it's `null` and `floor_area_id` remains the join key.
+  Foreign key into `Property.property_structure`. Populated conditionally: only set for rows
+  without a `floor_area_id` (currently a small minority); everywhere else it's `null` and
+  `floor_area_id` is the join key.
 </ResponseField>
 
 <Note>

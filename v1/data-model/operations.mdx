@@ -1,20 +1,20 @@
 ---
 title: "v1 Operations Data Model: Notifications and Projects"
 sidebarTitle: "Operations"
-description: "Field-level reference for the v1 Operations tables notifications and projects, covering the technical_object_id rename and the hierarchy array."
+description: "Field-level reference for the v1 Operations tables notifications and projects, covering technical_object_id and the hierarchy array."
 ---
 
-The v1 Operations domain currently covers two tables: `notifications` and `projects`.
+The v1 Operations domain covers two tables: `notifications` and `projects`.
 
 <Note>
-  `offers` and `orders` aren't live under `/v1/` yet — use their unversioned equivalents in
-  the [full data model](/data-model/operations) for now.
+  `offers` and `orders` have no `/v1/` endpoint yet — fetch them via the unversioned path in
+  the meantime, see the [full data model](/data-model/operations).
 </Note>
 
 <Note>
-  `notifications` and `projects` expose 20+ fields each in the live v1 schema. This page
-  documents the key identifying, join, and reshaped fields — see the **API Reference** tab
-  for the complete, auto-generated field list.
+  `notifications` and `projects` return 20+ fields each. This page covers the identifying,
+  join, and structured fields — the **API Reference** tab lists every field an endpoint
+  returns.
 </Note>
 
 ## notifications
@@ -85,9 +85,8 @@ The v1 Operations domain currently covers two tables: `notifications` and `proje
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Primary creditor for the project. Currently doesn't resolve against
-  `Stakeholder.creditor.creditor_id` — treat it as unreliable rather than a working foreign
-  key until the source data is fixed.
+  Primary creditor for the project. Does not currently resolve against
+  `Stakeholder.creditor.creditor_id` — don't rely on it as a foreign key.
 </ResponseField>
 
 <ResponseField name="offer_id" type="integer">
@@ -99,9 +98,9 @@ The v1 Operations domain currently covers two tables: `notifications` and `proje
 </ResponseField>
 
 <ResponseField name="to_hdr_id" type="integer">
-  Looks like a technical-object reference by name, but isn't — only about 3.5% match
-  against `technical_objects.to_id`, and no better match against `orders`/`notifications`.
-  The target entity is unconfirmed; don't treat this as a working foreign key.
+  Despite the name, this does not resolve against `technical_objects.to_id` (only about 3.5%
+  of rows match). Don't rely on it as a foreign key — use `report_id` or `offer_id` for the
+  links that do work.
 </ResponseField>
 
 <ResponseField name="hierarchy" type="string[]">
@@ -134,6 +133,6 @@ The v1 Operations domain currently covers two tables: `notifications` and `proje
 </ResponseField>
 
 <ResponseField name="projektleitung" type="string">
-  Project-lead flag. Still a `'0'`/`'1'` string, not yet a boolean — meaning of the two
-  values isn't confirmed with the source system yet.
+  Project-lead flag, a `'0'`/`'1'` string rather than a boolean. Contact support before
+  relying on the two values.
 </ResponseField>

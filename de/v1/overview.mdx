@@ -1,11 +1,11 @@
 ---
 title: "Data API v1 (Preview)"
 sidebarTitle: "Übersicht"
-description: "Vorschau auf die versionierte Data API, die schrittweise pro Tabelle ausgerollt wird, und die Konventionen für ihre Response-Struktur."
+description: "Vorschau auf die versionierte Data API: welche Tabellen unter /v1/ verfügbar sind und wie ihre Responses aufgebaut sind."
 ---
 
 <Warning>
-  `/v1/` ist live, aber noch nicht vollständig: Endpunkte werden nach und nach freigeschaltet, sobald die jeweilige Tabelle das Review durchlaufen hat. Der aktuelle Stand steht im Tab **API-Referenz** (generiert aus der Live-`openapi-v1.json`) — nicht davon ausgehen, dass eine in der unversionierten API gelistete Tabelle automatisch auch unter `/v1/` erreichbar ist.
+  `/v1/` ist live, aber noch nicht vollständig: Tabellen kommen einzeln hinzu. Der Tab **API-Referenz** zeigt immer den aktuellen Stand — eine in der unversionierten API gelistete Tabelle ist nicht automatisch auch unter `/v1/` erreichbar.
 </Warning>
 
-`/v1/` spiegelt die Pfade der unversionierten API unter einem `/v1/{category}/{api_table}`-Präfix. Eine Tabelle erscheint erst, wenn sie gegen die [Konventionen für die Response-Struktur](/de/v1/response-shape-conventions) reviewt wurde — bis dahin weiterhin den unversionierten Pfad für diese Tabelle nutzen.
+`/v1/` liefert Daten unter dem Pfad-Präfix `/v1/{category}/{api_table}`, mit Responses nach den Regeln der [Response-Struktur](/de/v1/response-shape-conventions). Für eine Tabelle, die noch keinen `/v1/`-Endpunkt hat, weiterhin den unversionierten Pfad nutzen.

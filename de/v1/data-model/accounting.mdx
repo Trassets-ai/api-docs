@@ -1,18 +1,18 @@
 ---
 title: "v1 Accounting Datenmodell: Konten, Buchungskopf, -positionen und Budgets"
 sidebarTitle: "Accounting"
-description: "Feldreferenz für die v1-Accounting-Tabellen accounts, booking_header, booking_positions und budgets, umgeformt mit period-, amount- und amount_per_sqm-Objekten."
+description: "Feldreferenz für die v1-Accounting-Tabellen accounts, booking_header, booking_positions und budgets, inklusive der period-, amount- und amount_per_sqm-Objekte."
 ---
 
-Die v1-Accounting-Domäne umfasst aktuell vier Tabellen: `accounts`, `booking_header`,
-`booking_positions` und `budgets`. Alle vier folgen den
-[Response-Shape-Konventionen](/de/v1/response-shape-conventions) — verschachtelte
-`period`-/`amount`-Objekte und stabile Join-Keys.
+Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
+`booking_positions` und `budgets`. Alle vier folgen den Regeln der
+[Response-Struktur](/de/v1/response-shape-conventions) — verschachtelte
+`period`-/`amount`-Objekte und flache Join-Keys.
 
 <Note>
-  `kontenmapping_ranges` ist noch nicht live unter `/v1/` — nutze vorerst das
-  unversionierte
-  [`Accounting.kontenmapping_ranges`](/de/data-model/accounting#kontenmapping_ranges).
+  `kontenmapping_ranges` hat noch keinen `/v1/`-Endpunkt — bis dahin über
+  [`Accounting.kontenmapping_ranges`](/de/data-model/accounting#kontenmapping_ranges)
+  abrufen.
 </Note>
 
 ## accounts
@@ -20,18 +20,15 @@ Die v1-Accounting-Domäne umfasst aktuell vier Tabellen: `accounts`, `booking_he
 `GET /v1/accounting/accounts` — der Kontenplan.
 
 <ResponseField name="property_id" type="string" required>
-  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung ein
-  Integer ist.
+  Eindeutige Objekt-ID.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
-  Interne Konto-ID. Umbenannt aus dem unversionierten `account_hdr_id` — wird von
-  `booking_positions` und `budgets` als `account_id` referenziert.
+  Interne Konto-ID. Wird von `booking_positions` und `budgets` als `account_id` referenziert.
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  Kontonummer. Umbenannt aus dem unversionierten `account_id`. Bei manchen Zeilen `null`
-  (z. B. Summen-/Sammelkonten).
+  Lesbare Kontonummer. Bei manchen Zeilen `null` (z. B. Summen-/Sammelkonten).
 </ResponseField>
 
 <ResponseField name="account_name" type="string">
@@ -40,9 +37,7 @@ Die v1-Accounting-Domäne umfasst aktuell vier Tabellen: `accounts`, `booking_he
 
 <ResponseField name="account_balance_type" type="object">
   Saldoseiten-Code des Kontos — `{code, label}` (z. B. `{"code": 1, "label":
-  "Aufwandskonto"}`). Ersetzt das unversionierte reine String-Feld, gemäß den
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions). `label` fehlt bei
-  manchen `code`-Werten.
+  "Aufwandskonto"}`). `label` fehlt bei manchen `code`-Werten.
 </ResponseField>
 
 <ResponseField name="account_type_name" type="string">
@@ -50,22 +45,21 @@ Die v1-Accounting-Domäne umfasst aktuell vier Tabellen: `accounts`, `booking_he
 </ResponseField>
 
 <ResponseField name="account_group" type="string">
-  Kontogruppenzuordnung. Verwandt mit, aber nicht abgeleitet aus dem unversionierten
-  `kontenmapping_ranges`.
+  Kontogruppenzuordnung. Verwandt mit, aber nicht abgeleitet aus `kontenmapping_ranges`.
 </ResponseField>
 
 <ResponseField name="accounting_entity" type="string">
-  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt — könnte derselbe Join-Begriff
-  wie `Property.properties.accounting_property_id` sein, ist aber nicht verifiziert. Ohne
-  Bestätigung keine Verknüpfung darauf aufbauen.
+  Nicht dokumentiert. Möglicherweise derselbe Join-Begriff wie
+  `Property.properties.accounting_property_id` — vor einer Verknüpfung darauf beim Support
+  nachfragen.
 </ResponseField>
 
 <ResponseField name="account_tax_code" type="integer">
-  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt.
+  Nicht dokumentierter Steuer-Code. Vor der Nutzung beim Support nachfragen.
 </ResponseField>
 
 <ResponseField name="account_tax_appliance" type="integer">
-  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt.
+  Nicht dokumentierter Steuer-Code. Vor der Nutzung beim Support nachfragen.
 </ResponseField>
 
 ## booking_header
@@ -235,11 +229,9 @@ Die v1-Accounting-Domäne umfasst aktuell vier Tabellen: `accounts`, `booking_he
 
 <ResponseField name="HNDL" type="string">
   Dezimalwert als String serialisiert (z. B. `"0.0000"`), keine JSON-Zahl — vor
-  Rechenoperationen casten. Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt. Rund
-  99,2 % der Zeilen sind `"0.0000"`; wo ungleich null, liegt der Wert oft nahe an
-  `amount.net` und konzentriert sich auf bestimmte Buchungstypen im Umfeld umlagefähiger
-  Betriebskosten — passt zu einem Korrekturfeld, ist aber nicht bestätigt. Nicht selbst
-  umbenennen oder umdeuten.
+  Rechenoperationen casten. Nicht dokumentiert: rund 99,2 % der Zeilen sind `"0.0000"`, und
+  wo ungleich null, liegt der Wert meist nahe an `amount.net` bei Buchungstypen im Umfeld
+  umlagefähiger Betriebskosten. Vor der Nutzung beim Support nachfragen.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
@@ -256,13 +248,12 @@ Die v1-Accounting-Domäne umfasst aktuell vier Tabellen: `accounts`, `booking_he
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
-  Konto, für das das Budget gilt. Dieselbe Umbenennung wie bei `accounts` — verknüpft sich
-  mit `accounts.account_id` oben.
+  Konto, für das das Budget gilt. Verknüpft sich mit `accounts.account_id` oben.
 </ResponseField>
 
 <ResponseField name="account_number" type="integer">
-  Kontonummer. Hier ein Integer, während die unversionierte Entsprechung
-  (`accounts.account_id`) ein String ist.
+  Lesbare Kontonummer. Hier ein Integer, während `accounts.account_number` ein String ist —
+  für einen Abgleich zwischen beiden Tabellen als String vergleichen.
 </ResponseField>
 
 <ResponseField name="date" type="date" required>
