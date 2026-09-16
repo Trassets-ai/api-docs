@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "luma",
-  "name": "Trassets Data API",
+  "name": "Data API",
   "colors": {
     "primary": "#5D18A7",
     "light": "#C49AF1",

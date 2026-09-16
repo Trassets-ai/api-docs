@@ -1,10 +1,10 @@
 ---
 title: "Sync Cycle: How Data Gets Into the API"
 sidebarTitle: "Sync Cycle"
-description: "Understand the upstream sync behind the Trassets Data API: TRUNCATE+Reload semantics, last_sync_at, and what GET /changes actually detects."
+description: "Understand the upstream sync behind the Data API: TRUNCATE+Reload semantics, last_sync_at, and what GET /changes actually detects."
 ---
 
-The Trassets Data API is a read-only interface over data that is synced in from an
+The Data API is a read-only interface over data that is synced in from an
 upstream pipeline. Understanding how and when that sync happens is essential for
 building a correct polling or incremental-sync integration.
 
