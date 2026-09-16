@@ -1,11 +1,11 @@
 ---
-title: "v1 Datenmodell: reviewte Tabellen"
+title: "v1 Datenmodell: aktuell verfügbare Tabellen"
 sidebarTitle: "Übersicht"
-description: "Die Tabellen, die aktuell unter /v1/ verfügbar sind, umgeformt nach den Response-Shape-Konventionen — Accounting, Operations und Property."
+description: "Die Tabellen, die aktuell unter /v1/ verfügbar sind, umgeformt nach den Response-Shape-Konventionen, und wie sie sich verknüpfen — Accounting, Operations und Property."
 ---
 
-`/v1/` dokumentiert eine Tabelle erst, wenn sie das Schema-Review durchlaufen hat. Aktuell
-haben drei Domänen mindestens eine reviewte Tabelle.
+`/v1/` dokumentiert eine Tabelle erst, sobald sie live ist. Aktuell haben drei Domänen
+mindestens eine dokumentierte Tabelle.
 
 <CardGroup cols={2}>
   <Card title="Accounting" icon="book" href="/de/v1/data-model/accounting">
@@ -29,5 +29,40 @@ haben drei Domänen mindestens eine reviewte Tabelle.
   [Response-Shape-Konventionen](/de/v1/response-shape-conventions). Nutze vorerst ihre
   unversionierten Entsprechungen im [vollständigen Datenmodell](/de/data-model/overview).
   Jede andere Tabelle (`orders`, `property_structure`, `assets`, `contract_debits` usw.) ist
-  noch nicht reviewt und bleibt auf dem unversionierten Pfad.
+  noch nicht live unter `/v1/` und bleibt auf dem unversionierten Pfad.
+</Note>
+
+## Wie die v1-Tabellen zusammenhängen
+
+`property_id` ist der Join-Key, den sich alle Tabellen auf dieser Seite teilen.
+
+```mermaid
+graph LR
+  properties["Property.properties<br/>(property_id)"]
+
+  properties -->|property_id| booking_header["Accounting.booking_header"]
+  properties -->|property_id| notifications["Operations.notifications"]
+  properties -->|property_id| projects["Operations.projects"]
+  properties -->|property_id| technical_objects["Property.technical_objects<br/>(to_id)"]
+
+  booking_header -->|booking_header_id| booking_positions["Accounting.booking_positions"]
+  notifications -->|technical_object_id| technical_objects
+  notifications -->|report_id| projects
+```
+
+### Verknüpfungsschlüssel im Detail
+
+| Key | Bedeutung | Kardinalität |
+|---|---|---|
+| `property_id` | Identifiziert ein Objekt. Auf jeder Tabelle dieser Seite vorhanden. | 1 Objekt → viele Zeilen in jeder Domäne |
+| `booking_header_id` | Gruppiert Buchungspositionen unter einem Buchungskopf. | 1 `booking_header` → viele `booking_positions` |
+| `technical_object_id` | Verknüpft eine Meldung mit dem technischen Objekt, auf das sie sich bezieht. Referenziert `technical_objects.to_id`. | 1 technisches Objekt → viele Meldungen |
+| `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
+| `property_structure_account_id` | Bedingter Fallback-Fremdschlüssel auf das unversionierte `Property.property_structure`, vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Nur befüllt, wenn der primäre Join-Key der Tabelle die Zeile nicht abdeckt — die genaue Bedingung steht in der jeweiligen Feldreferenz. | variiert pro Tabelle, siehe Feldreferenz |
+
+<Note>
+  Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell, nicht
+  unabhängig verifizierte Zeilenzahlen. `projects.creditor_id` und `projects.to_hdr_id` sind
+  bewusst nicht Teil dieses Diagramms — beide sind in der [Operations-Feldreferenz](/de/v1/data-model/operations)
+  als unzuverlässig markiert, also nicht als funktionierende Verknüpfung behandeln.
 </Note>
