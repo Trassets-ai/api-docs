@@ -8,7 +8,7 @@ Die Trassets Data API ist eine reine Lese-Schnittstelle über Daten, die von ein
 
 ## Pipeline-Architektur
 
-Daten fließen durch drei Stufen: **Databricks Unity Catalog → S3 → RDS PostgreSQL**. Die API hat zur Laufzeit keine direkte Verbindung zu Databricks — sie liest ausschließlich aus RDS. Die zugrunde liegenden Databricks-Jobs heißen `parquet_to_s3` und `ingest_parquet_to_rds`.
+Daten fließen durch drei Stufen: **Data Lakehouse → Cloud-Speicher → OLTP-Datenbank**. Die API hat zur Laufzeit keine direkte Verbindung zu Databricks — sie liest ausschließlich aus RDS. Die zugrunde liegenden Databricks-Jobs heißen `parquet_to_s3` und `ingest_parquet_to_rds`.
 
 <Note>
   Trassets' interne Dokumentation beschreibt diesen Sync als **täglich** laufend. Die

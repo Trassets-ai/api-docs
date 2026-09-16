@@ -10,7 +10,7 @@ essential for building a correct polling or incremental-sync integration.
 
 ## Pipeline architecture
 
-Data flows through three stages: **Databricks Unity Catalog → S3 → RDS PostgreSQL**. The
+Data flows through three stages: **Data Lakehouse → cloud storage → OLTP database**. The
 API has no direct connection to Databricks at runtime — it only ever reads from RDS. The
 underlying Databricks jobs are named `parquet_to_s3` and `ingest_parquet_to_rds`.
 
