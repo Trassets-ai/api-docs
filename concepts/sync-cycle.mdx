@@ -53,8 +53,9 @@ pattern).
 
 <Warning>
   `since` must not be older than 30 days — older values are rejected with a 400 error. This
-  limit is enforced in code but not explained anywhere in the API's own documentation or
-  source comments; treat it as a hard operational constraint rather than a tunable setting.
+  limit is documented in the endpoint's OpenAPI parameter description (see the **API
+  Reference** tab), but no rationale for the specific figure is given anywhere; treat it as
+  a fixed operational constraint rather than a tunable setting.
 </Warning>
 
 ## Practical implications for your integration
