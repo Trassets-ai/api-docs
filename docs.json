@@ -186,6 +186,14 @@
                     ]
                   },
                   {
+                    "group": "Guides",
+                    "pages": [
+                      "guides/bulk-export",
+                      "guides/delta-sync",
+                      "guides/incremental-sync"
+                    ]
+                  },
+                  {
                     "group": "Data Model",
                     "pages": [
                       "v1/data-model/overview",
@@ -234,6 +242,14 @@
                       "de/concepts/filtering",
                       "de/concepts/sync-cycle",
                       "de/concepts/versioning"
+                    ]
+                  },
+                  {
+                    "group": "Anleitungen",
+                    "pages": [
+                      "de/guides/bulk-export",
+                      "de/guides/delta-sync",
+                      "de/guides/incremental-sync"
                     ]
                   },
                   {
