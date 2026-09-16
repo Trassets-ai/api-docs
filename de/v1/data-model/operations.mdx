@@ -1,0 +1,139 @@
+---
+title: "v1 Operations Datenmodell: Meldungen und Projekte"
+sidebarTitle: "Operations"
+description: "Feldreferenz für die v1-Operations-Tabellen notifications und projects, inklusive der Umbenennung zu technical_object_id und dem hierarchy-Array."
+---
+
+Die v1-Operations-Domäne umfasst aktuell zwei reviewte Tabellen: `notifications` und
+`projects`.
+
+<Note>
+  `notifications` und `projects` stellen im Live-v1-Schema jeweils über 20 Felder bereit.
+  Diese Seite dokumentiert nur die wichtigsten Identifikations-, Verknüpfungs- und
+  umgeformten Felder — die vollständige, automatisch generierte Feldliste findest du im
+  Tab **API Reference**.
+</Note>
+
+## notifications
+
+`GET /v1/operations/notifications` — Wartungsmeldungen und Schadensmeldungen.
+
+<ResponseField name="report_id" type="integer" required>
+  Eindeutige Meldungs-ID. Umbenannt von `report_hdr_id`.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="technical_object_id" type="integer">
+  Technisches Objekt, auf das sich die Meldung bezieht. Umbenannt von
+  `to_hdr_id`/`to_reference_id` und gegen `Property.technical_objects.to_id` verifiziert.
+</ResponseField>
+
+<ResponseField name="person_id" type="integer">
+  Meldende Person. Dies ist eine `bigint`-Sequenz aus einem anderen Subsystem — nicht mit
+  demselben ID-Raum wie `person_id` auf `Accounting.booking_header` oder
+  `Stakeholder.tenants` verwechseln.
+</ResponseField>
+
+<ResponseField name="cost_center_id" type="string">
+  Kostenstelle, der die Meldung zugeordnet ist.
+</ResponseField>
+
+<ResponseField name="report_type" type="string">
+  Art der Meldung.
+</ResponseField>
+
+<ResponseField name="priority_text" type="string">
+  Prioritätsstufe.
+</ResponseField>
+
+<ResponseField name="Status" type="string">
+  Aktueller Status der Meldung.
+</ResponseField>
+
+<ResponseField name="report_date" type="date">
+  Datum der Erstellung der Meldung.
+</ResponseField>
+
+<ResponseField name="insurance_case" type="boolean">
+  Ob die Meldung mit einem Versicherungsfall verknüpft ist.
+</ResponseField>
+
+## projects
+
+`GET /v1/operations/projects` — Investitionsprojekte und größere Vorhaben mit mehreren
+Aufträgen.
+
+<ResponseField name="project_id" type="integer" required>
+  Eindeutige Projekt-ID. Umbenannt von `project_hdr_id`.
+</ResponseField>
+
+<ResponseField name="project_number" type="string">
+  Projektnummer. Das ist, was die unversionierte API `project_id` nennt — hier umbenannt,
+  um nicht mit der echten ID oben zu kollidieren.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="cost_center_id" type="string">
+  Kostenstelle, gegen die das Projekt gebucht wird.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Hauptkreditor für das Projekt. Join-Test gegen `Stakeholder.creditor.creditor_id`: 0 %
+  Treffer. Als derzeit nicht auflösbar behandeln, nicht als funktionierenden
+  Fremdschlüssel — ein vorbestehendes Datenproblem, unabhängig von der v1-Umformung.
+</ResponseField>
+
+<ResponseField name="offer_id" type="integer">
+  Zugehöriges Angebot, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="report_id" type="integer">
+  Zugehörige Meldung, falls das Projekt aus einer solchen entstanden ist.
+</ResponseField>
+
+<ResponseField name="to_hdr_id" type="integer">
+  Bewusst unverändert und flach. Sieht wie eine Referenz auf ein technisches Objekt aus,
+  ein Join-Test widerlegt das aber (nur 3,5 % Treffer gegen `technical_objects.to_id`, auch
+  gegen `orders`/`notifications` kein besserer Treffer). Die Zielentität ist ungeklärt —
+  nicht als `technical_object_id` oder funktionierenden Fremdschlüssel behandeln.
+</ResponseField>
+
+<ResponseField name="hierarchy" type="string[]">
+  Position in der Kostenaufschlüsselungs-Hierarchie. Ersetzt die nummerierten Spalten
+  `hierarchy_1`…`hierarchy_20` — leere Stufen werden aus dem Array weggelassen.
+</ResponseField>
+
+<ResponseField name="project_type" type="string">
+  Projektart.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Aktueller Projektstatus.
+</ResponseField>
+
+<ResponseField name="project_budget" type="number">
+  Gesamtes Budget für das Projekt.
+</ResponseField>
+
+<ResponseField name="percentage_completed" type="number">
+  Fertigstellungsgrad in Prozent.
+</ResponseField>
+
+<ResponseField name="project_begin_date" type="date">
+  Startdatum des Projekts.
+</ResponseField>
+
+<ResponseField name="project_end_date" type="date">
+  Enddatum des Projekts.
+</ResponseField>
+
+<ResponseField name="projektleitung" type="string">
+  Projektleitungs-Flag. Noch ein `'0'`/`'1'`-String, kein Boolean — die Bedeutung der
+  beiden Werte ist mit dem Quellsystem noch nicht geklärt.
+</ResponseField>
