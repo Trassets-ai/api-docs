@@ -268,12 +268,7 @@
     "href": "https://www.trassets.ai/"
   },
   "navbar": {
-    "links": [],
-    "primary": {
-      "type": "button",
-      "label": "API-Key beantragen",
-      "href": "https://portal.api.trassets.ai"
-    }
+    "links": []
   },
   "contextual": {
     "options": [
