@@ -76,16 +76,15 @@ The v1 Operations domain covers two tables: `notifications` and `projects`.
   identifier to use for lookups and joins.
 </ResponseField>
 
-<ResponseField name="property_id" type="integer" required>
-  Unique property identifier. A number here, while `properties.property_id` and most other
-  tables return it as a string — compare the two as strings.
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
 </ResponseField>
 
-<ResponseField name="cost_center_id" type="string">
-  Cost centre the project is booked against.
+<ResponseField name="cost_center" type="object">
+  Cost centre the project is booked against — `{code, label}`.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
+<ResponseField name="creditor_id" type="string">
   Primary creditor for the project. Its values sit in a different identifier space than
   `Stakeholder.creditor.creditor_id` and don't resolve against it — don't rely on it as a
   foreign key.
@@ -126,12 +125,12 @@ The v1 Operations domain covers two tables: `notifications` and `projects`.
   Completion percentage.
 </ResponseField>
 
-<ResponseField name="project_begin_date" type="date">
-  Project start date.
+<ResponseField name="project_period" type="object">
+  Project term — `{start, end}` (date strings).
 </ResponseField>
 
-<ResponseField name="project_end_date" type="date">
-  Project end date.
+<ResponseField name="budget_period" type="object">
+  Period the project budget applies to — `{start, end}` (date strings).
 </ResponseField>
 
 <ResponseField name="projektleitung" type="string">
