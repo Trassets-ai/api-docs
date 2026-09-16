@@ -1,17 +1,13 @@
 ---
-title: "v1 Depreciation Data Model: Assets"
+title: "v1 Depreciation Data Model: Assets and Postings"
 sidebarTitle: "Depreciation"
-description: "Field-level reference for the v1 Depreciation table assets, including the afa_period object and the asset_id/asset_number pair."
+description: "Field-level reference for the v1 Depreciation tables assets and depreciation, including the afa_period object and the asset_id/asset_number pair."
 ---
 
-The v1 Depreciation domain covers one table: `assets`, which follows the [response
-structure](/v1/response-shape-conventions) rules.
-
-<Note>
-  The `depreciation` postings table has no `/v1/` endpoint yet — fetch it via
-  [`Depreciation.depreciation`](/data-model/depreciation#depreciation) in the meantime. Until
-  then, a full depreciation schedule for an asset can't be assembled from `/v1/` alone.
-</Note>
+The v1 Depreciation domain covers two tables: `assets` (the fixed-asset master data) and
+`depreciation` (the postings against them), both following the [response
+structure](/v1/response-shape-conventions) rules. Join them on `asset_id` to assemble a
+full depreciation schedule for an asset.
 
 ## assets
 
@@ -75,3 +71,41 @@ structure](/v1/response-shape-conventions) rules.
   Accounting basis this depreciation record is booked under (e.g. `"Handelsrecht"`,
   `"Steuerrecht"`) — German GAAP vs. tax law depreciation can differ for the same asset.
 </ResponseField>
+
+## depreciation
+
+`GET /v1/depreciation/depreciation` — the individual depreciation postings. One row per
+posting, so an asset depreciated over 50 years has many rows here and exactly one in
+`assets`.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="asset_id" type="integer" required>
+  Asset this posting depreciates. Joins to `assets.asset_id` above.
+</ResponseField>
+
+<ResponseField name="asset_number" type="string">
+  Human-readable asset number, carried over from `assets.asset_number`.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Date the depreciation was posted.
+</ResponseField>
+
+<ResponseField name="booking_net_value" type="string">
+  Net amount depreciated. Decimal value serialized as a string — cast before doing
+  arithmetic on it.
+</ResponseField>
+
+<ResponseField name="booking_text" type="string">
+  Free-text description of the posting.
+</ResponseField>
+
+<Note>
+  These are the depreciation postings only — they are not part of
+  [`Accounting.booking_positions`](/v1/data-model/accounting) and carry no
+  `booking_header_id`, so they can't be tied back to a general-ledger booking through
+  `/v1/`.
+</Note>

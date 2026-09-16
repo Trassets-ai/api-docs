@@ -134,19 +134,24 @@ Kostenstellen und Flächen (Einheiten) innerhalb eines Objekts verbindet.
 </ResponseField>
 
 <ResponseField name="bt_hdr_id" type="integer">
-  Nicht dokumentiert. Vor der Nutzung beim Support nachfragen.
+  ID des Beteiligungskreises, den diese Zeile definiert. Genau auf den Zeilen befüllt, bei
+  denen `is_beteiligungskreis` `true` ist, sonst `null`.
 </ResponseField>
 
 <ResponseField name="is_beteiligungskreis" type="boolean">
-  Nicht dokumentiert. Vor der Nutzung beim Support nachfragen.
+  Ob dieser Knoten ein Beteiligungskreis ist — eine Menge von Flächen, die sich eine
+  Betriebskostenposition teilen, kein physischer Gebäudeteil.
 </ResponseField>
 
 <ResponseField name="is_core_structure" type="boolean">
-  Nicht dokumentiert. Vor der Nutzung beim Support nachfragen.
+  Ob dieser Knoten zur physischen Gebäudehierarchie gehört (Gebäude, Gebäudeteil, Geschoss)
+  und nicht zu Flächen oder Beteiligungskreisen.
 </ResponseField>
 
 <ResponseField name="structure_level_type" type="string">
-  Nicht dokumentiert. Vor der Nutzung beim Support nachfragen.
+  Ebenenbezeichnung physischer Hierarchieknoten (`"Gebäude"`, `"Gebäudeteil"`, `"Geschoss"`),
+  `null` für alles andere. Wo gesetzt, wiederholt das Feld exakt `account_type.label` —
+  besser `account_type` nutzen, das auf jeder Zeile befüllt ist.
 </ResponseField>
 
 <ResponseField name="property_name" type="string">
@@ -247,8 +252,16 @@ Kostenstellen und Flächen (Einheiten) innerhalb eines Objekts verbindet.
   Nicht jede Spalte ist bei jedem Knotentyp befüllt — `floor_area_id`, `floor_area_nr`,
   `address`, `floor_area_name`, `floor_area_type` und die Miet-/Leerstandsfelder sind nur
   bei Flächenzeilen gesetzt (`account_type.code` = `"F"`); `levels` ist bei
-  Kostenstellenzeilen leer.
+  Kostenstellenzeilen leer. `m2` ist auch auf Struktur- und Beteiligungsknoten befüllt — eine
+  Summe über alle Zeilen eines Objekts zählt daher doppelt, vorher auf
+  `account_type.code` = `"F"` filtern.
 </Note>
+
+<Warning>
+  `floor_area_id` kommt hier sowie bei `Stakeholder.tenants` und `Contracts.contract_ends` als
+  Zahl zurück, bei `Contracts.contract_debits` dagegen als JSON-String. Über diese Grenze
+  hinweg vor dem Join auf einen gemeinsamen Typ casten.
+</Warning>
 
 ## property_creditor_services
 
@@ -279,12 +292,8 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
 `GET /v1/property/technical_objects` — technische/gemessene Installationen an einem Objekt
 (Aufzüge, Heizungsanlagen, Zähler und ähnliche Anlagen).
 
-<Note>
-  `technical_objects` liefert über 20 Felder (Gewährleistungs-, Inspektions- und
-  Wartungsdaten und -Flags). Diese Seite behandelt die Identifikations-, Verknüpfungs- und
-  strukturierten Felder — der Tab **API-Referenz** listet jedes Feld auf, das der Endpunkt
-  zurückgibt.
-</Note>
+Die Inspektions-, Wartungs- und Gewährleistungsfelder sind Teil der Response, in der Praxis
+aber kaum befüllt — siehe den Warnhinweis am Ende dieses Abschnitts, bevor du darauf aufbaust.
 
 <ResponseField name="to_id" type="integer" required>
   ID des technischen Objekts.
@@ -333,6 +342,60 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
   Ob dieses Objekt einen Zähler repräsentiert.
 </ResponseField>
 
+<ResponseField name="inactive" type="boolean">
+  Ob das Objekt stillgelegt ist. Heute auf jeder Zeile `false`.
+</ResponseField>
+
+<ResponseField name="responsible_person" type="string">
+  Für das Objekt verantwortliche Person. Nur eine Handvoll unterschiedlicher Werte, und auf
+  etwa einem Drittel der Zeilen ein leerer String.
+</ResponseField>
+
+<ResponseField name="comment" type="string">
+  Freitextkommentar zum Objekt.
+</ResponseField>
+
+<ResponseField name="is_inspection_relevant" type="boolean">
+  Ob das Objekt prüfpflichtig ist. Auf rund 20 von 1.250 Zeilen `true`.
+</ResponseField>
+
+<ResponseField name="inspection_type" type="string">
+  Art der erforderlichen Prüfung.
+</ResponseField>
+
+<ResponseField name="inspection_date" type="date">
+  Datum der Prüfung. Auf genau einer Zeile befüllt — als nicht verfügbar behandeln, nicht als
+  „keine Prüfung fällig".
+</ResponseField>
+
+<ResponseField name="is_maintenance_relevant" type="boolean">
+  Ob das Objekt wartungspflichtig ist. Auf rund 20 von 1.250 Zeilen `true`.
+</ResponseField>
+
+<ResponseField name="maintenance_type" type="string">
+  Art der erforderlichen Wartung.
+</ResponseField>
+
+<ResponseField name="maintenance_date" type="date">
+  Datum der Wartung. Heute auf jeder Zeile `null`.
+</ResponseField>
+
+<ResponseField name="maintenance_creditor_id" type="string">
+  Für die Wartung beauftragter Kreditor. Heute auf jeder Zeile `null` — wer das Objekt
+  wartet, ergibt sich über `service_contract_id`.
+</ResponseField>
+
+<ResponseField name="maintenance_creditor_name" type="string">
+  Name des Wartungskreditors. Heute auf jeder Zeile ein leerer String, passend zu
+  `maintenance_creditor_id`.
+</ResponseField>
+
+<ResponseField name="warranty_period" type="object">
+  Gewährleistungszeitraum — `{start, end}` (Datumsstrings). Das Objekt ist auf jeder Zeile
+  vorhanden, beide Werte sind aber bis auf eine Ausnahme `null` — praktisch liegen hier noch
+  keine Gewährleistungsdaten.
+</ResponseField>
+
 <ResponseField name="property_structure_account_id" type="string">
   Fremdschlüssel auf [`Property.property_structure`](#property_structure), entspricht dessen
   `account_id`. Bedingt befüllt: nur bei Zeilen ohne `floor_area_id` gesetzt; sonst überall
@@ -345,3 +408,9 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
   einen Zähler repräsentieren, aber dieser Endpunkt liefert nur die Stammdaten des Objekts
   (Typ, Standort, verantwortlicher Kreditor) — keine Verbrauchsablesungen.
 </Note>
+
+<Warning>
+  Die Inspektions-, Wartungs- und Gewährleistungsfelder werden ausgeliefert, sind im
+  Quellsystem aber fast durchgängig leer. Keine Compliance- oder Terminlogik darauf aufbauen,
+  ohne vorher die tatsächliche Befüllung in den eigenen Daten zu prüfen.
+</Warning>
