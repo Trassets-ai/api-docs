@@ -18,7 +18,7 @@ The v1 Operations domain currently covers two reviewed tables: `notifications` a
 `GET /v1/operations/notifications` — maintenance reports and damage notifications.
 
 <ResponseField name="report_id" type="integer" required>
-  Unique notification identifier. Renamed from `report_hdr_id`.
+  Unique notification identifier.
 </ResponseField>
 
 <ResponseField name="property_id" type="integer" required>
@@ -26,8 +26,7 @@ The v1 Operations domain currently covers two reviewed tables: `notifications` a
 </ResponseField>
 
 <ResponseField name="technical_object_id" type="integer">
-  Technical object the report concerns. Renamed from `to_hdr_id`/`to_reference_id` and
-  verified against `Property.technical_objects.to_id`.
+  Technical object the report concerns. References `Property.technical_objects.to_id`.
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
@@ -65,12 +64,12 @@ The v1 Operations domain currently covers two reviewed tables: `notifications` a
 `GET /v1/operations/projects` — capital projects and larger multi-order initiatives.
 
 <ResponseField name="project_id" type="integer" required>
-  Unique project identifier. Renamed from `project_hdr_id`.
+  Unique project identifier.
 </ResponseField>
 
 <ResponseField name="project_number" type="string">
-  Project number. This is what the unversioned API calls `project_id` — renamed here to
-  avoid colliding with the real identifier above.
+  Human-readable project number — distinct from `project_id` above, which is the
+  identifier to use for lookups and joins.
 </ResponseField>
 
 <ResponseField name="property_id" type="integer" required>
@@ -82,9 +81,9 @@ The v1 Operations domain currently covers two reviewed tables: `notifications` a
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Primary creditor for the project. Join-tested against `Stakeholder.creditor.creditor_id`:
-  0% match. Treat as currently unresolvable, not as a working foreign key — a pre-existing
-  data issue, unrelated to the v1 reshaping.
+  Primary creditor for the project. Currently doesn't resolve against
+  `Stakeholder.creditor.creditor_id` — treat it as unreliable rather than a working foreign
+  key until the source data is fixed.
 </ResponseField>
 
 <ResponseField name="offer_id" type="integer">
@@ -96,15 +95,14 @@ The v1 Operations domain currently covers two reviewed tables: `notifications` a
 </ResponseField>
 
 <ResponseField name="to_hdr_id" type="integer">
-  Left unchanged and flat on purpose. It looks like a technical-object reference, but a
-  join test rules that out (only 3.5% match against `technical_objects.to_id`, and no
-  better match against `orders`/`notifications`). The target entity is unconfirmed — don't
-  treat it as `technical_object_id` or as a working foreign key.
+  Looks like a technical-object reference by name, but isn't — only about 3.5% match
+  against `technical_objects.to_id`, and no better match against `orders`/`notifications`.
+  The target entity is unconfirmed; don't treat this as a working foreign key.
 </ResponseField>
 
 <ResponseField name="hierarchy" type="string[]">
-  Position in the cost-breakdown hierarchy. Replaces the numbered
-  `hierarchy_1`…`hierarchy_20` columns — empty levels are omitted from the array.
+  Position in the cost-breakdown hierarchy, as an ordered array from the top level down.
+  Empty levels are omitted, so the array length varies per project.
 </ResponseField>
 
 <ResponseField name="project_type" type="string">

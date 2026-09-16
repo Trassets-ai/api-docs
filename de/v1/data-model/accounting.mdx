@@ -6,8 +6,7 @@ description: "Feldreferenz für die v1-Accounting-Tabellen booking_header und bo
 
 Die v1-Accounting-Domäne umfasst aktuell zwei reviewte Tabellen: `booking_header` und
 `booking_positions`. Beide folgen den [Response-Shape-Konventionen](/de/v1/response-shape-conventions)
-— verschachtelte `period`-/`amount`-Objekte, und Sync-Pipeline-Join-Keys werden umbenannt
-statt gestrichen, wenn sie sich als echte Fremdschlüssel herausstellen.
+— verschachtelte `period`-/`amount`-Objekte und stabile Join-Keys.
 
 <Note>
   `accounting.budgets` ist ebenfalls live unter `/v1/`, wird auf dieser Seite aber noch
@@ -28,8 +27,8 @@ statt gestrichen, wenn sie sich als echte Fremdschlüssel herausstellen.
 </ResponseField>
 
 <ResponseField name="booking_header_id" type="integer" required>
-  Eindeutige ID des Buchungskopfs. Umbenannt von `bko_hdr_id`. `booking_positions`
-  referenziert dies als `booking_header_id`.
+  Eindeutige ID des Buchungskopfs. `booking_positions` referenziert dies als
+  `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="booking_nr" type="integer">
@@ -76,44 +75,34 @@ statt gestrichen, wenn sie sich als echte Fremdschlüssel herausstellen.
 </ResponseField>
 
 <ResponseField name="cost_center_id_name_concat" type="string">
-  Kombinierte Kostenstellen-ID und -name. Bewusst flach gehalten — das ist die einzige
-  Quelle dieses Labels; es gibt kein separates ID/Name-Paar oder eine verknüpfbare Tabelle,
-  aus der es sich rekonstruieren ließe.
+  Kombinierte Kostenstellen-ID und -name — die einzige Quelle dieses Labels; es gibt kein
+  separates ID/Name-Paar, gegen das sich stattdessen verknüpfen ließe.
 </ResponseField>
 
 <ResponseField name="ledger_id_name_concat" type="string">
-  Kombinierte Konto-ID und -name. Aus demselben Grund wie `cost_center_id_name_concat`
-  flach gehalten.
+  Kombinierte Konto-ID und -name, aus demselben Grund wie `cost_center_id_name_concat`.
 </ResponseField>
 
 <ResponseField name="person_name_concat" type="string">
-  Kombinierte Personen-ID und -name. Aus demselben Grund wie `cost_center_id_name_concat`
-  flach gehalten.
+  Kombinierte Personen-ID und -name, aus demselben Grund wie `cost_center_id_name_concat`.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Fremdschlüssel auf `Property.property_structure`. Umbenannt von
-  `recommended_join_key` — 1:1 gegen `property_structure.account_id` verifiziert, also ein
-  echter Join-Key, kein Sync-Pipeline-Artefakt.
+  Fremdschlüssel auf `Property.property_structure`, entspricht
+  `property_structure.account_id`.
 </ResponseField>
-
-<Note>
-  `cost_center_m2` aus der unversionierten Tabelle entfällt hier: zu 100 % rekonstruierbar
-  aus `cost_center_id_name_concat` + `m2`.
-</Note>
 
 ## booking_positions
 
 `GET /v1/accounting/booking_positions` — einzelne Buchungspositionen, über
-`booking_header_id` mit einem Kopf verknüpft. Vollständig umgeformt: Datumspaare werden zu
-`period`, die Netto-/Steuer-/Brutto-Trios werden zu `amount`- und `amount_per_sqm`-Objekten.
+`booking_header_id` mit einem Kopf verknüpft.
 
 <ResponseField name="property_id" type="integer" required>
   Eindeutige Objekt-ID.
 </ResponseField>
 
 <ResponseField name="booking_position_id" type="integer" required>
-  Eindeutige ID der Position. Umbenannt von `booking_position_hdr_id`.
+  Eindeutige ID der Position.
 </ResponseField>
 
 <ResponseField name="booking_header_id" type="integer" required>
@@ -131,8 +120,8 @@ statt gestrichen, wenn sie sich als echte Fremdschlüssel herausstellen.
 </ResponseField>
 
 <ResponseField name="contra_account_name" type="string">
-  Name des Gegenkontos. Bewusst flach gehalten — ein Join-Test gegen `accounts` über dieses
-  Feld ergab 0 Treffer, es lässt sich also nicht über `contra_account_id` rekonstruieren.
+  Name des Gegenkontos. Nicht über eine Verknüpfung von `contra_account_id` mit `accounts`
+  ableitbar — die beiden entsprechen sich nicht.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
@@ -145,9 +134,8 @@ statt gestrichen, wenn sie sich als echte Fremdschlüssel herausstellen.
 
 <ResponseField name="property_id_person_id" type="integer">
   Zusammengesetzter Schlüssel, der den Mieter identifiziert, auf den sich diese Position
-  bezieht. Sieht wie eine Verkettung von `property_id` und `person_id` aus, ist es aber
-  nicht — an der Volltabelle mit 1,55 Mio. Zeilen verifiziert, rund 0,16 % der Zeilen folgen
-  diesem Muster nicht. Deshalb als eigenständiges Feld erhalten; nicht selbst ableiten.
+  bezieht. Ähnelt einer Verkettung von `property_id` und `person_id`, ist aber nicht immer
+  exakt das — nutze das Feld wie geliefert, statt es selbst abzuleiten.
 </ResponseField>
 
 <ResponseField name="period" type="object">
@@ -187,9 +175,9 @@ statt gestrichen, wenn sie sich als echte Fremdschlüssel herausstellen.
 </ResponseField>
 
 <ResponseField name="sh" type="string">
-  Soll/Haben-Kennzeichen (`S`/`H`). Bewusst flach gehalten statt in das Vorzeichen von
-  `amount.net` überführt — rund 3,55 % der Zeilen (Storno-/Korrekturbuchungen)
-  widersprechen diesem Vorzeichen-Muster.
+  Soll/Haben-Kennzeichen (`S`/`H`). Nicht aus dem Vorzeichen von `amount.net` ableiten —
+  rund 3,55 % der Zeilen (Storno-/Korrekturbuchungen) haben ein Vorzeichen, das diesem
+  Kennzeichen widerspricht.
 </ResponseField>
 
 <ResponseField name="HNDL" type="number">
@@ -200,6 +188,6 @@ statt gestrichen, wenn sie sich als echte Fremdschlüssel herausstellen.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Fremdschlüssel auf `Property.property_structure`. Umbenannt von
-  `recommended_join_key`, dieselbe verifizierte Umbenennung wie bei `booking_header`.
+  Fremdschlüssel auf `Property.property_structure`, entspricht
+  `property_structure.account_id` — derselbe Join-Key wie bei `booking_header`.
 </ResponseField>
