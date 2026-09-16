@@ -1,22 +1,13 @@
 ---
 title: "Sync-Zyklus: Wie Daten in die API gelangen"
 sidebarTitle: "Sync-Zyklus"
-description: "Verstehe die Databricks-zu-RDS-Sync-Pipeline hinter der Trassets Data API: TRUNCATE+Reload-Semantik, last_sync_at und was GET /changes tatsächlich erkennt."
+description: "Verstehe den vorgelagerten Sync hinter der Trassets Data API: TRUNCATE+Reload-Semantik, last_sync_at und was GET /changes tatsächlich erkennt."
 ---
 
-Die Trassets Data API ist eine reine Lese-Schnittstelle über Daten, die von einer vorgelagerten Pipeline in RDS PostgreSQL synchronisiert werden. Zu verstehen, wie und wann dieser Sync passiert, ist essenziell, um eine korrekte Polling- oder inkrementelle Sync-Integration zu bauen.
-
-## Pipeline-Architektur
-
-Daten fließen durch drei Stufen: **Data Lakehouse → Cloud-Speicher → OLTP-Datenbank**. Die API hat zur Laufzeit keine direkte Verbindung zu Databricks — sie liest ausschließlich aus RDS. Die zugrunde liegenden Databricks-Jobs heißen `parquet_to_s3` und `ingest_parquet_to_rds`.
+Die Trassets Data API ist eine reine Lese-Schnittstelle über Daten, die aus einer vorgelagerten Pipeline synchronisiert werden. Zu verstehen, wie und wann dieser Sync passiert, ist essenziell, um eine korrekte Polling- oder inkrementelle Sync-Integration zu bauen.
 
 <Note>
-  Trassets' interne Dokumentation beschreibt diesen Sync als **täglich** laufend. Die
-  öffentliche API-Schicht in diesem Repository hat keinen eigenen, maschinell erzwungenen
-  Zeitplan, gegen den man das prüfen könnte — der Sync-Takt ist eine Eigenschaft der
-  vorgelagerten Pipeline, nicht etwas, das die API konfiguriert oder offenlegt. Gehe nicht
-  von einer Aktualität unterhalb eines Tages aus — prüfe stattdessen immer `last_sync_at`
-  (siehe unten), statt anzunehmen, dass ein festes Intervall verstrichen ist.
+  Der Sync-Takt ist eine Eigenschaft der vorgelagerten Pipeline, nicht etwas, das die API konfiguriert oder offenlegt — sie hat keinen eigenen, maschinell erzwungenen Zeitplan, gegen den man das prüfen könnte. Gehe nicht von einem festen Aktualisierungsintervall aus — prüfe stattdessen immer `last_sync_at` (siehe unten).
 </Note>
 
 ## TRUNCATE + Reload-Semantik
@@ -28,20 +19,14 @@ Bei jedem Sync-Lauf wird jede Tabelle **vollständig gelöscht und komplett neu 
 
 ## Wann `last_sync_at` gesetzt wird
 
-Der Sync-Status wird pro `(customer_id, table_name)` in einer internen Statustabelle mit diesen Feldern erfasst: `last_sync_at` (nullable Timestamp), `status` (`synced`, `pending` oder `error`), `row_count`, `primary_key_column` und `error_message`.
+`last_sync_at` wird **nur gesetzt, wenn ein Sync für diese Tabelle erfolgreich abgeschlossen wird** — es bleibt `NULL`, bis der erste erfolgreiche Sync stattfindet, und ein fehlgeschlagener oder noch laufender Sync treibt es nicht voran. Das bedeutet:
 
-`last_sync_at` wird **nur gesetzt, wenn ein Sync für diese Tabelle erfolgreich abgeschlossen wird** — es bleibt `NULL`, bis der erste erfolgreiche Sync stattfindet, und ein fehlgeschlagener Sync (`status = 'error'`) treibt es nicht voran. Das bedeutet:
-
-- Eine Tabelle mit `status = 'pending'` oder `status = 'error'` erscheint niemals in `GET /changes`, unabhängig davon, wie kürzlich ein Sync versucht wurde.
+- Eine Tabelle ohne bisherigen erfolgreichen Sync erscheint niemals in `GET /changes`, unabhängig davon, wie kürzlich ein Sync versucht wurde.
 - `last_sync_at` spiegelt den Abschluss **auf Tabellenebene** wider, nicht den Änderungszeitpunkt einer einzelnen Zeile innerhalb dieser Tabelle.
 
 ## Was `GET /changes` tatsächlich prüft
 
-`GET /changes?since=<timestamp>` liefert eine Tabelle nur zurück, wenn **alle** der folgenden Bedingungen erfüllt sind:
-
-- `status` ist exakt `'synced'` (kein anderer Statuswert)
-- `last_sync_at` ist nicht `NULL`
-- `last_sync_at > since` — ein **strikter** Größer-als-Vergleich, kein `>=`
+`GET /changes?since=<timestamp>` liefert eine Tabelle nur zurück, wenn sie einen erfolgreichen Sync mit `last_sync_at > since` abgeschlossen hat — ein **strikter** Größer-als-Vergleich, kein `>=`.
 
 Der `ETag`-Response-Header ist das Maximum von `last_sync_at` über alle synchronisierten Tabellen eines Kunden. Polling mit `If-None-Match` erlaubt dir daher, einen Request komplett zu überspringen, wenn seit deinem letzten Poll nichts synchronisiert wurde (siehe [Delta Sync](/de/guides/delta-sync) für das vollständige Polling-Muster).
 
