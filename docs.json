@@ -179,7 +179,8 @@
                       "concepts/errors",
                       "concepts/filtering",
                       "concepts/rate-limits",
-                      "concepts/sync-cycle"
+                      "concepts/sync-cycle",
+                      "concepts/versioning"
                     ]
                   },
                   {
@@ -230,7 +231,8 @@
                       "de/concepts/errors",
                       "de/concepts/filtering",
                       "de/concepts/rate-limits",
-                      "de/concepts/sync-cycle"
+                      "de/concepts/sync-cycle",
+                      "de/concepts/versioning"
                     ]
                   },
                   {
