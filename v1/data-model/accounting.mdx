@@ -138,10 +138,9 @@ join keys.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Foreign key into `Property.property_structure`, matching `property_structure.account_id`.
-  Always populated, and the only way to resolve a booking down to a single unit —
-  `booking_header` carries no `floor_area_id`. `property_structure` has no `/v1/` endpoint
-  yet, so fetch it via the unversioned path.
+  Foreign key into [`Property.property_structure`](/v1/data-model/property#property_structure),
+  matching `property_structure.account_id`. Always populated, and the only way to resolve a
+  booking down to a single unit — `booking_header` carries no `floor_area_id`.
 </ResponseField>
 
 ## booking_positions

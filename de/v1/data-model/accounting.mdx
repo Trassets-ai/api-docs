@@ -137,11 +137,10 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Fremdschlüssel auf `Property.property_structure`, entspricht
-  `property_structure.account_id`. Immer befüllt und der einzige Weg, eine Buchung auf eine
-  einzelne Einheit herunterzubrechen — `booking_header` führt kein `floor_area_id`.
-  `property_structure` hat noch keinen `/v1/`-Endpunkt, also über den unversionierten Pfad
-  abrufen.
+  Fremdschlüssel auf [`Property.property_structure`](/de/v1/data-model/property#property_structure),
+  entspricht `property_structure.account_id`. Immer befüllt und der einzige Weg, eine
+  Buchung auf eine einzelne Einheit herunterzubrechen — `booking_header` führt kein
+  `floor_area_id`.
 </ResponseField>
 
 ## booking_positions

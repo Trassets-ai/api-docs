@@ -14,7 +14,9 @@ Tabellen.
   </Card>
 
   <Card title="Contracts" icon="file-contract" href="/de/v1/data-model/contracts">
-    `service_contracts`, mit dem `contract_period`-Objekt.
+    `service_contracts`, `contract_debits`, `contract_debit_diffs` und `contract_ends`, mit
+    den Objekten `contract_period`, `debit_period`, `debit_type`, `period` und
+    `option_state`.
   </Card>
 
   <Card title="Depreciation" icon="chart-line-down" href="/de/v1/data-model/depreciation">
@@ -26,23 +28,22 @@ Tabellen.
   </Card>
 
   <Card title="Property" icon="building" href="/de/v1/data-model/property">
-    `properties`, `property_creditor_services` und `technical_objects`, mit dem
-    `entrances`-Array, dem `mandate_period`-Objekt und dem bedingten
-    `property_structure_account_id`-Fallback.
+    `properties`, `property_structure`, `property_creditor_services` und
+    `technical_objects`, mit dem `entrances`-Array, dem `mandate_period`-Objekt, dem
+    `levels`-Array und dem bedingten `property_structure_account_id`-Fallback.
   </Card>
 
   <Card title="Stakeholder" icon="users" href="/de/v1/data-model/stakeholder">
-    `creditor` und `tenants`, beide mit einem `phones`-Array.
+    `creditor`, `employees`, `owner` und `tenants`, mit einem `phones`-Array auf `creditor`
+    und `tenants`.
   </Card>
 </CardGroup>
 
 <Note>
   Diese Tabellen haben noch keinen `/v1/`-Endpunkt: `Accounting.kontenmapping_ranges`,
-  `Contracts.contract_debits`/`contract_debit_diffs`/`contract_ends`,
   `Depreciation.depreciation` (die Buchungstabelle — `assets` ist verfügbar, die Buchungen
-  nicht), `Operations.offers`/`orders`, `Property.property_structure` und
-  `Stakeholder.employees`/`owner`. Bis dahin über den unversionierten Pfad abrufen — siehe
-  das [vollständige Datenmodell](/de/data-model/overview).
+  nicht) und `Operations.offers`/`orders`. Bis dahin über den unversionierten Pfad abrufen —
+  siehe das [vollständige Datenmodell](/de/data-model/overview).
 </Note>
 
 ## Wie die v1-Tabellen zusammenhängen
@@ -92,7 +93,7 @@ graph LR
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
 | `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. | 1 Person → 1..N Mietverhältnisse pro Objekt |
-| `property_structure_account_id` | Fremdschlüssel auf `Property.property_structure` (über den unversionierten Pfad verfügbar), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
+| `property_structure_account_id` | Fremdschlüssel auf [`Property.property_structure`](/de/v1/data-model/property#property_structure), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
 
 <Note>
   Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell, nicht

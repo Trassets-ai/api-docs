@@ -1,16 +1,11 @@
 ---
-title: "v1 Property Data Model: Properties, Creditor Services, and Technical Objects"
+title: "v1 Property Data Model: Properties, Structure, Creditor Services, and Technical Objects"
 sidebarTitle: "Property"
-description: "Field-level reference for the v1 Property tables properties, property_creditor_services, and technical_objects, including the entrances array, mandate_period object, and the conditional property_structure_account_id fallback."
+description: "Field-level reference for the v1 Property tables properties, property_structure, property_creditor_services, and technical_objects, including the entrances array, mandate_period object, levels array, and the conditional property_structure_account_id fallback."
 ---
 
-The v1 Property domain covers three tables: `properties`, `property_creditor_services`, and
-`technical_objects`.
-
-<Note>
-  `property_structure` has no `/v1/` endpoint yet — fetch it via
-  [`Property.property_structure`](/data-model/property#property_structure) in the meantime.
-</Note>
+The v1 Property domain covers four tables: `properties`, `property_structure`,
+`property_creditor_services`, and `technical_objects`.
 
 ## properties
 
@@ -84,6 +79,170 @@ The v1 Property domain covers three tables: `properties`, `property_creditor_ser
 <ResponseField name="dms_link" type="string">
   Link to the property document in the document management system, if attached.
 </ResponseField>
+
+## property_structure
+
+`GET /v1/property/property_structure` — the hierarchy tree that connects buildings,
+floors, cost centres, and floor areas (units) within a property.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="account_id" type="string" required>
+  Business key for this structure node (cost centre or floor area) — format varies by node
+  type (e.g. `"ALLE/5"` for a cost centre, `"9990/91021"` for a floor area). Referenced by
+  `Property.technical_objects.property_structure_account_id`,
+  `Accounting.booking_header.property_structure_account_id`, and
+  `Accounting.booking_positions.property_structure_account_id`. Unrelated to the integer
+  `account_id` used on `Accounting.accounts`/`booking_positions`/`budgets` — see the [Field
+  Glossary](/v1/data-model/field-glossary) for that distinction.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Floor-area identifier, populated only on rows where `account_type.code` is `"F"` (a
+  floor area / unit).
+</ResponseField>
+
+<ResponseField name="levels" type="object[]">
+  Hierarchy path from the property down to this node, one entry per level (e.g. floor, then
+  floor area) — `{name, type}`. Empty for cost-centre nodes.
+</ResponseField>
+
+<ResponseField name="account_type" type="object">
+  Node type — `{code, label}` (e.g. `{"code": "F", "label": "Fläche"}`, `{"code": "K",
+  "label": "Kostenstelle"}`). Many codes exist beyond cost centre/floor area (building,
+  floor, building part, and customer-specific groupings) — treat `code` as an opaque
+  classification rather than an enum you exhaustively branch on.
+</ResponseField>
+
+<ResponseField name="mandate_period" type="object">
+  Management mandate period for this node — `{start, end}` (date strings). A missing key
+  (rather than `null`) means that boundary isn't set; an empty object means neither is.
+</ResponseField>
+
+<ResponseField name="floor_area_period" type="object">
+  Period this floor area has been on file, same shape as `mandate_period` above.
+</ResponseField>
+
+<ResponseField name="active_period" type="object">
+  Period this node has been active, same shape as `mandate_period` above.
+</ResponseField>
+
+<ResponseField name="bt_hdr_id" type="integer">
+  Undocumented. Contact support before relying on it.
+</ResponseField>
+
+<ResponseField name="is_beteiligungskreis" type="boolean">
+  Undocumented. Contact support before relying on it.
+</ResponseField>
+
+<ResponseField name="is_core_structure" type="boolean">
+  Undocumented. Contact support before relying on it.
+</ResponseField>
+
+<ResponseField name="structure_level_type" type="string">
+  Undocumented. Contact support before relying on it.
+</ResponseField>
+
+<ResponseField name="property_name" type="string">
+  Property name.
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Display name of the structure node (cost centre or unit name).
+</ResponseField>
+
+<ResponseField name="floor_area_nr" type="string">
+  Floor-area number, populated only on floor-area rows.
+</ResponseField>
+
+<ResponseField name="address" type="string">
+  Address of this node, populated only on floor-area rows.
+</ResponseField>
+
+<ResponseField name="entrance" type="string">
+  Building entrance, if this node has one.
+</ResponseField>
+
+<ResponseField name="building_part" type="string">
+  Building part / wing, if applicable.
+</ResponseField>
+
+<ResponseField name="floor" type="string">
+  Floor within the building, if applicable.
+</ResponseField>
+
+<ResponseField name="floor_area_name" type="string">
+  Name of the floor area (unit), populated only on floor-area rows.
+</ResponseField>
+
+<ResponseField name="location" type="string">
+  Position of the unit within the building (e.g. left/right), if recorded.
+</ResponseField>
+
+<ResponseField name="floor_area_type" type="string">
+  Usage type of the unit (e.g. `"Wohnung"` for residential), populated only on floor-area
+  rows.
+</ResponseField>
+
+<ResponseField name="no_marketing" type="boolean">
+  Whether this unit is excluded from vacancy marketing.
+</ResponseField>
+
+<ResponseField name="target_rent_per_m2" type="string">
+  Target (budgeted) rent per square metre for this unit. Decimal value serialized as a
+  string, not a JSON number — cast before doing arithmetic on it.
+</ResponseField>
+
+<ResponseField name="market_rent_per_m2" type="string">
+  Market rent per square metre for this unit. Same serialization as `target_rent_per_m2`
+  above.
+</ResponseField>
+
+<ResponseField name="heating" type="string">
+  Heating type for this unit, if recorded.
+</ResponseField>
+
+<ResponseField name="vacancy_reason" type="string">
+  Reason code for this unit's vacancy, if currently vacant.
+</ResponseField>
+
+<ResponseField name="vacancy_reason_comment" type="string">
+  Free-text comment on the vacancy reason.
+</ResponseField>
+
+<ResponseField name="vacancy_reason_begin_date" type="date">
+  Date the current vacancy began.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  Link to a property photo, if available.
+</ResponseField>
+
+<ResponseField name="m2" type="string">
+  Floor area in square metres. Decimal value serialized as a string, not a JSON number —
+  cast before doing arithmetic on it.
+</ResponseField>
+
+<ResponseField name="target_rent_total" type="string">
+  Target (budgeted) rent total for this unit. Decimal value serialized as a string, not a
+  JSON number — cast before doing arithmetic on it.
+</ResponseField>
+
+<ResponseField name="market_rent_total" type="string">
+  Market rent total for this unit. Same serialization as `target_rent_total` above.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link to the related document in the document management system, if attached.
+</ResponseField>
+
+<Note>
+  Not every column is populated for every node type — `floor_area_id`, `floor_area_nr`,
+  `address`, `floor_area_name`, `floor_area_type`, and the rent/vacancy fields are only set
+  on floor-area rows (`account_type.code` = `"F"`); `levels` is empty on cost-centre rows.
+</Note>
 
 ## property_creditor_services
 
@@ -166,9 +325,10 @@ a property, and whether that assignment is exclusive.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Foreign key into `Property.property_structure`, matching its `account_id`. Populated
-  conditionally: set only for rows without a `floor_area_id`; everywhere else it's `null` and
-  `floor_area_id` is the join key. The two never appear together and never both `null`.
+  Foreign key into [`Property.property_structure`](#property_structure), matching its
+  `account_id`. Populated conditionally: set only for rows without a `floor_area_id`;
+  everywhere else it's `null` and `floor_area_id` is the join key. The two never appear
+  together and never both `null`.
 </ResponseField>
 
 <Note>

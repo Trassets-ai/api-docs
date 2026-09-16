@@ -12,7 +12,7 @@ description: "The tables available under /v1/ and how they join — Accounting, 
   </Card>
 
   <Card title="Contracts" icon="file-contract" href="/v1/data-model/contracts">
-    `service_contracts`, with the `contract_period` object.
+    `service_contracts`, `contract_debits`, `contract_debit_diffs`, and `contract_ends`, with the `contract_period`, `debit_period`, `debit_type`, `period`, and `option_state` objects.
   </Card>
 
   <Card title="Depreciation" icon="chart-line-down" href="/v1/data-model/depreciation">
@@ -24,21 +24,19 @@ description: "The tables available under /v1/ and how they join — Accounting, 
   </Card>
 
   <Card title="Property" icon="building" href="/v1/data-model/property">
-    `properties`, `property_creditor_services`, and `technical_objects`, with the `entrances` array, `mandate_period` object, and conditional `property_structure_account_id` fallback.
+    `properties`, `property_structure`, `property_creditor_services`, and `technical_objects`, with the `entrances` array, `mandate_period` object, `levels` array, and conditional `property_structure_account_id` fallback.
   </Card>
 
   <Card title="Stakeholder" icon="users" href="/v1/data-model/stakeholder">
-    `creditor` and `tenants`, both with a `phones` array.
+    `creditor`, `employees`, `owner`, and `tenants`, with a `phones` array on `creditor` and `tenants`.
   </Card>
 </CardGroup>
 
 <Note>
   These tables have no `/v1/` endpoint yet: `Accounting.kontenmapping_ranges`,
-  `Contracts.contract_debits`/`contract_debit_diffs`/`contract_ends`,
   `Depreciation.depreciation` (the postings table — `assets` is available, the postings
-  aren't), `Operations.offers`/`orders`, `Property.property_structure`, and
-  `Stakeholder.employees`/`owner`. Fetch them via the unversioned path in the meantime — see
-  the [full data model](/data-model/overview).
+  aren't), and `Operations.offers`/`orders`. Fetch them via the unversioned path in the
+  meantime — see the [full data model](/data-model/overview).
 </Note>
 
 ## How the v1 tables connect
@@ -88,7 +86,7 @@ graph LR
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
 | `service_contract_id` | Links a technical object to the service contract covering it. References `service_contracts.contract_id`. | 1 contract → many technical objects |
 | `person_id` | Links a booking to the tenant it applies to. Only valid combined with `property_id`, since the numbering restarts per property. | 1 person → 1..N tenancies per property |
-| `property_structure_account_id` | Foreign key into `Property.property_structure` (available via the unversioned path), present on `booking_header`, `booking_positions`, and `technical_objects`. Always populated on the two booking tables, where it's the only route from a booking down to a unit; on `technical_objects` it's the fallback for rows without a `floor_area_id`. | 1 unit → many rows |
+| `property_structure_account_id` | Foreign key into [`Property.property_structure`](/v1/data-model/property#property_structure), present on `booking_header`, `booking_positions`, and `technical_objects`. Always populated on the two booking tables, where it's the only route from a booking down to a unit; on `technical_objects` it's the fallback for rows without a `floor_area_id`. | 1 unit → many rows |
 
 <Note>
   Cardinalities above describe the intended data model, not independently verified row

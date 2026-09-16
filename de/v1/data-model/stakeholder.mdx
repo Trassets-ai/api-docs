@@ -1,17 +1,12 @@
 ---
-title: "v1 Stakeholder Datenmodell: Kreditoren und Mieter"
+title: "v1 Stakeholder Datenmodell: Kreditoren, Mitarbeiter, Eigentümer und Mieter"
 sidebarTitle: "Stakeholder"
-description: "Feldreferenz für die v1-Stakeholder-Tabellen creditor und tenants, inklusive des phones-Arrays auf beiden Tabellen."
+description: "Feldreferenz für die v1-Stakeholder-Tabellen creditor, employees, owner und tenants, inklusive des phones-Arrays auf creditor und tenants."
 ---
 
-Die v1-Stakeholder-Domäne umfasst zwei Tabellen: `creditor` und `tenants`, beide folgen den
-Regeln der [Response-Struktur](/de/v1/response-shape-conventions).
-
-<Note>
-  `employees` und `owner` haben noch keinen `/v1/`-Endpunkt — bis dahin über den
-  unversionierten Pfad abrufen, siehe das [vollständige
-  Datenmodell](/de/data-model/stakeholder).
-</Note>
+Die v1-Stakeholder-Domäne umfasst vier Tabellen: `creditor`, `employees`, `owner` und
+`tenants`, die alle den Regeln der
+[Response-Struktur](/de/v1/response-shape-conventions) folgen.
 
 ## creditor
 
@@ -71,6 +66,115 @@ auf anderen Tabellen.
 
 <ResponseField name="dms_link" type="string">
   Link zum Dokumentenordner des Kreditors im Dokumentenmanagementsystem, falls vorhanden.
+</ResponseField>
+
+## employees
+
+`GET /v1/stakeholder/employees` — das für ein Objekt verantwortliche
+Property-Management-Team.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="team" type="string">
+  Name des für das Objekt verantwortlichen Teams.
+</ResponseField>
+
+<ResponseField name="first_name" type="string">
+  Vorname des Mitarbeiters.
+</ResponseField>
+
+<ResponseField name="last_name" type="string">
+  Nachname des Mitarbeiters.
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  Kontakt-Telefonnummer.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Kontakt-E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="inactive" type="boolean">
+  Ob der Mitarbeiter-Datensatz inaktiv ist.
+</ResponseField>
+
+<Note>
+  Dieser Endpunkt liefert eine Zeile pro Objekt mit dem verantwortlichen Team/Mitarbeiter —
+  er ist kein allgemeines Mitarbeiterverzeichnis.
+</Note>
+
+## owner
+
+`GET /v1/stakeholder/owner` — Stammdaten zu Objekteigentümern, einschließlich des
+Eigentumsanteils bei Objekten mit mehreren Eigentümern.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="debitor_id" type="integer" required>
+  Eigentümer-ID.
+</ResponseField>
+
+<ResponseField name="share" type="string" required>
+  Eigentumsanteil in Prozent. Dezimalwert als String serialisiert, keine JSON-Zahl — vor
+  Rechenoperationen casten. Ein Objekt kann mehrere `owner`-Zeilen haben, deren Summe den
+  gesamten Anteil ergibt.
+</ResponseField>
+
+<ResponseField name="salutation" type="string">
+  Anrede/Titel.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Name des Eigentümers (Privatperson oder Firma).
+</ResponseField>
+
+<ResponseField name="name_2" type="string">
+  Zweite Namenszeile.
+</ResponseField>
+
+<ResponseField name="street_nr" type="string">
+  Straße und Hausnummer.
+</ResponseField>
+
+<ResponseField name="zipcode_city" type="string">
+  Postleitzahl und Ort, in einem Feld kombiniert.
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  Kontakt-Telefonnummer.
+</ResponseField>
+
+<ResponseField name="partner" type="string">
+  Nicht dokumentiert. Vor der Nutzung beim Support nachfragen.
+</ResponseField>
+
+<ResponseField name="bank" type="string">
+  Bankname.
+</ResponseField>
+
+<ResponseField name="fax" type="string">
+  Faxnummer, falls hinterlegt.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Kontakt-E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="bic" type="string">
+  Bank Identifier Code (BIC), falls hinterlegt.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  IBAN des Bankkontos.
+</ResponseField>
+
+<ResponseField name="account_number" type="string">
+  Kontonummer des Eigentümers für Auszahlungen.
 </ResponseField>
 
 ## tenants
