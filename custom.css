@@ -1,0 +1,12 @@
+/* Page title: fixed leading-[2.25rem] makes the H1 look cramped at sm+ breakpoints
+   where font-size grows to text-4xl but line-height doesn't scale with it. */
+#page-title {
+  line-height: 1.25 !important;
+}
+
+/* Widen the content column beyond the default max-w-174 (43.5rem). */
+#content-area {
+  max-width: 56rem !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
