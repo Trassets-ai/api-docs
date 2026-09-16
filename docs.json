@@ -200,7 +200,8 @@
                       "v1/data-model/accounting",
                       "v1/data-model/operations",
                       "v1/data-model/property",
-                      "v1/data-model/stakeholder"
+                      "v1/data-model/stakeholder",
+                      "v1/data-model/field-glossary"
                     ]
                   }
                 ]
@@ -260,7 +261,8 @@
                       "de/v1/data-model/accounting",
                       "de/v1/data-model/operations",
                       "de/v1/data-model/property",
-                      "de/v1/data-model/stakeholder"
+                      "de/v1/data-model/stakeholder",
+                      "de/v1/data-model/field-glossary"
                     ]
                   }
                 ]

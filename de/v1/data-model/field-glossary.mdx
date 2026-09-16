@@ -1,0 +1,29 @@
+---
+title: "v1 Field Glossary"
+sidebarTitle: "Field Glossary"
+description: "Referenzleitfaden zu Feldnamen, die über mehrere /v1/-Tabellen hinweg vorkommen, einschließlich property_id, person_id, creditor_id und dem mehrdeutigen account_id."
+---
+
+Dieses Glossar definiert Feldnamen, die auf mehr als einer im [v1 Datenmodell](/de/v1/data-model/overview)
+dokumentierten `/v1/`-Tabelle vorkommen. Nutze es als schnelle Referenz beim Verknüpfen über
+`/v1/`-Tabellen hinweg — mehrere dieser Felder haben je nach Tabelle unterschiedliche
+Bedeutungen, genau deshalb lohnt sich der Blick hierher.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `property_id` | integer oder string | Eindeutige Objekt-ID; primärer Verknüpfungsschlüssel über jede `/v1/`-Tabelle. Typ variiert je Tabelle — integer bei `booking_header`, `booking_positions`, `budgets`, `notifications`, `projects` und `technical_objects`; string bei `tenants`. |
+| `person_id` | integer oder string | Identifiziert einen Mieter oder eine Kontaktperson. **Kein einheitlicher ID-Raum** — `booking_header.person_id`, `booking_positions.person_id`, `notifications.person_id` und `tenants.person_id` stammen aus unterschiedlichen Subsystemen. Nicht allein über dieses Feld verknüpfen. |
+| `creditor_id` | integer | Identifiziert einen Kreditor (Lieferant oder Dienstleister). Referenziert das unversionierte `Stakeholder.creditor` — es gibt noch keinen `/v1/`-Creditor-Endpunkt. Bei `projects` unzuverlässig; siehe die [Operations-Feldreferenz](/de/v1/data-model/operations). |
+| `floor_area_id` | integer | Referenziert das unversionierte `Property.property_structure` — es gibt noch keinen `/v1/`-property_structure-Endpunkt. Kommt bei `technical_objects` und `tenants` vor. |
+| `account_id` | integer | **Mehrdeutig über Tabellen hinweg — kein einheitlicher Join-Key.** Bei `booking_positions` das Konto, auf das die Position gebucht wird (Fremdschlüssel auf das unversionierte `Accounting.accounts.account_hdr_id`). Bei `budgets` umbenannt aus dem unversionierten `account_hdr_id` und unabhängig von `booking_positions.account_id`. |
+| `property_structure_account_id` | string | Bedingter Fallback-Fremdschlüssel auf das unversionierte `Property.property_structure`, neu in v1. Kommt bei `booking_header`, `booking_positions` und `technical_objects` vor — nur befüllt, wenn der primäre Join-Key der Tabelle die Zeile nicht abdeckt. |
+| `cost_center_id` | string | Kostenstellen-Referenz. Kommt bei `notifications` und `projects` vor; es gibt noch keinen `/v1/`-Kostenstellen-Endpunkt, um sie aufzulösen. |
+| `booking_date` | date | ISO-8601-Datum der Buchhaltungsbuchung. Kommt bei `booking_header` und `booking_positions` vor. |
+| `dms_link` | string | Link zum zugehörigen Dokument im Dokumentenmanagementsystem, falls vorhanden. Kommt bei `booking_header` und `tenants` vor. |
+
+<Note>
+  Felder mit dem Präfix `sk_` sind interne Surrogatschlüssel, die für Verknüpfungen im
+  zugrunde liegenden Data Warehouse verwendet werden. Keine der aktuell unter `/v1/`
+  dokumentierten Tabellen legt einen solchen offen, aber falls dir im Tab **API Reference**
+  einer begegnet: nicht als stabilen Identifikator verwenden.
+</Note>
