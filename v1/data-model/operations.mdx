@@ -1,0 +1,137 @@
+---
+title: "v1 Operations Data Model: Notifications and Projects"
+sidebarTitle: "Operations"
+description: "Field-level reference for the v1 Operations tables notifications and projects, covering the technical_object_id rename and the hierarchy array."
+---
+
+The v1 Operations domain currently covers two reviewed tables: `notifications` and
+`projects`.
+
+<Note>
+  `notifications` and `projects` expose 20+ fields each in the live v1 schema. This page
+  documents the key identifying, join, and reshaped fields — see the **API Reference** tab
+  for the complete, auto-generated field list.
+</Note>
+
+## notifications
+
+`GET /v1/operations/notifications` — maintenance reports and damage notifications.
+
+<ResponseField name="report_id" type="integer" required>
+  Unique notification identifier. Renamed from `report_hdr_id`.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="technical_object_id" type="integer">
+  Technical object the report concerns. Renamed from `to_hdr_id`/`to_reference_id` and
+  verified against `Property.technical_objects.to_id`.
+</ResponseField>
+
+<ResponseField name="person_id" type="integer">
+  Reporting person. This is a `bigint` sequence from a different subsystem — don't treat it
+  as the same identifier space as `person_id` on `Accounting.booking_header` or
+  `Stakeholder.tenants`.
+</ResponseField>
+
+<ResponseField name="cost_center_id" type="string">
+  Cost centre the notification is attributed to.
+</ResponseField>
+
+<ResponseField name="report_type" type="string">
+  Type of report.
+</ResponseField>
+
+<ResponseField name="priority_text" type="string">
+  Priority level.
+</ResponseField>
+
+<ResponseField name="Status" type="string">
+  Current status of the notification.
+</ResponseField>
+
+<ResponseField name="report_date" type="date">
+  Date the report was created.
+</ResponseField>
+
+<ResponseField name="insurance_case" type="boolean">
+  Whether the notification is linked to an insurance claim.
+</ResponseField>
+
+## projects
+
+`GET /v1/operations/projects` — capital projects and larger multi-order initiatives.
+
+<ResponseField name="project_id" type="integer" required>
+  Unique project identifier. Renamed from `project_hdr_id`.
+</ResponseField>
+
+<ResponseField name="project_number" type="string">
+  Project number. This is what the unversioned API calls `project_id` — renamed here to
+  avoid colliding with the real identifier above.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="cost_center_id" type="string">
+  Cost centre the project is booked against.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Primary creditor for the project. Join-tested against `Stakeholder.creditor.creditor_id`:
+  0% match. Treat as currently unresolvable, not as a working foreign key — a pre-existing
+  data issue, unrelated to the v1 reshaping.
+</ResponseField>
+
+<ResponseField name="offer_id" type="integer">
+  Related offer, if applicable.
+</ResponseField>
+
+<ResponseField name="report_id" type="integer">
+  Related notification, if the project originated from one.
+</ResponseField>
+
+<ResponseField name="to_hdr_id" type="integer">
+  Left unchanged and flat on purpose. It looks like a technical-object reference, but a
+  join test rules that out (only 3.5% match against `technical_objects.to_id`, and no
+  better match against `orders`/`notifications`). The target entity is unconfirmed — don't
+  treat it as `technical_object_id` or as a working foreign key.
+</ResponseField>
+
+<ResponseField name="hierarchy" type="string[]">
+  Position in the cost-breakdown hierarchy. Replaces the numbered
+  `hierarchy_1`…`hierarchy_20` columns — empty levels are omitted from the array.
+</ResponseField>
+
+<ResponseField name="project_type" type="string">
+  Project type.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current project status.
+</ResponseField>
+
+<ResponseField name="project_budget" type="number">
+  Total budgeted amount for the project.
+</ResponseField>
+
+<ResponseField name="percentage_completed" type="number">
+  Completion percentage.
+</ResponseField>
+
+<ResponseField name="project_begin_date" type="date">
+  Project start date.
+</ResponseField>
+
+<ResponseField name="project_end_date" type="date">
+  Project end date.
+</ResponseField>
+
+<ResponseField name="projektleitung" type="string">
+  Project-lead flag. Still a `'0'`/`'1'` string, not yet a boolean — meaning of the two
+  values isn't confirmed with the source system yet.
+</ResponseField>

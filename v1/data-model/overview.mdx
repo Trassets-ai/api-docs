@@ -1,0 +1,31 @@
+---
+title: "v1 Data Model: Reviewed Tables"
+sidebarTitle: "Overview"
+description: "The tables currently available under /v1/, reshaped per the response shape conventions — Accounting, Operations, and Property."
+---
+
+`/v1/` only documents a table once it has passed schema review (`v1_reviewed`). Three domains
+currently have at least one reviewed table.
+
+<CardGroup cols={2}>
+  <Card title="Accounting" icon="book" href="/v1/data-model/accounting">
+    `booking_header` and `booking_positions`, with `period`, `amount`, and `amount_per_sqm` objects.
+  </Card>
+
+  <Card title="Operations" icon="clipboard-list" href="/v1/data-model/operations">
+    `notifications` and `projects`, with the `technical_object_id` rename and the `hierarchy` array.
+  </Card>
+
+  <Card title="Property" icon="building" href="/v1/data-model/property">
+    `technical_objects`, with the conditional `property_structure_account_id` fallback.
+  </Card>
+</CardGroup>
+
+<Note>
+  `Accounting.budgets` and `Stakeholder.tenants` are also live under `/v1/`, but aren't
+  documented here yet — both still have open points against the [response shape
+  conventions](/v1/response-shape-conventions). Use their unversioned equivalents in the
+  [full data model](/data-model/overview) for now. Every other table (`orders`,
+  `property_structure`, `assets`, `contract_debits`, and so on) hasn't been reviewed yet and
+  stays on the unversioned path.
+</Note>

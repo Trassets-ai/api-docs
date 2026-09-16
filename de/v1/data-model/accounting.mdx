@@ -1,0 +1,205 @@
+---
+title: "v1 Accounting Datenmodell: Buchungskopf und -positionen"
+sidebarTitle: "Accounting"
+description: "Feldreferenz für die v1-Accounting-Tabellen booking_header und booking_positions, umgeformt mit period-, amount- und amount_per_sqm-Objekten."
+---
+
+Die v1-Accounting-Domäne umfasst aktuell zwei reviewte Tabellen: `booking_header` und
+`booking_positions`. Beide folgen den [Response-Shape-Konventionen](/de/v1/response-shape-conventions)
+— verschachtelte `period`-/`amount`-Objekte, und Sync-Pipeline-Join-Keys werden umbenannt
+statt gestrichen, wenn sie sich als echte Fremdschlüssel herausstellen.
+
+<Note>
+  `accounting.budgets` ist ebenfalls live unter `/v1/`, wird auf dieser Seite aber noch
+  nicht dokumentiert — die Response trägt weiterhin ein bekanntes, ungelöstes Artefakt
+  (`property_id_account_number`), das laut Response-Shape-Konventionen entfernt werden
+  soll. Nutze vorerst das unversionierte [`Accounting.budgets`](/de/data-model/accounting#budgets),
+  oder prüfe die aktuelle Feldliste im Tab **API Reference**.
+</Note>
+
+## booking_header
+
+`GET /v1/accounting/booking_header` — Hauptbuch-Buchungsköpfe. Kein `period`- oder
+`amount`-Objekt: Die Tabelle hat nur ein einzelnes `booking_date`-Feld und ein einzelnes
+`booking_value`-Feld, die beiden Konventionen greifen hier strukturell nicht.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="booking_header_id" type="integer" required>
+  Eindeutige ID des Buchungskopfs. Umbenannt von `bko_hdr_id`. `booking_positions`
+  referenziert dies als `booking_header_id`.
+</ResponseField>
+
+<ResponseField name="booking_nr" type="integer">
+  Buchungsnummer.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string">
+  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="person_id" type="string">
+  Mit der Buchung verknüpfter Mieter oder Ansprechpartner, mit lokaler, objektbezogener
+  Nummerierung. Nicht mit demselben ID-Raum wie `person_id` auf
+  `Operations.notifications` verwechseln — dort ist es eine eigenständige
+  `bigint`-Sequenz aus einem anderen Subsystem.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Datum der Buchung.
+</ResponseField>
+
+<ResponseField name="booking_value" type="number">
+  Gesamtwert des Buchungskopfs.
+</ResponseField>
+
+<ResponseField name="m2" type="number">
+  Mit der Buchung verbundene Fläche in Quadratmetern, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="booking_text" type="string">
+  Freitextbeschreibung der Buchung.
+</ResponseField>
+
+<ResponseField name="initial_booking_text" type="string">
+  Ursprünglicher Buchungstext, vor einer eventuellen späteren Korrektur.
+</ResponseField>
+
+<ResponseField name="booking_barcode" type="string">
+  Barcode-Referenz auf das Buchungsdokument, falls gescannt.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link zum Buchungsdokument im Dokumentenmanagementsystem, falls vorhanden.
+</ResponseField>
+
+<ResponseField name="cost_center_id_name_concat" type="string">
+  Kombinierte Kostenstellen-ID und -name. Bewusst flach gehalten — das ist die einzige
+  Quelle dieses Labels; es gibt kein separates ID/Name-Paar oder eine verknüpfbare Tabelle,
+  aus der es sich rekonstruieren ließe.
+</ResponseField>
+
+<ResponseField name="ledger_id_name_concat" type="string">
+  Kombinierte Konto-ID und -name. Aus demselben Grund wie `cost_center_id_name_concat`
+  flach gehalten.
+</ResponseField>
+
+<ResponseField name="person_name_concat" type="string">
+  Kombinierte Personen-ID und -name. Aus demselben Grund wie `cost_center_id_name_concat`
+  flach gehalten.
+</ResponseField>
+
+<ResponseField name="property_structure_account_id" type="string">
+  Fremdschlüssel auf `Property.property_structure`. Umbenannt von
+  `recommended_join_key` — 1:1 gegen `property_structure.account_id` verifiziert, also ein
+  echter Join-Key, kein Sync-Pipeline-Artefakt.
+</ResponseField>
+
+<Note>
+  `cost_center_m2` aus der unversionierten Tabelle entfällt hier: zu 100 % rekonstruierbar
+  aus `cost_center_id_name_concat` + `m2`.
+</Note>
+
+## booking_positions
+
+`GET /v1/accounting/booking_positions` — einzelne Buchungspositionen, über
+`booking_header_id` mit einem Kopf verknüpft. Vollständig umgeformt: Datumspaare werden zu
+`period`, die Netto-/Steuer-/Brutto-Trios werden zu `amount`- und `amount_per_sqm`-Objekten.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="booking_position_id" type="integer" required>
+  Eindeutige ID der Position. Umbenannt von `booking_position_hdr_id`.
+</ResponseField>
+
+<ResponseField name="booking_header_id" type="integer" required>
+  ID des übergeordneten Buchungskopfs. Verknüpft sich mit
+  `booking_header.booking_header_id`.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer" required>
+  Konto, auf das die Position gebucht wird. Es gibt noch keinen `/v1/`-Accounts-Endpunkt —
+  verknüpfe für Kontostammdaten mit dem unversionierten `Accounting.accounts`.
+</ResponseField>
+
+<ResponseField name="contra_account_id" type="integer">
+  Gegenkonto für die Buchung.
+</ResponseField>
+
+<ResponseField name="contra_account_name" type="string">
+  Name des Gegenkontos. Bewusst flach gehalten — ein Join-Test gegen `accounts` über dieses
+  Feld ergab 0 Treffer, es lässt sich also nicht über `contra_account_id` rekonstruieren.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Mit der Position verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="person_id" type="integer">
+  Mit der Position verknüpfter Mieter oder Ansprechpartner.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Zusammengesetzter Schlüssel, der den Mieter identifiziert, auf den sich diese Position
+  bezieht. Sieht wie eine Verkettung von `property_id` und `person_id` aus, ist es aber
+  nicht — an der Volltabelle mit 1,55 Mio. Zeilen verifiziert, rund 0,16 % der Zeilen folgen
+  diesem Muster nicht. Deshalb als eigenständiges Feld erhalten; nicht selbst ableiten.
+</ResponseField>
+
+<ResponseField name="period" type="object">
+  Buchungszeitraum — `{start, end}` (Datumsstrings).
+</ResponseField>
+
+<ResponseField name="amount" type="object">
+  Buchungsbetrag — `{net, tax, gross}`.
+</ResponseField>
+
+<ResponseField name="amount_per_sqm" type="object">
+  Buchungsbetrag, pro Quadratmeter normalisiert — `{net, tax, gross}`.
+</ResponseField>
+
+<ResponseField name="account_group" type="string">
+  Kontogruppenzuordnung.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Datum der Buchung.
+</ResponseField>
+
+<ResponseField name="booking_nr" type="integer">
+  Buchungsnummer.
+</ResponseField>
+
+<ResponseField name="booking_Lfd_nr" type="integer">
+  Laufende Positionsnummer innerhalb der Buchung.
+</ResponseField>
+
+<ResponseField name="booking_type" type="integer">
+  Buchungstyp-Code.
+</ResponseField>
+
+<ResponseField name="booking_position_text" type="string">
+  Freitextbeschreibung der Position.
+</ResponseField>
+
+<ResponseField name="sh" type="string">
+  Soll/Haben-Kennzeichen (`S`/`H`). Bewusst flach gehalten statt in das Vorzeichen von
+  `amount.net` überführt — rund 3,55 % der Zeilen (Storno-/Korrekturbuchungen)
+  widersprechen diesem Vorzeichen-Muster.
+</ResponseField>
+
+<ResponseField name="HNDL" type="number">
+  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt. Rund 99,2 % der Zeilen sind
+  `0.0`; wo ungleich null, liegt der Wert oft nahe an `amount.net` und konzentriert sich auf
+  bestimmte Buchungstypen im Umfeld umlagefähiger Betriebskosten — passt zu einem
+  Korrekturfeld, ist aber nicht bestätigt. Nicht selbst umbenennen oder umdeuten.
+</ResponseField>
+
+<ResponseField name="property_structure_account_id" type="string">
+  Fremdschlüssel auf `Property.property_structure`. Umbenannt von
+  `recommended_join_key`, dieselbe verifizierte Umbenennung wie bei `booking_header`.
+</ResponseField>

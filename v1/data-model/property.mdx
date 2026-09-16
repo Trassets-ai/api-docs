@@ -1,0 +1,66 @@
+---
+title: "v1 Property Data Model: Technical Objects"
+sidebarTitle: "Property"
+description: "Field-level reference for the v1 Property table technical_objects, including the conditional property_structure_account_id fallback."
+---
+
+The v1 Property domain currently covers one reviewed table: `technical_objects`.
+
+<Note>
+  `technical_objects` exposes 20+ fields in the live v1 schema (warranty, inspection, and
+  maintenance dates and flags). This page documents the key identifying, join, and reshaped
+  fields — see the **API Reference** tab for the complete, auto-generated field list.
+</Note>
+
+## technical_objects
+
+`GET /v1/property/technical_objects` — technical/metered installations at a property
+(elevators, heating systems, meters, and similar equipment).
+
+<ResponseField name="to_id" type="integer" required>
+  Technical object identifier.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Floor area the technical object is installed in, if applicable.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Maintenance creditor responsible for the object. References `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="to_nr" type="string">
+  Technical object number.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Object name.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Object type.
+</ResponseField>
+
+<ResponseField name="built_date" type="date">
+  Installation/build date.
+</ResponseField>
+
+<ResponseField name="is_meter" type="boolean">
+  Whether this object represents a meter.
+</ResponseField>
+
+<ResponseField name="property_structure_account_id" type="string">
+  Foreign key into `Property.property_structure`. New in v1, and populated conditionally:
+  only set for rows without a `floor_area_id` (currently a small minority); everywhere else
+  it's `null` and `floor_area_id` remains the join key.
+</ResponseField>
+
+<Note>
+  There is no separate meter-reading endpoint. A `technical_objects` row can represent a
+  meter, but this endpoint only returns the object's master data (type, location,
+  responsible creditor) — not consumption readings.
+</Note>
