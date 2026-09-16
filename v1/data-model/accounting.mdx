@@ -1,13 +1,69 @@
 ---
-title: "v1 Accounting Data Model: Booking Header, Positions, and Budgets"
+title: "v1 Accounting Data Model: Accounts, Booking Header, Positions, and Budgets"
 sidebarTitle: "Accounting"
-description: "Field-level reference for the v1 Accounting tables booking_header, booking_positions, and budgets, reshaped with period, amount, and amount_per_sqm objects."
+description: "Field-level reference for the v1 Accounting tables accounts, booking_header, booking_positions, and budgets, reshaped with period, amount, and amount_per_sqm objects."
 ---
 
-The v1 Accounting domain currently covers three tables: `booking_header`,
-`booking_positions`, and `budgets`. All three follow the [response shape
+The v1 Accounting domain currently covers four tables: `accounts`, `booking_header`,
+`booking_positions`, and `budgets`. All four follow the [response shape
 conventions](/v1/response-shape-conventions) — nested `period`/`amount` objects and stable
 join keys.
+
+<Note>
+  `kontenmapping_ranges` isn't live under `/v1/` yet — use the unversioned
+  [`Accounting.kontenmapping_ranges`](/data-model/accounting#kontenmapping_ranges) for now.
+</Note>
+
+## accounts
+
+`GET /v1/accounting/accounts` — the chart of accounts.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier. A string here, where the unversioned equivalent is an integer.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer" required>
+  Internal account identifier. Renamed from the unversioned `account_hdr_id` — referenced by
+  `booking_positions` and `budgets` as `account_id`.
+</ResponseField>
+
+<ResponseField name="account_number" type="string">
+  Account number. Renamed from the unversioned `account_id`. `null` on some rows (e.g.
+  summary/total accounts).
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Account name.
+</ResponseField>
+
+<ResponseField name="account_balance_type" type="object">
+  Balance-side code for the account — `{code, label}` (e.g. `{"code": 1, "label":
+  "Aufwandskonto"}`). Replaces the unversioned plain string field, per the [response shape
+  conventions](/v1/response-shape-conventions). `label` is absent for some `code` values.
+</ResponseField>
+
+<ResponseField name="account_type_name" type="string">
+  Human-readable account type.
+</ResponseField>
+
+<ResponseField name="account_group" type="string">
+  Account group assignment. Related to, but not derived through, the unversioned
+  `kontenmapping_ranges`.
+</ResponseField>
+
+<ResponseField name="accounting_entity" type="string">
+  Meaning not yet confirmed with the source system — may be the same join concept as
+  `Property.properties.accounting_property_id`, but this isn't verified. Don't build a join
+  on it without confirming first.
+</ResponseField>
+
+<ResponseField name="account_tax_code" type="integer">
+  Meaning not yet confirmed with the source system.
+</ResponseField>
+
+<ResponseField name="account_tax_appliance" type="integer">
+  Meaning not yet confirmed with the source system.
+</ResponseField>
 
 ## booking_header
 
@@ -29,7 +85,8 @@ join keys.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string">
-  Creditor linked to the booking. References `Stakeholder.creditor`.
+  Creditor linked to the booking. References `Stakeholder.creditor` — see the
+  [Stakeholder field reference](/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
@@ -101,8 +158,7 @@ via `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
-  Account the line item is posted to. There is no `/v1/` accounts endpoint yet — join
-  against the unversioned `Accounting.accounts` for account metadata.
+  Account the line item is posted to. Joins to `accounts.account_id` above.
 </ResponseField>
 
 <ResponseField name="contra_account_id" type="integer">
@@ -115,7 +171,8 @@ via `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Creditor linked to the posting. References `Stakeholder.creditor`.
+  Creditor linked to the posting. References `Stakeholder.creditor` — see the
+  [Stakeholder field reference](/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
@@ -191,9 +248,8 @@ via `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
-  Account the budget applies to. Renamed from the unversioned `account_hdr_id` — joins to
-  the unversioned `Accounting.accounts.account_hdr_id` (there is no `/v1/` accounts endpoint
-  yet).
+  Account the budget applies to. Same rename as on `accounts` — joins to `accounts.account_id`
+  above.
 </ResponseField>
 
 <ResponseField name="account_number" type="integer">

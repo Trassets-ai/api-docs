@@ -1,10 +1,16 @@
 ---
-title: "v1 Property Datenmodell: Objekte und technische Objekte"
+title: "v1 Property Datenmodell: Objekte, Kreditor-Dienstleistungen und technische Objekte"
 sidebarTitle: "Property"
-description: "Feldreferenz für die v1-Property-Tabellen properties und technical_objects, inklusive des entrances-Arrays, des mandate_period-Objekts und des bedingten property_structure_account_id-Fallbacks."
+description: "Feldreferenz für die v1-Property-Tabellen properties, property_creditor_services und technical_objects, inklusive des entrances-Arrays, des mandate_period-Objekts und des bedingten property_structure_account_id-Fallbacks."
 ---
 
-Die v1-Property-Domäne umfasst aktuell zwei Tabellen: `properties` und `technical_objects`.
+Die v1-Property-Domäne umfasst aktuell drei Tabellen: `properties`,
+`property_creditor_services` und `technical_objects`.
+
+<Note>
+  `property_structure` ist noch nicht live unter `/v1/` — nutze vorerst das unversionierte
+  [`Property.property_structure`](/de/data-model/property#property_structure).
+</Note>
 
 ## properties
 
@@ -86,6 +92,33 @@ Die v1-Property-Domäne umfasst aktuell zwei Tabellen: `properties` und `technic
   Link zum Objektdokument im Dokumentenmanagementsystem, falls vorhanden.
 </ResponseField>
 
+## property_creditor_services
+
+`GET /v1/property/property_creditor_services` — welcher Kreditor welche Dienstleistung für
+ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung ein
+  Integer ist.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string" required>
+  Referenziert `Stakeholder.creditor` — siehe die
+  [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Hier ein String, während die
+  unversionierte Entsprechung ein Integer ist.
+</ResponseField>
+
+<ResponseField name="service" type="string">
+  Dienstleistungsname (z. B. Reinigung, Aufzugswartung).
+</ResponseField>
+
+<ResponseField name="exclusivity" type="object">
+  Ob der Kreditor eine exklusive Zuordnung für diese Dienstleistung bei diesem Objekt hat —
+  `{code, label}` (z. B. `{"code": 1, "label": "Exklusiv"}`). Ersetzt das unversionierte
+  reine String-Feld, gemäß den
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
+</ResponseField>
+
 ## technical_objects
 
 `GET /v1/property/technical_objects` — technische/gemessene Installationen an einem Objekt
@@ -111,7 +144,8 @@ Die v1-Property-Domäne umfasst aktuell zwei Tabellen: `properties` und `technic
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Für das Objekt verantwortlicher Wartungskreditor. Referenziert `Stakeholder.creditor`.
+  Für das Objekt verantwortlicher Wartungskreditor. Referenziert `Stakeholder.creditor` —
+  siehe die [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="to_nr" type="string">
