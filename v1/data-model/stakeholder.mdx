@@ -1,17 +1,11 @@
 ---
 title: "v1 Stakeholder Data Model: Tenants"
 sidebarTitle: "Stakeholder"
-description: "Field-level reference for the v1 Stakeholder table tenants, including its lease-date fields and the not-yet-arrayified phone number columns."
+description: "Field-level reference for the v1 Stakeholder table tenants, including its lease-date fields and the phones array."
 ---
 
-The v1 Stakeholder domain currently covers one table: `tenants`.
-
-<Note>
-  `tenants` doesn't yet fully follow the [response shape
-  conventions](/v1/response-shape-conventions) — the numbered `phone_1`/`phone_2`/`phone_3`
-  columns haven't been collapsed into an array. Documented here anyway since the rest of the
-  table is stable; treat those three fields as likely to change shape in a future revision.
-</Note>
+The v1 Stakeholder domain currently covers one table: `tenants`, which follows the
+[response shape conventions](/v1/response-shape-conventions).
 
 ## tenants
 
@@ -63,17 +57,10 @@ The v1 Stakeholder domain currently covers one table: `tenants`.
   Contact email address.
 </ResponseField>
 
-<ResponseField name="phone_1" type="string">
-  Additional phone number.
-</ResponseField>
-
-<ResponseField name="phone_2" type="string">
-  Additional phone number.
-</ResponseField>
-
-<ResponseField name="phone_3" type="string">
-  Additional phone number. These three numbered columns haven't been collapsed into an
-  array yet — see the note above.
+<ResponseField name="phones" type="string[]">
+  Additional phone numbers. Replaces the unversioned `phone_1`/`phone_2`/`phone_3` numbered
+  columns with a single array, per the [response shape
+  conventions](/v1/response-shape-conventions).
 </ResponseField>
 
 <ResponseField name="iban" type="string">

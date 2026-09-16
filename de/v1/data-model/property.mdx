@@ -1,10 +1,95 @@
 ---
-title: "v1 Property Datenmodell: technische Objekte"
+title: "v1 Property Datenmodell: Objekte und technische Objekte"
 sidebarTitle: "Property"
-description: "Feldreferenz für die v1-Property-Tabelle technical_objects, inklusive des bedingten property_structure_account_id-Fallbacks."
+description: "Feldreferenz für die v1-Property-Tabellen properties und technical_objects, inklusive des entrances-Arrays, des mandate_period-Objekts und des bedingten property_structure_account_id-Fallbacks."
 ---
 
-Die v1-Property-Domäne umfasst aktuell eine reviewte Tabelle: `technical_objects`.
+Die v1-Property-Domäne umfasst aktuell zwei Tabellen: `properties` und `technical_objects`.
+
+## properties
+
+`GET /v1/property/properties` — eine Zeile pro Objekt.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung
+  (`Property.properties.property_id`) ein Integer ist.
+</ResponseField>
+
+<ResponseField name="entrances" type="string[]">
+  Zugänge / Straßenadress-Komponenten des Gebäudes. Ersetzt die unversionierten
+  durchnummerierten Spalten `entrance_1`–`entrance_5` durch ein einzelnes Array, gemäß den
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
+</ResponseField>
+
+<ResponseField name="mandate_period" type="object">
+  Verwaltungsmandats-Zeitraum — `{start, end}` (Datumsstrings). Ersetzt die unversionierten
+  getrennten Felder `begin_mandate`/`end_mandate`.
+</ResponseField>
+
+<ResponseField name="accounting_property_id" type="string">
+  Verifizierter Join-Key auf die buchhalterische Objektreferenz. Umbenannt aus einem
+  Sync-Pipeline-Feld der unversionierten Tabelle; das exakte Zieltabellenschema ist noch
+  nicht anderswo dokumentiert — als stabilen Identifikator behandeln, ohne weitere Struktur
+  daraus abzuleiten.
+</ResponseField>
+
+<ResponseField name="obj_name" type="string">
+  Objektname.
+</ResponseField>
+
+<ResponseField name="postcode" type="string">
+  Postleitzahl.
+</ResponseField>
+
+<ResponseField name="adr_city" type="string">
+  Stadt-Komponente der Objektadresse.
+</ResponseField>
+
+<ResponseField name="city" type="string">
+  Stadt. Zu unterscheiden von `adr_city` — welches der beiden Felder für die Anzeige zu
+  nutzen ist, ist mit dem Quellsystem nicht geklärt.
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  Land.
+</ResponseField>
+
+<ResponseField name="construction_year" type="integer">
+  Baujahr des Objekts.
+</ResponseField>
+
+<ResponseField name="longitude" type="number">
+  Längengrad.
+</ResponseField>
+
+<ResponseField name="latitude" type="number">
+  Breitengrad.
+</ResponseField>
+
+<ResponseField name="state_name" type="string">
+  Bundesland.
+</ResponseField>
+
+<ResponseField name="use_type" type="string">
+  Nutzungsart des Objekts.
+</ResponseField>
+
+<ResponseField name="property_type" type="string">
+  Objekttyp.
+</ResponseField>
+
+<ResponseField name="tax_model" type="string">
+  Für das Objekt angewendetes Steuermodell.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link zum Objektdokument im Dokumentenmanagementsystem, falls vorhanden.
+</ResponseField>
+
+## technical_objects
+
+`GET /v1/property/technical_objects` — technische/gemessene Installationen an einem Objekt
+(Aufzüge, Heizungsanlagen, Zähler und ähnliche Anlagen).
 
 <Note>
   `technical_objects` stellt im Live-v1-Schema über 20 Felder bereit (Gewährleistungs-,
@@ -12,11 +97,6 @@ Die v1-Property-Domäne umfasst aktuell eine reviewte Tabelle: `technical_object
   Identifikations-, Verknüpfungs- und umgeformten Felder — die vollständige, automatisch
   generierte Feldliste findest du im Tab **API Reference**.
 </Note>
-
-## technical_objects
-
-`GET /v1/property/technical_objects` — technische/gemessene Installationen an einem Objekt
-(Aufzüge, Heizungsanlagen, Zähler und ähnliche Anlagen).
 
 <ResponseField name="to_id" type="integer" required>
   ID des technischen Objekts.

@@ -1,7 +1,7 @@
 ---
 title: "v1 Data Model: Tables Live Today"
 sidebarTitle: "Overview"
-description: "The tables currently available under /v1/, reshaped per the response shape conventions, and how they join — Accounting, Operations, and Property."
+description: "The tables currently available under /v1/, reshaped per the response shape conventions, and how they join — Accounting, Operations, Property, and Stakeholder."
 ---
 
 `/v1/` only documents a table once it's live. Four domains currently have at least one
@@ -17,21 +17,20 @@ documented table.
   </Card>
 
   <Card title="Property" icon="building" href="/v1/data-model/property">
-    `technical_objects`, with the conditional `property_structure_account_id` fallback.
+    `properties`, with the `entrances` array and `mandate_period` object, and `technical_objects`, with the conditional `property_structure_account_id` fallback.
   </Card>
 
   <Card title="Stakeholder" icon="users" href="/v1/data-model/stakeholder">
-    `tenants`, with lease dates and contact fields — the `phone_1`–`phone_3` columns aren't arrayified yet.
+    `tenants`, with lease dates, contact fields, and the `phones` array.
   </Card>
 </CardGroup>
 
 <Note>
-  `Property.properties` is also live under `/v1/`, but is exposed as-is (raw numbered
-  `entrance_1`–`entrance_5` columns and all) rather than reshaped — it's deliberately left
-  out of this data model. Use the unversioned
-  [`Property.properties`](/data-model/property#properties) instead. Every other table
-  (`orders`, `property_structure`, `assets`, `contract_debits`, and so on) isn't live under
-  `/v1/` yet and stays on the unversioned path.
+  The rest of the unversioned data model isn't live under `/v1/` yet: the whole Contracts
+  and Depreciation domains, plus `Accounting.accounts`, `Operations.offers`/`orders`,
+  `Property.property_structure`/`property_creditor_services`, and
+  `Stakeholder.creditor`/`employees`/`owner`. Use their unversioned equivalents in the [full
+  data model](/data-model/overview) for now.
 </Note>
 
 ## How the v1 tables connect

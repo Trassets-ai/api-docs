@@ -5,9 +5,9 @@ description: "Field-level reference for the v1 Accounting tables booking_header,
 ---
 
 The v1 Accounting domain currently covers three tables: `booking_header`,
-`booking_positions`, and `budgets`. `booking_header` and `booking_positions` follow the
-[response shape conventions](/v1/response-shape-conventions) — nested `period`/`amount`
-objects and stable join keys; `budgets` still carries one open artifact, flagged below.
+`booking_positions`, and `budgets`. All three follow the [response shape
+conventions](/v1/response-shape-conventions) — nested `period`/`amount` objects and stable
+join keys.
 
 ## booking_header
 
@@ -206,10 +206,4 @@ via `booking_header_id`.
 
 <ResponseField name="budget" type="number" required>
   Budget amount for the specific month and account.
-</ResponseField>
-
-<ResponseField name="property_id_account_number" type="integer">
-  Sync-pipeline artifact, not yet resolved. The [response shape
-  conventions](/v1/response-shape-conventions) call for dropping unverifiable artifacts like
-  this one — don't build on it, it may be removed in a future revision.
 </ResponseField>

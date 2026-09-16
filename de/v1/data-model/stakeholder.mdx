@@ -1,18 +1,11 @@
 ---
 title: "v1 Stakeholder Datenmodell: Mieter"
 sidebarTitle: "Stakeholder"
-description: "Feldreferenz für die v1-Stakeholder-Tabelle tenants, inklusive ihrer Mietvertrags-Datumsfelder und der noch nicht zu einem Array zusammengefassten Telefon-Spalten."
+description: "Feldreferenz für die v1-Stakeholder-Tabelle tenants, inklusive ihrer Mietvertrags-Datumsfelder und des phones-Arrays."
 ---
 
-Die v1-Stakeholder-Domäne umfasst aktuell eine Tabelle: `tenants`.
-
-<Note>
-  `tenants` folgt noch nicht vollständig den
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions) — die durchnummerierten
-  Spalten `phone_1`/`phone_2`/`phone_3` wurden noch nicht zu einem Array zusammengefasst.
-  Trotzdem hier dokumentiert, da der Rest der Tabelle stabil ist; diese drei Felder können
-  sich in einer künftigen Revision noch ändern.
-</Note>
+Die v1-Stakeholder-Domäne umfasst aktuell eine Tabelle: `tenants`, die den
+[Response-Shape-Konventionen](/de/v1/response-shape-conventions) folgt.
 
 ## tenants
 
@@ -65,17 +58,10 @@ Die v1-Stakeholder-Domäne umfasst aktuell eine Tabelle: `tenants`.
   Kontakt-E-Mail-Adresse.
 </ResponseField>
 
-<ResponseField name="phone_1" type="string">
-  Zusätzliche Telefonnummer.
-</ResponseField>
-
-<ResponseField name="phone_2" type="string">
-  Zusätzliche Telefonnummer.
-</ResponseField>
-
-<ResponseField name="phone_3" type="string">
-  Zusätzliche Telefonnummer. Diese drei durchnummerierten Spalten wurden noch nicht zu
-  einem Array zusammengefasst — siehe Hinweis oben.
+<ResponseField name="phones" type="string[]">
+  Zusätzliche Telefonnummern. Ersetzt die unversionierten durchnummerierten Spalten
+  `phone_1`/`phone_2`/`phone_3` durch ein einzelnes Array, gemäß den
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
 </ResponseField>
 
 <ResponseField name="iban" type="string">

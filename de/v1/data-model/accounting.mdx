@@ -5,10 +5,9 @@ description: "Feldreferenz für die v1-Accounting-Tabellen booking_header, booki
 ---
 
 Die v1-Accounting-Domäne umfasst aktuell drei Tabellen: `booking_header`,
-`booking_positions` und `budgets`. `booking_header` und `booking_positions` folgen den
+`booking_positions` und `budgets`. Alle drei folgen den
 [Response-Shape-Konventionen](/de/v1/response-shape-conventions) — verschachtelte
-`period`-/`amount`-Objekte und stabile Join-Keys; `budgets` trägt noch ein offenes Artefakt,
-siehe unten.
+`period`-/`amount`-Objekte und stabile Join-Keys.
 
 ## booking_header
 
@@ -211,11 +210,4 @@ siehe unten.
 
 <ResponseField name="budget" type="number" required>
   Budgetbetrag für den jeweiligen Monat und das jeweilige Konto.
-</ResponseField>
-
-<ResponseField name="property_id_account_number" type="integer">
-  Sync-Pipeline-Artefakt, noch nicht aufgelöst. Die
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions) sehen vor, unverifizierbare
-  Artefakte wie dieses zu entfernen — nicht darauf aufbauen, es kann in einer künftigen
-  Revision entfernt werden.
 </ResponseField>
