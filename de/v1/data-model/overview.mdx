@@ -1,7 +1,7 @@
 ---
 title: "v1 Datenmodell: aktuell verfügbare Tabellen"
 sidebarTitle: "Übersicht"
-description: "Die Tabellen, die aktuell unter /v1/ verfügbar sind, umgeformt nach den Response-Shape-Konventionen, und wie sie sich verknüpfen — Accounting, Operations und Property."
+description: "Die Tabellen, die aktuell unter /v1/ verfügbar sind, umgeformt nach den Response-Shape-Konventionen, und wie sie sich verknüpfen — Accounting, Operations, Property und Stakeholder."
 ---
 
 `/v1/` dokumentiert eine Tabelle erst, sobald sie live ist. Aktuell haben vier Domänen
@@ -19,22 +19,21 @@ mindestens eine dokumentierte Tabelle.
   </Card>
 
   <Card title="Property" icon="building" href="/de/v1/data-model/property">
+    `properties`, mit dem `entrances`-Array und dem `mandate_period`-Objekt, und
     `technical_objects`, mit dem bedingten `property_structure_account_id`-Fallback.
   </Card>
 
   <Card title="Stakeholder" icon="users" href="/de/v1/data-model/stakeholder">
-    `tenants`, mit Mietvertrags-Datumsfeldern und Kontaktdaten — die Spalten
-    `phone_1`–`phone_3` sind noch nicht zu einem Array zusammengefasst.
+    `tenants`, mit Mietvertrags-Datumsfeldern, Kontaktdaten und dem `phones`-Array.
   </Card>
 </CardGroup>
 
 <Note>
-  `Property.properties` ist ebenfalls live unter `/v1/`, wird aber unverändert (inklusive
-  der durchnummerierten Spalten `entrance_1`–`entrance_5`) statt umgeformt ausgeliefert —
-  bewusst nicht Teil dieses Datenmodells. Nutze stattdessen das unversionierte
-  [`Property.properties`](/de/data-model/property#properties). Jede andere Tabelle
-  (`orders`, `property_structure`, `assets`, `contract_debits` usw.) ist noch nicht live
-  unter `/v1/` und bleibt auf dem unversionierten Pfad.
+  Der Rest des unversionierten Datenmodells ist noch nicht live unter `/v1/`: die
+  kompletten Domänen Contracts und Depreciation, sowie `Accounting.accounts`,
+  `Operations.offers`/`orders`, `Property.property_structure`/`property_creditor_services`
+  und `Stakeholder.creditor`/`employees`/`owner`. Nutze vorerst ihre unversionierten
+  Entsprechungen im [vollständigen Datenmodell](/de/data-model/overview).
 </Note>
 
 ## Wie die v1-Tabellen zusammenhängen
