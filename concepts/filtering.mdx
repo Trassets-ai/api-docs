@@ -1,0 +1,28 @@
+---
+title: "Filtering: Rows and Columns"
+sidebarTitle: "Filtering"
+description: "How to filter rows via query parameters, and how column-level access is controlled per API key in the Trassets Data API."
+---
+
+The Trassets Data API has two independent filtering axes: which **rows** come back, controlled by you via query parameters, and which **columns** come back, controlled by an admin per API key.
+
+## Row filtering (horizontal)
+
+Category endpoints accept query parameters named after the columns you can filter on — each one does an exact match. Which columns are filterable varies per endpoint; check the **API Reference** tab for the exact list on the endpoint you're calling.
+
+```text
+GET /property/properties?city=Berlin&use_type=Wohnen
+GET /contracts/contract_debits?property_id=1234&date_begin=2024-01-01
+```
+
+There is no range, wildcard, or `OR` syntax — a query parameter matches rows where that column equals the given value exactly. To narrow further, combine multiple parameters; they are ANDed together.
+
+<Note>
+  Raw endpoints (`/raw/{table_name}`) do not support these filters — they always return the full unfiltered table, paginated via cursor. See [Endpoint Types](/concepts/endpoint-types).
+</Note>
+
+## Column filtering (vertical)
+
+Which fields an entity's response includes can be restricted per API key. An admin configures this in the Trassets portal, per key and per entity — a key without explicit configuration returns the full column set documented in the **API Reference**. Changes take effect immediately, without an API redeploy.
+
+This is not something you control via the request itself — there is no `fields` or `select` query parameter. If a field you expect is missing from a response even though it's listed in the API Reference for that entity, your API key's column configuration is the likely cause; contact Trassets support to review or change it.

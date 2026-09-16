@@ -34,6 +34,7 @@
                 "pages": [
                   "concepts/endpoint-types",
                   "concepts/errors",
+                  "concepts/filtering",
                   "concepts/pagination",
                   "concepts/rate-limits",
                   "concepts/sync-cycle",
@@ -102,6 +103,7 @@
                 "pages": [
                   "de/concepts/endpoint-types",
                   "de/concepts/errors",
+                  "de/concepts/filtering",
                   "de/concepts/pagination",
                   "de/concepts/rate-limits",
                   "de/concepts/sync-cycle",
@@ -175,6 +177,7 @@
                     "pages": [
                       "v1/response-shape-conventions",
                       "concepts/errors",
+                      "concepts/filtering",
                       "concepts/rate-limits",
                       "concepts/sync-cycle"
                     ]
@@ -225,6 +228,7 @@
                     "pages": [
                       "de/v1/response-shape-conventions",
                       "de/concepts/errors",
+                      "de/concepts/filtering",
                       "de/concepts/rate-limits",
                       "de/concepts/sync-cycle"
                     ]
