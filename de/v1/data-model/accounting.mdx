@@ -1,20 +1,14 @@
 ---
-title: "v1 Accounting Datenmodell: Buchungskopf und -positionen"
+title: "v1 Accounting Datenmodell: Buchungskopf, -positionen und Budgets"
 sidebarTitle: "Accounting"
-description: "Feldreferenz für die v1-Accounting-Tabellen booking_header und booking_positions, umgeformt mit period-, amount- und amount_per_sqm-Objekten."
+description: "Feldreferenz für die v1-Accounting-Tabellen booking_header, booking_positions und budgets, umgeformt mit period-, amount- und amount_per_sqm-Objekten."
 ---
 
-Die v1-Accounting-Domäne umfasst aktuell zwei reviewte Tabellen: `booking_header` und
-`booking_positions`. Beide folgen den [Response-Shape-Konventionen](/de/v1/response-shape-conventions)
-— verschachtelte `period`-/`amount`-Objekte und stabile Join-Keys.
-
-<Note>
-  `accounting.budgets` ist ebenfalls live unter `/v1/`, wird auf dieser Seite aber noch
-  nicht dokumentiert — die Response trägt weiterhin ein bekanntes, ungelöstes Artefakt
-  (`property_id_account_number`), das laut Response-Shape-Konventionen entfernt werden
-  soll. Nutze vorerst das unversionierte [`Accounting.budgets`](/de/data-model/accounting#budgets),
-  oder prüfe die aktuelle Feldliste im Tab **API Reference**.
-</Note>
+Die v1-Accounting-Domäne umfasst aktuell drei Tabellen: `booking_header`,
+`booking_positions` und `budgets`. `booking_header` und `booking_positions` folgen den
+[Response-Shape-Konventionen](/de/v1/response-shape-conventions) — verschachtelte
+`period`-/`amount`-Objekte und stabile Join-Keys; `budgets` trägt noch ein offenes Artefakt,
+siehe unten.
 
 ## booking_header
 
@@ -190,4 +184,38 @@ Die v1-Accounting-Domäne umfasst aktuell zwei reviewte Tabellen: `booking_heade
 <ResponseField name="property_structure_account_id" type="string">
   Fremdschlüssel auf `Property.property_structure`, entspricht
   `property_structure.account_id` — derselbe Join-Key wie bei `booking_header`.
+</ResponseField>
+
+## budgets
+
+`GET /v1/accounting/budgets` — Budgetbeträge, eine Zeile pro Objekt, Konto und Monat.
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer" required>
+  Konto, für das das Budget gilt. Umbenannt aus dem unversionierten `account_hdr_id` —
+  verknüpft sich mit dem unversionierten `Accounting.accounts.account_hdr_id` (es gibt noch
+  keinen `/v1/`-Accounts-Endpunkt).
+</ResponseField>
+
+<ResponseField name="account_number" type="integer">
+  Kontonummer. Hier ein Integer, während die unversionierte Entsprechung
+  (`accounts.account_id`) ein String ist.
+</ResponseField>
+
+<ResponseField name="date" type="date" required>
+  Monat, für den die Budgetzeile gilt.
+</ResponseField>
+
+<ResponseField name="budget" type="number" required>
+  Budgetbetrag für den jeweiligen Monat und das jeweilige Konto.
+</ResponseField>
+
+<ResponseField name="property_id_account_number" type="integer">
+  Sync-Pipeline-Artefakt, noch nicht aufgelöst. Die
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions) sehen vor, unverifizierbare
+  Artefakte wie dieses zu entfernen — nicht darauf aufbauen, es kann in einer künftigen
+  Revision entfernt werden.
 </ResponseField>

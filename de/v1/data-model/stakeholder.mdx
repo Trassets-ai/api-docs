@@ -1,0 +1,118 @@
+---
+title: "v1 Stakeholder Datenmodell: Mieter"
+sidebarTitle: "Stakeholder"
+description: "Feldreferenz für die v1-Stakeholder-Tabelle tenants, inklusive ihrer Mietvertrags-Datumsfelder und der noch nicht zu einem Array zusammengefassten Telefon-Spalten."
+---
+
+Die v1-Stakeholder-Domäne umfasst aktuell eine Tabelle: `tenants`.
+
+<Note>
+  `tenants` folgt noch nicht vollständig den
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions) — die durchnummerierten
+  Spalten `phone_1`/`phone_2`/`phone_3` wurden noch nicht zu einem Array zusammengefasst.
+  Trotzdem hier dokumentiert, da der Rest der Tabelle stabil ist; diese drei Felder können
+  sich in einer künftigen Revision noch ändern.
+</Note>
+
+## tenants
+
+`GET /v1/stakeholder/tenants` — Mieterstammdaten und aktuelle Mietvertragskonditionen.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung
+  (`Stakeholder.tenants.property_id`) ein Integer ist.
+</ResponseField>
+
+<ResponseField name="tenancy_id" type="string" required>
+  Eindeutige ID dieses Mietverhältnisses.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Einheit, die der Mieter belegt. Referenziert `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="person_id" type="string" required>
+  Mieter-ID.
+</ResponseField>
+
+<ResponseField name="person_name" type="string">
+  Vollständiger Mietername als ein einzelnes Feld. Keine getrennten Vor-/Nachnamen
+  verfügbar.
+</ResponseField>
+
+<ResponseField name="name_1" type="string">
+  Erste Namenszeile im Mieterdatensatz. Verhältnis zu `person_name` ist mit dem Quellsystem
+  nicht geklärt.
+</ResponseField>
+
+<ResponseField name="name_2" type="string">
+  Zweite Namenszeile im Mieterdatensatz, falls vorhanden.
+</ResponseField>
+
+<ResponseField name="street_nr" type="string">
+  Straße und Hausnummer der Kontaktadresse des Mieters.
+</ResponseField>
+
+<ResponseField name="zipcode_city" type="string">
+  Postleitzahl und Ort der Kontaktadresse des Mieters, in einem Feld kombiniert.
+</ResponseField>
+
+<ResponseField name="contact_phone_main" type="string">
+  Primäre Kontakttelefonnummer.
+</ResponseField>
+
+<ResponseField name="contact_mail" type="string">
+  Kontakt-E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="phone_1" type="string">
+  Zusätzliche Telefonnummer.
+</ResponseField>
+
+<ResponseField name="phone_2" type="string">
+  Zusätzliche Telefonnummer.
+</ResponseField>
+
+<ResponseField name="phone_3" type="string">
+  Zusätzliche Telefonnummer. Diese drei durchnummerierten Spalten wurden noch nicht zu
+  einem Array zusammengefasst — siehe Hinweis oben.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  IBAN des Mieters, falls hinterlegt.
+</ResponseField>
+
+<ResponseField name="bank" type="string">
+  Bank des Mieters, falls hinterlegt.
+</ResponseField>
+
+<ResponseField name="contract_begin" type="date">
+  Mietvertragsbeginn.
+</ResponseField>
+
+<ResponseField name="contract_end" type="date">
+  Mietvertragsende.
+</ResponseField>
+
+<ResponseField name="contract_end_option" type="date">
+  Mietvertragsende bei Ausübung einer Verlängerungsoption.
+</ResponseField>
+
+<ResponseField name="contract_end_actual" type="date">
+  Tatsächliches/effektives Mietvertragsende.
+</ResponseField>
+
+<ResponseField name="option_valid_until" type="date">
+  Frist zur Ausübung der Verlängerungsoption.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link zum Mietvertragsdokument im Dokumentenmanagementsystem, falls vorhanden.
+</ResponseField>
+
+<Note>
+  Das unversionierte `Stakeholder.tenants` stellt zusätzlich die zusammengesetzten
+  Schlüssel `floor_area_person_id` und `property_id_person_id` bereit — keiner von beiden
+  ist in dieser v1-Response enthalten. Verknüpfe stattdessen über `property_id` und
+  `floor_area_id`.
+</Note>

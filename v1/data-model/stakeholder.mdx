@@ -1,0 +1,115 @@
+---
+title: "v1 Stakeholder Data Model: Tenants"
+sidebarTitle: "Stakeholder"
+description: "Field-level reference for the v1 Stakeholder table tenants, including its lease-date fields and the not-yet-arrayified phone number columns."
+---
+
+The v1 Stakeholder domain currently covers one table: `tenants`.
+
+<Note>
+  `tenants` doesn't yet fully follow the [response shape
+  conventions](/v1/response-shape-conventions) — the numbered `phone_1`/`phone_2`/`phone_3`
+  columns haven't been collapsed into an array. Documented here anyway since the rest of the
+  table is stable; treat those three fields as likely to change shape in a future revision.
+</Note>
+
+## tenants
+
+`GET /v1/stakeholder/tenants` — tenant master data and current lease terms.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier. A string here, where the unversioned equivalent
+  (`Stakeholder.tenants.property_id`) is an integer.
+</ResponseField>
+
+<ResponseField name="tenancy_id" type="string" required>
+  Unique identifier for this tenancy.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Unit the tenant occupies. References `Property.property_structure`.
+</ResponseField>
+
+<ResponseField name="person_id" type="string" required>
+  Tenant identifier.
+</ResponseField>
+
+<ResponseField name="person_name" type="string">
+  Full tenant name as a single field. No separate first/last name available.
+</ResponseField>
+
+<ResponseField name="name_1" type="string">
+  First name line on the tenant record. Relationship to `person_name` isn't confirmed with
+  the source system.
+</ResponseField>
+
+<ResponseField name="name_2" type="string">
+  Second name line on the tenant record, if present.
+</ResponseField>
+
+<ResponseField name="street_nr" type="string">
+  Street and house number of the tenant's contact address.
+</ResponseField>
+
+<ResponseField name="zipcode_city" type="string">
+  Postal code and city of the tenant's contact address, combined into one field.
+</ResponseField>
+
+<ResponseField name="contact_phone_main" type="string">
+  Primary contact phone number.
+</ResponseField>
+
+<ResponseField name="contact_mail" type="string">
+  Contact email address.
+</ResponseField>
+
+<ResponseField name="phone_1" type="string">
+  Additional phone number.
+</ResponseField>
+
+<ResponseField name="phone_2" type="string">
+  Additional phone number.
+</ResponseField>
+
+<ResponseField name="phone_3" type="string">
+  Additional phone number. These three numbered columns haven't been collapsed into an
+  array yet — see the note above.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  Tenant's bank account IBAN, if on file.
+</ResponseField>
+
+<ResponseField name="bank" type="string">
+  Tenant's bank name, if on file.
+</ResponseField>
+
+<ResponseField name="contract_begin" type="date">
+  Lease start date.
+</ResponseField>
+
+<ResponseField name="contract_end" type="date">
+  Lease end date.
+</ResponseField>
+
+<ResponseField name="contract_end_option" type="date">
+  Lease end date if an extension option is exercised.
+</ResponseField>
+
+<ResponseField name="contract_end_actual" type="date">
+  Actual/effective lease end date.
+</ResponseField>
+
+<ResponseField name="option_valid_until" type="date">
+  Deadline to exercise the extension option.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link to the lease document in the document management system, if attached.
+</ResponseField>
+
+<Note>
+  The unversioned `Stakeholder.tenants` also exposes `floor_area_person_id` and
+  `property_id_person_id` composite keys — neither is present in this v1 response. Join via
+  `property_id` and `floor_area_id` instead.
+</Note>

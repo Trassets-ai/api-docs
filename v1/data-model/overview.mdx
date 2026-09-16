@@ -4,12 +4,12 @@ sidebarTitle: "Overview"
 description: "The tables currently available under /v1/, reshaped per the response shape conventions, and how they join — Accounting, Operations, and Property."
 ---
 
-`/v1/` only documents a table once it's live. Three domains currently have at least one
+`/v1/` only documents a table once it's live. Four domains currently have at least one
 documented table.
 
 <CardGroup cols={2}>
   <Card title="Accounting" icon="book" href="/v1/data-model/accounting">
-    `booking_header` and `booking_positions`, with `period`, `amount`, and `amount_per_sqm` objects.
+    `booking_header`, `booking_positions`, and `budgets`, with `period`, `amount`, and `amount_per_sqm` objects.
   </Card>
 
   <Card title="Operations" icon="clipboard-list" href="/v1/data-model/operations">
@@ -19,15 +19,19 @@ documented table.
   <Card title="Property" icon="building" href="/v1/data-model/property">
     `technical_objects`, with the conditional `property_structure_account_id` fallback.
   </Card>
+
+  <Card title="Stakeholder" icon="users" href="/v1/data-model/stakeholder">
+    `tenants`, with lease dates and contact fields — the `phone_1`–`phone_3` columns aren't arrayified yet.
+  </Card>
 </CardGroup>
 
 <Note>
-  `Accounting.budgets` and `Stakeholder.tenants` are also live under `/v1/`, but aren't
-  documented here yet — both still have open points against the [response shape
-  conventions](/v1/response-shape-conventions). Use their unversioned equivalents in the
-  [full data model](/data-model/overview) for now. Every other table (`orders`,
-  `property_structure`, `assets`, `contract_debits`, and so on) isn't live under `/v1/` yet
-  and stays on the unversioned path.
+  `Property.properties` is also live under `/v1/`, but is exposed as-is (raw numbered
+  `entrance_1`–`entrance_5` columns and all) rather than reshaped — it's deliberately left
+  out of this data model. Use the unversioned
+  [`Property.properties`](/data-model/property#properties) instead. Every other table
+  (`orders`, `property_structure`, `assets`, `contract_debits`, and so on) isn't live under
+  `/v1/` yet and stays on the unversioned path.
 </Note>
 
 ## How the v1 tables connect
@@ -42,6 +46,8 @@ graph LR
   properties -->|property_id| notifications["Operations.notifications"]
   properties -->|property_id| projects["Operations.projects"]
   properties -->|property_id| technical_objects["Property.technical_objects<br/>(to_id)"]
+  properties -->|property_id| budgets["Accounting.budgets"]
+  properties -->|property_id| tenants["Stakeholder.tenants"]
 
   booking_header -->|booking_header_id| booking_positions["Accounting.booking_positions"]
   notifications -->|technical_object_id| technical_objects
@@ -57,6 +63,10 @@ graph LR
 | `technical_object_id` | Links a notification to the technical object it concerns. References `technical_objects.to_id`. | 1 technical object → many notifications |
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
 | `property_structure_account_id` | Conditional fallback foreign key into the unversioned `Property.property_structure`, present on `booking_header`, `booking_positions`, and `technical_objects`. Populated only where the table's primary join key doesn't cover the row — see each table's field reference for the exact condition. | varies per table, see field reference |
+
+`budgets` and `tenants` only carry `property_id` as a join key into the tables on this
+page — see their field references for other, external join keys (`account_id`,
+`floor_area_id`).
 
 <Note>
   Cardinalities above describe the intended data model, not independently verified row
