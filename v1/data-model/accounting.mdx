@@ -1,21 +1,13 @@
 ---
-title: "v1 Accounting Data Model: Booking Header and Positions"
+title: "v1 Accounting Data Model: Booking Header, Positions, and Budgets"
 sidebarTitle: "Accounting"
-description: "Field-level reference for the v1 Accounting tables booking_header and booking_positions, reshaped with period, amount, and amount_per_sqm objects."
+description: "Field-level reference for the v1 Accounting tables booking_header, booking_positions, and budgets, reshaped with period, amount, and amount_per_sqm objects."
 ---
 
-The v1 Accounting domain currently covers two reviewed tables: `booking_header` and
-`booking_positions`. Both follow the [response shape
-conventions](/v1/response-shape-conventions) — nested `period`/`amount` objects and stable
-join keys.
-
-<Note>
-  `accounting.budgets` is also live under `/v1/`, but isn't documented on this page yet —
-  its response still carries a known, unresolved artifact (`property_id_account_number`)
-  that the response shape conventions call for removing. Use the unversioned
-  [`Accounting.budgets`](/data-model/accounting#budgets) for now, or check the **API
-  Reference** tab for the live v1 field list.
-</Note>
+The v1 Accounting domain currently covers three tables: `booking_header`,
+`booking_positions`, and `budgets`. `booking_header` and `booking_positions` follow the
+[response shape conventions](/v1/response-shape-conventions) — nested `period`/`amount`
+objects and stable join keys; `budgets` still carries one open artifact, flagged below.
 
 ## booking_header
 
@@ -187,4 +179,37 @@ via `booking_header_id`.
 <ResponseField name="property_structure_account_id" type="string">
   Foreign key into `Property.property_structure`, matching `property_structure.account_id`
   — the same join key as on `booking_header`.
+</ResponseField>
+
+## budgets
+
+`GET /v1/accounting/budgets` — budget amounts, one row per property, account, and month.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer" required>
+  Account the budget applies to. Renamed from the unversioned `account_hdr_id` — joins to
+  the unversioned `Accounting.accounts.account_hdr_id` (there is no `/v1/` accounts endpoint
+  yet).
+</ResponseField>
+
+<ResponseField name="account_number" type="integer">
+  Account number. An integer here, where the unversioned equivalent (`accounts.account_id`)
+  is a string.
+</ResponseField>
+
+<ResponseField name="date" type="date" required>
+  Month the budget row applies to.
+</ResponseField>
+
+<ResponseField name="budget" type="number" required>
+  Budget amount for the specific month and account.
+</ResponseField>
+
+<ResponseField name="property_id_account_number" type="integer">
+  Sync-pipeline artifact, not yet resolved. The [response shape
+  conventions](/v1/response-shape-conventions) call for dropping unverifiable artifacts like
+  this one — don't build on it, it may be removed in a future revision.
 </ResponseField>
