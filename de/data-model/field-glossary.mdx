@@ -1,6 +1,6 @@
 ---
-title: "Field Glossary für die Data API"
-sidebarTitle: "Field Glossary"
+title: "Feldglossar für die Data API"
+sidebarTitle: "Feldglossar"
 description: "Referenzleitfaden zu gängigen Feldnamen in der Data API, einschließlich entrance, address, floor_area_id, property_id und Pagination-Cursorn."
 ---
 
@@ -21,8 +21,7 @@ Datenmodelle abbildest oder Verknüpfungen über Domänen hinweg gestaltest.
 | `next_cursor` | string | Undurchsichtiger Cursor für die Pagination des Raw-Endpunkts; null, wenn alle Zeilen abgerufen wurden |
 
 <Note>
-  Felder mit dem Präfix `sk_` sind interne Surrogatschlüssel, die für Verknüpfungen im
-  zugrunde liegenden Data Warehouse verwendet werden. Sie sind keine stabilen
+  Felder mit dem Präfix `sk_` sind interne Surrogatschlüssel. Sie sind keine stabilen
   Identifikatoren für die externe Nutzung und sollten in deinen Integrationen nicht
   verwendet werden.
 </Note>

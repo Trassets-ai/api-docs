@@ -4,13 +4,13 @@ sidebarTitle: "Contracts"
 description: "Field-level reference for the v1 Contracts table service_contracts, including the contract_period object."
 ---
 
-The v1 Contracts domain currently covers one table: `service_contracts`, which follows the
-[response shape conventions](/v1/response-shape-conventions).
+The v1 Contracts domain covers one table: `service_contracts`, which follows the [response
+structure](/v1/response-shape-conventions) rules.
 
 <Note>
-  `contract_debits`, `contract_debit_diffs`, and `contract_ends` aren't live under `/v1/`
-  yet — use their unversioned equivalents in the [full data
-  model](/data-model/contracts) for now.
+  `contract_debits`, `contract_debit_diffs`, and `contract_ends` have no `/v1/` endpoint
+  yet — fetch them via the unversioned path in the meantime, see the [full data
+  model](/data-model/contracts).
 </Note>
 
 ## service_contracts
@@ -18,14 +18,12 @@ The v1 Contracts domain currently covers one table: `service_contracts`, which f
 `GET /v1/contracts/service_contracts` — maintenance and service contracts.
 
 <ResponseField name="property_id" type="string" required>
-  Unique property identifier. A string here, where the unversioned equivalent
-  (`Contracts.service_contracts.property_id`) is an integer.
+  Unique property identifier.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string" required>
   Identifies the service provider. References `Stakeholder.creditor` — see the
-  [Stakeholder field reference](/v1/data-model/stakeholder). A string here, where the
-  unversioned equivalent is an integer.
+  [Stakeholder field reference](/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="creditor_name" type="string">
@@ -34,8 +32,7 @@ The v1 Contracts domain currently covers one table: `service_contracts`, which f
 </ResponseField>
 
 <ResponseField name="contract_id" type="string" required>
-  Contract identifier (e.g. `"2019/00015"`). A formatted string here, where the unversioned
-  equivalent is a plain integer.
+  Contract identifier, a formatted string (e.g. `"2019/00015"`).
 </ResponseField>
 
 <ResponseField name="contract_number" type="string">
@@ -55,8 +52,7 @@ The v1 Contracts domain currently covers one table: `service_contracts`, which f
 </ResponseField>
 
 <ResponseField name="contract_period" type="object">
-  Contract term — `{start, end}` (date strings). Replaces the unversioned separate
-  `contract_begin`/`contract_end` fields.
+  Contract term — `{start, end}` (date strings).
 </ResponseField>
 
 <ResponseField name="contract_value" type="string">

@@ -1,11 +1,11 @@
 ---
 title: "Data API v1 (Preview)"
 sidebarTitle: "Overview"
-description: "Preview of the versioned Data API, rolled out table by table, and the response shape conventions it is moving towards."
+description: "Preview of the versioned Data API: which tables are available under /v1/ and how its responses are structured."
 ---
 
 <Warning>
-  `/v1/` is live but not complete: endpoints are added one table at a time as they pass review. Check the **API Reference** tab (generated from the live `openapi-v1.json`) for what is currently available — do not assume a table listed under the unversioned API is already reachable under `/v1/`.
+  `/v1/` is live but not yet complete: tables are added one at a time. The **API Reference** tab always shows what is available right now — a table listed under the unversioned API is not automatically reachable under `/v1/`.
 </Warning>
 
-`/v1/` mirrors the unversioned API's paths under a `/v1/{category}/{api_table}` prefix. A table only appears once it has been reviewed against the [response shape conventions](/v1/response-shape-conventions); until then, keep using the unversioned path for that table.
+`/v1/` serves data under a `/v1/{category}/{api_table}` path prefix, with responses that follow the [response structure](/v1/response-shape-conventions) rules. For a table that has no `/v1/` endpoint yet, keep using the unversioned path.

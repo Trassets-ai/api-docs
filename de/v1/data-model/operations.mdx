@@ -1,21 +1,21 @@
 ---
 title: "v1 Operations Datenmodell: Meldungen und Projekte"
 sidebarTitle: "Operations"
-description: "Feldreferenz für die v1-Operations-Tabellen notifications und projects, inklusive der Umbenennung zu technical_object_id und dem hierarchy-Array."
+description: "Feldreferenz für die v1-Operations-Tabellen notifications und projects, inklusive technical_object_id und dem hierarchy-Array."
 ---
 
-Die v1-Operations-Domäne umfasst aktuell zwei Tabellen: `notifications` und `projects`.
+Die v1-Operations-Domäne umfasst zwei Tabellen: `notifications` und `projects`.
 
 <Note>
-  `offers` und `orders` sind noch nicht live unter `/v1/` — nutze vorerst ihre
-  unversionierten Entsprechungen im [vollständigen Datenmodell](/de/data-model/operations).
+  `offers` und `orders` haben noch keinen `/v1/`-Endpunkt — bis dahin über den
+  unversionierten Pfad abrufen, siehe das [vollständige
+  Datenmodell](/de/data-model/operations).
 </Note>
 
 <Note>
-  `notifications` und `projects` stellen im Live-v1-Schema jeweils über 20 Felder bereit.
-  Diese Seite dokumentiert nur die wichtigsten Identifikations-, Verknüpfungs- und
-  umgeformten Felder — die vollständige, automatisch generierte Feldliste findest du im
-  Tab **API Reference**.
+  `notifications` und `projects` liefern jeweils über 20 Felder. Diese Seite behandelt die
+  Identifikations-, Verknüpfungs- und strukturierten Felder — der Tab **API-Referenz**
+  listet jedes Feld auf, das ein Endpunkt zurückgibt.
 </Note>
 
 ## notifications
@@ -89,8 +89,7 @@ Aufträgen.
 
 <ResponseField name="creditor_id" type="integer">
   Hauptkreditor für das Projekt. Löst sich aktuell nicht gegen
-  `Stakeholder.creditor.creditor_id` auf — als unzuverlässig behandeln, nicht als
-  funktionierenden Fremdschlüssel, bis die Quelldaten korrigiert sind.
+  `Stakeholder.creditor.creditor_id` auf — nicht als Fremdschlüssel verwenden.
 </ResponseField>
 
 <ResponseField name="offer_id" type="integer">
@@ -102,10 +101,9 @@ Aufträgen.
 </ResponseField>
 
 <ResponseField name="to_hdr_id" type="integer">
-  Sieht dem Namen nach wie eine Referenz auf ein technisches Objekt aus, ist es aber
-  nicht — nur rund 3,5 % Treffer gegen `technical_objects.to_id`, auch gegen
-  `orders`/`notifications` kein besserer Treffer. Die Zielentität ist ungeklärt; nicht als
-  funktionierenden Fremdschlüssel behandeln.
+  Trotz des Namens löst sich das Feld nicht gegen `technical_objects.to_id` auf (nur rund
+  3,5 % der Zeilen passen). Nicht als Fremdschlüssel verwenden — für funktionierende
+  Verknüpfungen `report_id` oder `offer_id` nutzen.
 </ResponseField>
 
 <ResponseField name="hierarchy" type="string[]">
@@ -139,6 +137,6 @@ Aufträgen.
 </ResponseField>
 
 <ResponseField name="projektleitung" type="string">
-  Projektleitungs-Flag. Noch ein `'0'`/`'1'`-String, kein Boolean — die Bedeutung der
-  beiden Werte ist mit dem Quellsystem noch nicht geklärt.
+  Projektleitungs-Flag, ein `'0'`/`'1'`-String statt eines Boolean. Vor der Nutzung der
+  beiden Werte beim Support nachfragen.
 </ResponseField>

@@ -4,12 +4,12 @@ sidebarTitle: "Property"
 description: "Feldreferenz für die v1-Property-Tabellen properties, property_creditor_services und technical_objects, inklusive des entrances-Arrays, des mandate_period-Objekts und des bedingten property_structure_account_id-Fallbacks."
 ---
 
-Die v1-Property-Domäne umfasst aktuell drei Tabellen: `properties`,
-`property_creditor_services` und `technical_objects`.
+Die v1-Property-Domäne umfasst drei Tabellen: `properties`, `property_creditor_services`
+und `technical_objects`.
 
 <Note>
-  `property_structure` ist noch nicht live unter `/v1/` — nutze vorerst das unversionierte
-  [`Property.property_structure`](/de/data-model/property#property_structure).
+  `property_structure` hat noch keinen `/v1/`-Endpunkt — bis dahin über
+  [`Property.property_structure`](/de/data-model/property#property_structure) abrufen.
 </Note>
 
 ## properties
@@ -17,26 +17,20 @@ Die v1-Property-Domäne umfasst aktuell drei Tabellen: `properties`,
 `GET /v1/property/properties` — eine Zeile pro Objekt.
 
 <ResponseField name="property_id" type="string" required>
-  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung
-  (`Property.properties.property_id`) ein Integer ist.
+  Eindeutige Objekt-ID.
 </ResponseField>
 
 <ResponseField name="entrances" type="string[]">
-  Zugänge / Straßenadress-Komponenten des Gebäudes. Ersetzt die unversionierten
-  durchnummerierten Spalten `entrance_1`–`entrance_5` durch ein einzelnes Array, gemäß den
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
+  Zugänge / Straßenadress-Komponenten des Gebäudes, als Array mit einem Eintrag pro Zugang.
 </ResponseField>
 
 <ResponseField name="mandate_period" type="object">
-  Verwaltungsmandats-Zeitraum — `{start, end}` (Datumsstrings). Ersetzt die unversionierten
-  getrennten Felder `begin_mandate`/`end_mandate`.
+  Verwaltungsmandats-Zeitraum — `{start, end}` (Datumsstrings).
 </ResponseField>
 
 <ResponseField name="accounting_property_id" type="string">
-  Verifizierter Join-Key auf die buchhalterische Objektreferenz. Umbenannt aus einem
-  Sync-Pipeline-Feld der unversionierten Tabelle; das exakte Zieltabellenschema ist noch
-  nicht anderswo dokumentiert — als stabilen Identifikator behandeln, ohne weitere Struktur
-  daraus abzuleiten.
+  Join-Key auf die buchhalterische Objektreferenz. Als opaken Identifikator behandeln —
+  keine weitere Struktur aus dem Wert ableiten.
 </ResponseField>
 
 <ResponseField name="obj_name" type="string">
@@ -52,8 +46,8 @@ Die v1-Property-Domäne umfasst aktuell drei Tabellen: `properties`,
 </ResponseField>
 
 <ResponseField name="city" type="string">
-  Stadt. Zu unterscheiden von `adr_city` — welches der beiden Felder für die Anzeige zu
-  nutzen ist, ist mit dem Quellsystem nicht geklärt.
+  Stadt. Zu unterscheiden von `adr_city`; vor der Wahl eines der beiden Felder für die
+  Anzeige beim Support nachfragen.
 </ResponseField>
 
 <ResponseField name="country" type="string">
@@ -98,14 +92,12 @@ Die v1-Property-Domäne umfasst aktuell drei Tabellen: `properties`,
 ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
 
 <ResponseField name="property_id" type="string" required>
-  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung ein
-  Integer ist.
+  Eindeutige Objekt-ID.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string" required>
   Referenziert `Stakeholder.creditor` — siehe die
-  [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Hier ein String, während die
-  unversionierte Entsprechung ein Integer ist.
+  [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="service" type="string">
@@ -114,9 +106,8 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
 
 <ResponseField name="exclusivity" type="object">
   Ob der Kreditor eine exklusive Zuordnung für diese Dienstleistung bei diesem Objekt hat —
-  `{code, label}` (z. B. `{"code": 1, "label": "Exklusiv"}`). Ersetzt das unversionierte
-  reine String-Feld, gemäß den
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
+  `{code, label}` (z. B. `{"code": 1, "label": "Exklusiv"}`), gemäß den Regeln der
+  [Response-Struktur](/de/v1/response-shape-conventions).
 </ResponseField>
 
 ## technical_objects
@@ -125,10 +116,10 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
 (Aufzüge, Heizungsanlagen, Zähler und ähnliche Anlagen).
 
 <Note>
-  `technical_objects` stellt im Live-v1-Schema über 20 Felder bereit (Gewährleistungs-,
-  Inspektions- und Wartungsdaten und -Flags). Diese Seite dokumentiert nur die wichtigsten
-  Identifikations-, Verknüpfungs- und umgeformten Felder — die vollständige, automatisch
-  generierte Feldliste findest du im Tab **API Reference**.
+  `technical_objects` liefert über 20 Felder (Gewährleistungs-, Inspektions- und
+  Wartungsdaten und -Flags). Diese Seite behandelt die Identifikations-, Verknüpfungs- und
+  strukturierten Felder — der Tab **API-Referenz** listet jedes Feld auf, das der Endpunkt
+  zurückgibt.
 </Note>
 
 <ResponseField name="to_id" type="integer" required>
@@ -169,9 +160,9 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Fremdschlüssel auf `Property.property_structure`. Neu in v1 und bedingt befüllt: nur bei
-  Zeilen ohne `floor_area_id` gesetzt (aktuell eine kleine Minderheit); sonst überall
-  `null`, dort bleibt `floor_area_id` der Join-Key.
+  Fremdschlüssel auf `Property.property_structure`. Bedingt befüllt: nur bei Zeilen ohne
+  `floor_area_id` gesetzt (aktuell eine kleine Minderheit); sonst überall `null`, dort ist
+  `floor_area_id` der Join-Key.
 </ResponseField>
 
 <Note>

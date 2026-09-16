@@ -4,24 +4,22 @@ sidebarTitle: "Stakeholder"
 description: "Field-level reference for the v1 Stakeholder tables creditor and tenants, including the phones array on both tables."
 ---
 
-The v1 Stakeholder domain currently covers two tables: `creditor` and `tenants`, both of
-which follow the [response shape conventions](/v1/response-shape-conventions).
+The v1 Stakeholder domain covers two tables: `creditor` and `tenants`, both of which follow
+the [response structure](/v1/response-shape-conventions) rules.
 
 <Note>
-  `employees` and `owner` aren't live under `/v1/` yet — use their unversioned equivalents
-  in the [full data model](/data-model/stakeholder) for now.
+  `employees` and `owner` have no `/v1/` endpoint yet — fetch them via the unversioned path
+  in the meantime, see the [full data model](/data-model/stakeholder).
 </Note>
 
 ## creditor
 
-`GET /v1/stakeholder/creditor` — vendor and creditor master data. Like the unversioned
-equivalent, this is the only v1 Stakeholder endpoint without a `property_id` column — a
-creditor is a standalone entity that may serve multiple properties, referenced by
-`creditor_id` on other tables.
+`GET /v1/stakeholder/creditor` — vendor and creditor master data. This is the only
+Stakeholder endpoint without a `property_id` column — a creditor is a standalone entity that
+may serve multiple properties, referenced by `creditor_id` on other tables.
 
 <ResponseField name="creditor_id" type="string" required>
-  Unique creditor identifier. A string here, where the unversioned equivalent
-  (`Stakeholder.creditor.creditor_id`) is an integer.
+  Unique creditor identifier.
 </ResponseField>
 
 <ResponseField name="name_1" type="string">
@@ -49,9 +47,8 @@ creditor is a standalone entity that may serve multiple properties, referenced b
 </ResponseField>
 
 <ResponseField name="phones" type="string[]">
-  Phone numbers. Replaces the unversioned `phone_1` (and any further numbered columns) with
-  a single array, per the [response shape
-  conventions](/v1/response-shape-conventions) — same reshape as `Stakeholder.tenants.phones`.
+  Phone numbers, as an array with one entry per number — same shape as
+  `Stakeholder.tenants.phones`.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
@@ -79,8 +76,7 @@ creditor is a standalone entity that may serve multiple properties, referenced b
 `GET /v1/stakeholder/tenants` — tenant master data and current lease terms.
 
 <ResponseField name="property_id" type="string" required>
-  Unique property identifier. A string here, where the unversioned equivalent
-  (`Stakeholder.tenants.property_id`) is an integer.
+  Unique property identifier.
 </ResponseField>
 
 <ResponseField name="tenancy_id" type="string" required>
@@ -100,8 +96,8 @@ creditor is a standalone entity that may serve multiple properties, referenced b
 </ResponseField>
 
 <ResponseField name="name_1" type="string">
-  First name line on the tenant record. Relationship to `person_name` isn't confirmed with
-  the source system.
+  First name line on the tenant record. Contact support before relying on its relationship
+  to `person_name`.
 </ResponseField>
 
 <ResponseField name="name_2" type="string">
@@ -125,9 +121,7 @@ creditor is a standalone entity that may serve multiple properties, referenced b
 </ResponseField>
 
 <ResponseField name="phones" type="string[]">
-  Additional phone numbers. Replaces the unversioned `phone_1`/`phone_2`/`phone_3` numbered
-  columns with a single array, per the [response shape
-  conventions](/v1/response-shape-conventions).
+  Additional phone numbers, as an array with one entry per number.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
@@ -138,20 +132,12 @@ creditor is a standalone entity that may serve multiple properties, referenced b
   Tenant's bank name, if on file.
 </ResponseField>
 
-<ResponseField name="contract_begin" type="date">
-  Lease start date.
-</ResponseField>
-
-<ResponseField name="contract_end" type="date">
-  Lease end date.
+<ResponseField name="contract_period" type="object">
+  Lease term — `{start, end}` (date strings).
 </ResponseField>
 
 <ResponseField name="contract_end_option" type="date">
   Lease end date if an extension option is exercised.
-</ResponseField>
-
-<ResponseField name="contract_end_actual" type="date">
-  Actual/effective lease end date.
 </ResponseField>
 
 <ResponseField name="option_valid_until" type="date">
@@ -163,7 +149,6 @@ creditor is a standalone entity that may serve multiple properties, referenced b
 </ResponseField>
 
 <Note>
-  The unversioned `Stakeholder.tenants` also exposes `floor_area_person_id` and
-  `property_id_person_id` composite keys — neither is present in this v1 response. Join via
-  `property_id` and `floor_area_id` instead.
+  There are no composite key fields on this endpoint. To link a tenancy to a unit, join via
+  `property_id` and `floor_area_id`.
 </Note>

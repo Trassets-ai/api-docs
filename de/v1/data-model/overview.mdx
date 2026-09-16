@@ -1,11 +1,11 @@
 ---
-title: "v1 Datenmodell: aktuell verfügbare Tabellen"
+title: "v1 Datenmodell"
 sidebarTitle: "Übersicht"
-description: "Die Tabellen, die aktuell unter /v1/ verfügbar sind, umgeformt nach den Response-Shape-Konventionen, und wie sie sich verknüpfen — Accounting, Contracts, Depreciation, Operations, Property und Stakeholder."
+description: "Die unter /v1/ verfügbaren Tabellen und wie sie sich verknüpfen — Accounting, Contracts, Depreciation, Operations, Property und Stakeholder."
 ---
 
-`/v1/` dokumentiert eine Tabelle erst, sobald sie live ist. Aktuell hat jede der sechs
-Domänen mindestens eine dokumentierte Tabelle.
+`/v1/` umfasst sechs Datendomänen. Jede Domänenseite enthält die Feldreferenz ihrer
+Tabellen.
 
 <CardGroup cols={2}>
   <Card title="Accounting" icon="book" href="/de/v1/data-model/accounting">
@@ -18,12 +18,11 @@ Domänen mindestens eine dokumentierte Tabelle.
   </Card>
 
   <Card title="Depreciation" icon="chart-line-down" href="/de/v1/data-model/depreciation">
-    `assets`, mit dem `afa_period`-Objekt und dem umbenannten Paar `asset_id`/`asset_number`.
+    `assets`, mit dem `afa_period`-Objekt und dem Paar `asset_id`/`asset_number`.
   </Card>
 
   <Card title="Operations" icon="clipboard-list" href="/de/v1/data-model/operations">
-    `notifications` und `projects`, mit der Umbenennung zu `technical_object_id` und dem
-    `hierarchy`-Array.
+    `notifications` und `projects`, mit `technical_object_id` und dem `hierarchy`-Array.
   </Card>
 
   <Card title="Property" icon="building" href="/de/v1/data-model/property">
@@ -38,12 +37,12 @@ Domänen mindestens eine dokumentierte Tabelle.
 </CardGroup>
 
 <Note>
-  Der Rest des unversionierten Datenmodells ist noch nicht live unter `/v1/`:
-  `Accounting.kontenmapping_ranges`, komplett `Contracts.contract_debits`/
-  `contract_debit_diffs`/`contract_ends`, `Depreciation.depreciation` (die
-  Buchungstabelle — `assets` ist live, die Buchungen nicht), `Operations.offers`/`orders`,
-  `Property.property_structure` und `Stakeholder.employees`/`owner`. Nutze vorerst ihre
-  unversionierten Entsprechungen im [vollständigen Datenmodell](/de/data-model/overview).
+  Diese Tabellen haben noch keinen `/v1/`-Endpunkt: `Accounting.kontenmapping_ranges`,
+  `Contracts.contract_debits`/`contract_debit_diffs`/`contract_ends`,
+  `Depreciation.depreciation` (die Buchungstabelle — `assets` ist verfügbar, die Buchungen
+  nicht), `Operations.offers`/`orders`, `Property.property_structure` und
+  `Stakeholder.employees`/`owner`. Bis dahin über den unversionierten Pfad abrufen — siehe
+  das [vollständige Datenmodell](/de/data-model/overview).
 </Note>
 
 ## Wie die v1-Tabellen zusammenhängen
@@ -84,11 +83,11 @@ graph LR
 |---|---|---|
 | `property_id` | Identifiziert ein Objekt. Auf jeder Tabelle dieser Seite vorhanden, außer `creditor` (eine eigenständige Entität, referenziert über `creditor_id`). | 1 Objekt → viele Zeilen in jeder Domäne |
 | `booking_header_id` | Gruppiert Buchungspositionen unter einem Buchungskopf. | 1 `booking_header` → viele `booking_positions` |
-| `account_id` | Interne Konto-ID, umbenannt aus dem unversionierten `account_hdr_id`. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
+| `account_id` | Interne Konto-ID. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
 | `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header` und `booking_positions` — bei `projects` unzuverlässig, siehe unten. | 1 Kreditor → viele Zeilen über Domänen hinweg |
 | `technical_object_id` | Verknüpft eine Meldung mit dem technischen Objekt, auf das sie sich bezieht. Referenziert `technical_objects.to_id`. | 1 technisches Objekt → viele Meldungen |
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
-| `property_structure_account_id` | Bedingter Fallback-Fremdschlüssel auf das unversionierte `Property.property_structure`, vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Nur befüllt, wenn der primäre Join-Key der Tabelle die Zeile nicht abdeckt — die genaue Bedingung steht in der jeweiligen Feldreferenz. | variiert pro Tabelle, siehe Feldreferenz |
+| `property_structure_account_id` | Bedingter Fallback-Fremdschlüssel auf `Property.property_structure` (über den unversionierten Pfad verfügbar), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Nur befüllt, wenn der primäre Join-Key der Tabelle die Zeile nicht abdeckt — die genaue Bedingung steht in der jeweiligen Feldreferenz. | variiert pro Tabelle, siehe Feldreferenz |
 
 <Note>
   Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell, nicht

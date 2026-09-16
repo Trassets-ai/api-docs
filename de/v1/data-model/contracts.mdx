@@ -4,13 +4,13 @@ sidebarTitle: "Contracts"
 description: "Feldreferenz für die v1-Contracts-Tabelle service_contracts, inklusive des contract_period-Objekts."
 ---
 
-Die v1-Contracts-Domäne umfasst aktuell eine Tabelle: `service_contracts`, die den
-[Response-Shape-Konventionen](/de/v1/response-shape-conventions) folgt.
+Die v1-Contracts-Domäne umfasst eine Tabelle: `service_contracts`, die den Regeln der
+[Response-Struktur](/de/v1/response-shape-conventions) folgt.
 
 <Note>
-  `contract_debits`, `contract_debit_diffs` und `contract_ends` sind noch nicht live unter
-  `/v1/` — nutze vorerst ihre unversionierten Entsprechungen im [vollständigen
-  Datenmodell](/de/data-model/contracts).
+  `contract_debits`, `contract_debit_diffs` und `contract_ends` haben noch keinen
+  `/v1/`-Endpunkt — bis dahin über den unversionierten Pfad abrufen, siehe das
+  [vollständige Datenmodell](/de/data-model/contracts).
 </Note>
 
 ## service_contracts
@@ -18,14 +18,12 @@ Die v1-Contracts-Domäne umfasst aktuell eine Tabelle: `service_contracts`, die 
 `GET /v1/contracts/service_contracts` — Wartungs- und Dienstleistungsverträge.
 
 <ResponseField name="property_id" type="string" required>
-  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung
-  (`Contracts.service_contracts.property_id`) ein Integer ist.
+  Eindeutige Objekt-ID.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string" required>
   Identifiziert den Dienstleister. Referenziert `Stakeholder.creditor` — siehe die
-  [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Hier ein String, während die
-  unversionierte Entsprechung ein Integer ist.
+  [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="creditor_name" type="string">
@@ -34,8 +32,7 @@ Die v1-Contracts-Domäne umfasst aktuell eine Tabelle: `service_contracts`, die 
 </ResponseField>
 
 <ResponseField name="contract_id" type="string" required>
-  Vertrags-ID (z. B. `"2019/00015"`). Hier ein formatierter String, während die
-  unversionierte Entsprechung ein reiner Integer ist.
+  Vertrags-ID, ein formatierter String (z. B. `"2019/00015"`).
 </ResponseField>
 
 <ResponseField name="contract_number" type="string">
@@ -55,8 +52,7 @@ Die v1-Contracts-Domäne umfasst aktuell eine Tabelle: `service_contracts`, die 
 </ResponseField>
 
 <ResponseField name="contract_period" type="object">
-  Vertragslaufzeit — `{start, end}` (Datumsstrings). Ersetzt die unversionierten getrennten
-  Felder `contract_begin`/`contract_end`.
+  Vertragslaufzeit — `{start, end}` (Datumsstrings).
 </ResponseField>
 
 <ResponseField name="contract_value" type="string">

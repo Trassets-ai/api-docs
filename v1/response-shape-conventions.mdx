@@ -1,23 +1,26 @@
 ---
-title: "Response Shape Conventions for /v1/"
-sidebarTitle: "Response Shape Conventions"
-description: "Target response shape conventions for /v1/ tables — period and amount objects, arrays instead of numbered columns, code+label pairs, and flat ID fields."
+title: "Response Structure under /v1/"
+sidebarTitle: "Response Structure"
+description: "How /v1/ responses are structured — period and amount objects, arrays for repeating values, code+label pairs, and flat ID fields."
 ---
 
-The unversioned API returns database tables largely as-is — flat rows with sync-pipeline artifacts, numbered repeating columns, and inconsistent field types. `/v1/` is moving away from that, one reviewed table at a time. These are the target conventions; **most `/v1/` tables do not fully follow them yet** (see the note below).
+`/v1/` responses follow a small set of structural rules. Knowing them means you can predict
+the shape of an endpoint you haven't called yet.
 
-| Convention | Before | After |
-|---|---|---|
-| Date ranges become a `period` object | `"date_begin": "2013-04-01", "date_end": "2017-01-31"` | `"period": {"start": "2013-04-01", "end": "2017-01-31"}` |
-| Money fields become an `amount` object | `"booking_sum_net": 327.0, "booking_sum_tax": 0.0, "booking_sum_gross": 327.0` | `"amount": {"net": 327.0, "tax": 0.0, "gross": 327.0}` |
-| Numbered repeating columns become an array | `"hierarchy_1": "17 10 01", "hierarchy_2": "17 10 01.06", "hierarchy_3": null, …` | `"hierarchy": ["17 10 01", "17 10 01.06"]` |
-| Code+label pairs become one object | `"exclusivity_id": 0, "exclusivity": "Vorschlag"` | `"exclusivity": {"code": 0, "label": "Vorschlag"}` |
-| Verified sync-pipeline join keys are renamed, not dropped | `"recommended_join_key": "1204"` | `"property_structure_account_id": "1204"` — kept once verified as a real foreign key (e.g. on `booking_positions`, `booking_header`, `technical_objects`) |
-| Unverifiable sync-pipeline artifacts are dropped | `"property_id_account_number": 1101410500` | removed entirely — join on the real ID fields instead |
-| ID fields stay flat, always | — | `property_id`, `account_id`, `floor_area_id`, etc. are never nested, in any table — this is what keeps records joinable across endpoints |
+| Rule | Example |
+|---|---|
+| Date ranges are a `period` object | `"period": {"start": "2013-04-01", "end": "2017-01-31"}` |
+| Money values are an `amount` object | `"amount": {"net": 327.0, "tax": 0.0, "gross": 327.0}` |
+| Repeating values are an array | `"hierarchy": ["17 10 01", "17 10 01.06"]` |
+| Coded values carry code and label together | `"exclusivity": {"code": 0, "label": "Vorschlag"}` |
+| ID fields are flat, always | `property_id`, `account_id`, `floor_area_id` are never nested, in any table |
 
-The last row is the one guarantee that holds across every other change: whatever else gets restructured, the ID fields you already use to cross-reference records between endpoints stay exactly where they are.
+The last rule is the one guarantee that holds everywhere: the ID fields you use to
+cross-reference records between endpoints stay at the top level of every response, so joins
+across endpoints never depend on the surrounding structure.
 
 <Note>
-  These conventions are still being applied table by table — most `/v1/` tables don't fully follow them yet.
+  Not every table applies all of these rules yet. Each [data model](/v1/data-model/overview)
+  page documents the actual structure of its tables, and the **API Reference** tab always
+  shows what an endpoint returns today.
 </Note>

@@ -1,23 +1,26 @@
 ---
-title: "Konventionen für die Response-Struktur unter /v1/"
-sidebarTitle: "Response Shape Conventions"
-description: "Zielkonventionen für die Response-Struktur von /v1/-Tabellen — period- und amount-Objekte, Arrays statt nummerierter Spalten, Code+Label-Paare und flache ID-Felder."
+title: "Response-Struktur unter /v1/"
+sidebarTitle: "Response-Struktur"
+description: "Wie /v1/-Responses aufgebaut sind — period- und amount-Objekte, Arrays für wiederkehrende Werte, Code+Label-Paare und flache ID-Felder."
 ---
 
-Die unversionierte API liefert Datenbanktabellen weitgehend unverändert — flache Zeilen mit Sync-Pipeline-Artefakten, nummerierten Wiederholungsspalten und uneinheitlichen Feldtypen. `/v1/` bewegt sich davon weg, Tabelle für Tabelle. Das ist das Zielbild; **die meisten `/v1/`-Tabellen folgen dem noch nicht vollständig** (siehe Hinweis unten).
+`/v1/`-Responses folgen einigen wenigen Strukturregeln. Wer sie kennt, kann die Struktur
+eines Endpunkts vorhersagen, den er noch nicht abgerufen hat.
 
-| Konvention | Vorher | Nachher |
-|---|---|---|
-| Zeiträume werden zu einem `period`-Objekt | `"date_begin": "2013-04-01", "date_end": "2017-01-31"` | `"period": {"start": "2013-04-01", "end": "2017-01-31"}` |
-| Geldbeträge werden zu einem `amount`-Objekt | `"booking_sum_net": 327.0, "booking_sum_tax": 0.0, "booking_sum_gross": 327.0` | `"amount": {"net": 327.0, "tax": 0.0, "gross": 327.0}` |
-| Nummerierte Wiederholungsspalten werden zu einem Array | `"hierarchy_1": "17 10 01", "hierarchy_2": "17 10 01.06", "hierarchy_3": null, …` | `"hierarchy": ["17 10 01", "17 10 01.06"]` |
-| Code+Label-Paare werden zu einem Objekt | `"exclusivity_id": 0, "exclusivity": "Vorschlag"` | `"exclusivity": {"code": 0, "label": "Vorschlag"}` |
-| Verifizierte Sync-Pipeline-Join-Keys werden umbenannt, nicht gestrichen | `"recommended_join_key": "1204"` | `"property_structure_account_id": "1204"` — bleibt erhalten, sobald als echter Fremdschlüssel verifiziert (z. B. bei `booking_positions`, `booking_header`, `technical_objects`) |
-| Nicht verifizierbare Sync-Pipeline-Artefakte entfallen | `"property_id_account_number": 1101410500` | vollständig entfernt — stattdessen über die echten ID-Felder verknüpfen |
-| ID-Felder bleiben immer flach | — | `property_id`, `account_id`, `floor_area_id` etc. werden in keiner Tabelle verschachtelt — das hält Datensätze über Endpunkte hinweg verknüpfbar |
+| Regel | Beispiel |
+|---|---|
+| Zeiträume sind ein `period`-Objekt | `"period": {"start": "2013-04-01", "end": "2017-01-31"}` |
+| Geldbeträge sind ein `amount`-Objekt | `"amount": {"net": 327.0, "tax": 0.0, "gross": 327.0}` |
+| Wiederkehrende Werte sind ein Array | `"hierarchy": ["17 10 01", "17 10 01.06"]` |
+| Codierte Werte führen Code und Label gemeinsam | `"exclusivity": {"code": 0, "label": "Vorschlag"}` |
+| ID-Felder sind immer flach | `property_id`, `account_id`, `floor_area_id` werden in keiner Tabelle verschachtelt |
 
-Die letzte Zeile ist die eine Garantie, die über alle anderen Änderungen hinweg gilt: Egal was sonst umstrukturiert wird, die ID-Felder, über die Datensätze heute schon zwischen Endpunkten verknüpft werden, bleiben exakt dort, wo sie sind.
+Die letzte Regel ist die eine Garantie, die überall gilt: Die ID-Felder, über die du
+Datensätze zwischen Endpunkten verknüpfst, liegen in jeder Response auf oberster Ebene —
+Verknüpfungen über Endpunkte hinweg hängen damit nie von der umgebenden Struktur ab.
 
 <Note>
-  Diese Konventionen werden Tabelle für Tabelle umgesetzt — die meisten `/v1/`-Tabellen folgen ihnen noch nicht vollständig.
+  Noch folgt nicht jede Tabelle allen Regeln. Die [Datenmodell](/de/v1/data-model/overview)-Seiten
+  dokumentieren die tatsächliche Struktur der jeweiligen Tabellen, und der Tab
+  **API-Referenz** zeigt immer, was ein Endpunkt heute zurückgibt.
 </Note>

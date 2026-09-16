@@ -1,7 +1,7 @@
 ---
 title: "Filterung: Zeilen und Spalten"
 sidebarTitle: "Filterung"
-description: "Wie du Zeilen per Query-Parameter filterst und wie die Spaltenzugriffe pro API-Key in der Data API gesteuert werden."
+description: "Zeilenfilterung per Query-Parameter und Spaltensteuerung pro API-Key in der Data API."
 ---
 
 Die Data API hat zwei unabhängige Filterachsen: welche **Zeilen** zurückkommen, gesteuert von dir per Query-Parameter, und welche **Spalten** zurückkommen, gesteuert von einem Admin pro API-Key.
@@ -23,6 +23,6 @@ Es gibt keine Bereichs-, Wildcard- oder `OR`-Syntax — ein Query-Parameter matc
 
 ## Spaltenfilterung (vertikal)
 
-Welche Felder in der Response einer Entität enthalten sind, kann pro API-Key eingeschränkt werden. Ein Admin konfiguriert das im Trassets-Portal, pro Key und pro Entität — ein Key ohne explizite Konfiguration liefert den vollen, in der **API-Referenz** dokumentierten Spaltenumfang. Änderungen wirken sofort, ohne API-Redeploy.
+Welche Felder in der Response einer Entität enthalten sind, kann pro API-Key eingeschränkt werden. Ein Admin konfiguriert das im Trassets-Portal, pro Key und pro Entität — ein Key ohne explizite Konfiguration liefert den vollen, in der **API-Referenz** dokumentierten Spaltenumfang. Änderungen wirken sofort.
 
 Das ist nicht über den Request selbst steuerbar — es gibt keinen `fields`- oder `select`-Query-Parameter. Fehlt ein erwartetes Feld in der Response, obwohl es in der API-Referenz für diese Entität steht, liegt das wahrscheinlich an der Spaltenkonfiguration deines API-Keys — wende dich an den Trassets-Support, um sie zu prüfen oder zu ändern.

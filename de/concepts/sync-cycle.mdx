@@ -1,7 +1,7 @@
 ---
 title: "Sync-Zyklus: Wie Daten in die API gelangen"
 sidebarTitle: "Sync-Zyklus"
-description: "Verstehe den vorgelagerten Sync hinter der Data API: TRUNCATE+Reload-Semantik, last_sync_at und was GET /changes tatsächlich erkennt."
+description: "Der vorgelagerte Sync hinter der Data API: TRUNCATE+Reload-Semantik, last_sync_at und was GET /changes tatsächlich erkennt."
 ---
 
 Die Data API ist eine reine Lese-Schnittstelle über Daten, die aus einer vorgelagerten Pipeline synchronisiert werden. Zu verstehen, wie und wann dieser Sync passiert, ist essenziell, um eine korrekte Polling- oder inkrementelle Sync-Integration zu bauen.

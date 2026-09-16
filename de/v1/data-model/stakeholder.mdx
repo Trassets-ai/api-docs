@@ -4,24 +4,24 @@ sidebarTitle: "Stakeholder"
 description: "Feldreferenz für die v1-Stakeholder-Tabellen creditor und tenants, inklusive des phones-Arrays auf beiden Tabellen."
 ---
 
-Die v1-Stakeholder-Domäne umfasst aktuell zwei Tabellen: `creditor` und `tenants`, beide
-folgen den [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
+Die v1-Stakeholder-Domäne umfasst zwei Tabellen: `creditor` und `tenants`, beide folgen den
+Regeln der [Response-Struktur](/de/v1/response-shape-conventions).
 
 <Note>
-  `employees` und `owner` sind noch nicht live unter `/v1/` — nutze vorerst ihre
-  unversionierten Entsprechungen im [vollständigen Datenmodell](/de/data-model/stakeholder).
+  `employees` und `owner` haben noch keinen `/v1/`-Endpunkt — bis dahin über den
+  unversionierten Pfad abrufen, siehe das [vollständige
+  Datenmodell](/de/data-model/stakeholder).
 </Note>
 
 ## creditor
 
-`GET /v1/stakeholder/creditor` — Lieferanten- und Kreditorenstammdaten. Wie die
-unversionierte Entsprechung ist dies der einzige v1-Stakeholder-Endpunkt ohne
-`property_id`-Spalte — ein Kreditor ist eine eigenständige Entität, die mehreren Objekten
-dienen kann, referenziert über `creditor_id` auf anderen Tabellen.
+`GET /v1/stakeholder/creditor` — Lieferanten- und Kreditorenstammdaten. Dies ist der
+einzige Stakeholder-Endpunkt ohne `property_id`-Spalte — ein Kreditor ist eine
+eigenständige Entität, die mehreren Objekten dienen kann, referenziert über `creditor_id`
+auf anderen Tabellen.
 
 <ResponseField name="creditor_id" type="string" required>
-  Eindeutige Kreditor-ID. Hier ein String, während die unversionierte Entsprechung
-  (`Stakeholder.creditor.creditor_id`) ein Integer ist.
+  Eindeutige Kreditor-ID.
 </ResponseField>
 
 <ResponseField name="name_1" type="string">
@@ -49,10 +49,8 @@ dienen kann, referenziert über `creditor_id` auf anderen Tabellen.
 </ResponseField>
 
 <ResponseField name="phones" type="string[]">
-  Telefonnummern. Ersetzt das unversionierte `phone_1` (und etwaige weitere durchnummerierte
-  Spalten) durch ein einzelnes Array, gemäß den
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions) — dieselbe Umformung wie
-  bei `Stakeholder.tenants.phones`.
+  Telefonnummern, als Array mit einem Eintrag pro Nummer — dieselbe Struktur wie bei
+  `Stakeholder.tenants.phones`.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
@@ -80,8 +78,7 @@ dienen kann, referenziert über `creditor_id` auf anderen Tabellen.
 `GET /v1/stakeholder/tenants` — Mieterstammdaten und aktuelle Mietvertragskonditionen.
 
 <ResponseField name="property_id" type="string" required>
-  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung
-  (`Stakeholder.tenants.property_id`) ein Integer ist.
+  Eindeutige Objekt-ID.
 </ResponseField>
 
 <ResponseField name="tenancy_id" type="string" required>
@@ -102,8 +99,8 @@ dienen kann, referenziert über `creditor_id` auf anderen Tabellen.
 </ResponseField>
 
 <ResponseField name="name_1" type="string">
-  Erste Namenszeile im Mieterdatensatz. Verhältnis zu `person_name` ist mit dem Quellsystem
-  nicht geklärt.
+  Erste Namenszeile im Mieterdatensatz. Vor der Nutzung des Verhältnisses zu `person_name`
+  beim Support nachfragen.
 </ResponseField>
 
 <ResponseField name="name_2" type="string">
@@ -127,9 +124,7 @@ dienen kann, referenziert über `creditor_id` auf anderen Tabellen.
 </ResponseField>
 
 <ResponseField name="phones" type="string[]">
-  Zusätzliche Telefonnummern. Ersetzt die unversionierten durchnummerierten Spalten
-  `phone_1`/`phone_2`/`phone_3` durch ein einzelnes Array, gemäß den
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
+  Zusätzliche Telefonnummern, als Array mit einem Eintrag pro Nummer.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
@@ -140,20 +135,12 @@ dienen kann, referenziert über `creditor_id` auf anderen Tabellen.
   Bank des Mieters, falls hinterlegt.
 </ResponseField>
 
-<ResponseField name="contract_begin" type="date">
-  Mietvertragsbeginn.
-</ResponseField>
-
-<ResponseField name="contract_end" type="date">
-  Mietvertragsende.
+<ResponseField name="contract_period" type="object">
+  Mietvertragslaufzeit — `{start, end}` (Datumsstrings).
 </ResponseField>
 
 <ResponseField name="contract_end_option" type="date">
   Mietvertragsende bei Ausübung einer Verlängerungsoption.
-</ResponseField>
-
-<ResponseField name="contract_end_actual" type="date">
-  Tatsächliches/effektives Mietvertragsende.
 </ResponseField>
 
 <ResponseField name="option_valid_until" type="date">
@@ -165,8 +152,6 @@ dienen kann, referenziert über `creditor_id` auf anderen Tabellen.
 </ResponseField>
 
 <Note>
-  Das unversionierte `Stakeholder.tenants` stellt zusätzlich die zusammengesetzten
-  Schlüssel `floor_area_person_id` und `property_id_person_id` bereit — keiner von beiden
-  ist in dieser v1-Response enthalten. Verknüpfe stattdessen über `property_id` und
-  `floor_area_id`.
+  Dieser Endpunkt enthält keine zusammengesetzten Schlüsselfelder. Um ein Mietverhältnis
+  einer Einheit zuzuordnen, über `property_id` und `floor_area_id` verknüpfen.
 </Note>

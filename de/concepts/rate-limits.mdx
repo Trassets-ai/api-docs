@@ -1,7 +1,7 @@
 ---
 title: "Rate-Limits für die Data API"
 sidebarTitle: "Rate-Limits"
-description: "Die Data API erlaubt 500 Requests pro Stunde pro API-Key. Erfahre, wie du mit 429-Antworten umgehst und unnötige Requests mit Delta Sync minimierst."
+description: "Die Data API erlaubt 500 Requests pro Stunde pro API-Key — Umgang mit 429-Antworten und Minimierung unnötiger Requests per Delta Sync."
 ---
 
 Die Data API erzwingt ein Rate-Limit von **500 Requests pro Stunde pro API-Key**. Jeder Request zählt auf dieses Limit, einschließlich Wiederholungen und Polling-Aufrufen. Wenn du das Limit überschreitest, liefert die API einen 429-Statuscode, und du musst warten, bis das aktuelle Stundenfenster zurückgesetzt wird, bevor du weitere Requests stellen kannst.

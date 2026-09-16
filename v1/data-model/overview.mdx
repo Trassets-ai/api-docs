@@ -1,11 +1,10 @@
 ---
-title: "v1 Data Model: Tables Live Today"
+title: "v1 Data Model"
 sidebarTitle: "Overview"
-description: "The tables currently available under /v1/, reshaped per the response shape conventions, and how they join — Accounting, Contracts, Depreciation, Operations, Property, and Stakeholder."
+description: "The tables available under /v1/ and how they join — Accounting, Contracts, Depreciation, Operations, Property, and Stakeholder."
 ---
 
-`/v1/` only documents a table once it's live. All six domains now have at least one
-documented table.
+`/v1/` covers six data domains. Each domain page holds the field reference for its tables.
 
 <CardGroup cols={2}>
   <Card title="Accounting" icon="book" href="/v1/data-model/accounting">
@@ -17,11 +16,11 @@ documented table.
   </Card>
 
   <Card title="Depreciation" icon="chart-line-down" href="/v1/data-model/depreciation">
-    `assets`, with the `afa_period` object and the renamed `asset_id`/`asset_number` pair.
+    `assets`, with the `afa_period` object and the `asset_id`/`asset_number` pair.
   </Card>
 
   <Card title="Operations" icon="clipboard-list" href="/v1/data-model/operations">
-    `notifications` and `projects`, with the `technical_object_id` rename and the `hierarchy` array.
+    `notifications` and `projects`, with `technical_object_id` and the `hierarchy` array.
   </Card>
 
   <Card title="Property" icon="building" href="/v1/data-model/property">
@@ -34,12 +33,12 @@ documented table.
 </CardGroup>
 
 <Note>
-  The rest of the unversioned data model isn't live under `/v1/` yet:
-  `Accounting.kontenmapping_ranges`, all of `Contracts.contract_debits`/
-  `contract_debit_diffs`/`contract_ends`, `Depreciation.depreciation` (the postings table —
-  `assets` is live, the postings aren't), `Operations.offers`/`orders`,
-  `Property.property_structure`, and `Stakeholder.employees`/`owner`. Use their unversioned
-  equivalents in the [full data model](/data-model/overview) for now.
+  These tables have no `/v1/` endpoint yet: `Accounting.kontenmapping_ranges`,
+  `Contracts.contract_debits`/`contract_debit_diffs`/`contract_ends`,
+  `Depreciation.depreciation` (the postings table — `assets` is available, the postings
+  aren't), `Operations.offers`/`orders`, `Property.property_structure`, and
+  `Stakeholder.employees`/`owner`. Fetch them via the unversioned path in the meantime — see
+  the [full data model](/data-model/overview).
 </Note>
 
 ## How the v1 tables connect
@@ -80,11 +79,11 @@ graph LR
 |---|---|---|
 | `property_id` | Identifies a property. Present on every table on this page except `creditor` (a standalone entity, referenced via `creditor_id` instead). | 1 property → many rows in each domain |
 | `booking_header_id` | Groups booking line items under one header. | 1 `booking_header` → many `booking_positions` |
-| `account_id` | Internal account identifier, renamed from the unversioned `account_hdr_id`. | 1 `accounts` row → many `booking_positions`/`budgets` rows |
+| `account_id` | Internal account identifier. | 1 `accounts` row → many `booking_positions`/`budgets` rows |
 | `creditor_id` | Identifies a creditor. Referenced by `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header`, and `booking_positions` — unreliable on `projects`, see below. | 1 creditor → many rows across domains |
 | `technical_object_id` | Links a notification to the technical object it concerns. References `technical_objects.to_id`. | 1 technical object → many notifications |
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
-| `property_structure_account_id` | Conditional fallback foreign key into the unversioned `Property.property_structure`, present on `booking_header`, `booking_positions`, and `technical_objects`. Populated only where the table's primary join key doesn't cover the row — see each table's field reference for the exact condition. | varies per table, see field reference |
+| `property_structure_account_id` | Conditional fallback foreign key into `Property.property_structure` (available via the unversioned path), present on `booking_header`, `booking_positions`, and `technical_objects`. Populated only where the table's primary join key doesn't cover the row — see each table's field reference for the exact condition. | varies per table, see field reference |
 
 <Note>
   Cardinalities above describe the intended data model, not independently verified row

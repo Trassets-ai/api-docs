@@ -11,7 +11,7 @@ This guide gets you from zero to a successful `/v1/` API call in a few minutes. 
     Visit [portal.api.trassets.ai](https://portal.api.trassets.ai) and create an account. Generate an API key and store it securely. The plaintext key is shown only once.
   </Step>
   <Step title="Make your first request">
-    Set your key as an environment variable and query `technical_objects` — one of the tables currently reviewed and live under `/v1/`.
+    Set your key as an environment variable and query `technical_objects` — one of the tables currently available under `/v1/`.
 
     ```bash
     export TRASSETS_API_KEY="sk_live_…"
@@ -36,18 +36,17 @@ This guide gets you from zero to a successful `/v1/` API call in a few minutes. 
     ```
 
     <Note>
-      `/v1/` only exposes a table once it has passed schema review — see the [v1 Property
-      data model](/v1/data-model/property) for the full `technical_objects` field
-      reference. Other tables are added incrementally; check the **API Reference** tab for
-      what's currently live.
+      See the [v1 Property data model](/v1/data-model/property) for the full
+      `technical_objects` field reference. Tables are added to `/v1/` one at a time — check
+      the **API Reference** tab for what's available right now.
     </Note>
 
     Success! You have authenticated and fetched your first row of data from a `/v1/` endpoint.
   </Step>
   <Step title="Next steps">
     - Read [Authentication](/v1/authentication) for key management and access tiers.
-    - Check the [v1 Overview](/v1/overview) to see which tables are currently live under `/v1/`.
-    - Read [Response Shape Conventions](/v1/response-shape-conventions) to understand how `/v1/` reshapes tables compared to the unversioned API.
-    - Browse the [v1 Data Model](/v1/data-model/overview) pages for the tables reviewed so far.
+    - Check the [v1 Overview](/v1/overview) to see which tables are currently available under `/v1/`.
+    - Read [Response Structure](/v1/response-shape-conventions) for the structural rules every `/v1/` response follows.
+    - Browse the [v1 Data Model](/v1/data-model/overview) pages for the field reference of each table.
   </Step>
 </Steps>
