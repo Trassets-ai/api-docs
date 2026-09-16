@@ -48,6 +48,36 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
   Kontogruppenzuordnung. Verwandt mit, aber nicht abgeleitet aus `kontenmapping_ranges`.
 </ResponseField>
 
+<ResponseField name="group" type="string">
+  Oberste Ebene der Auswertungsklassifikation — entweder `"A – Einnahmen- /
+  Ausgabenkonten"` oder `"B – Bestandskonten"`. Vollständig durch `category` bestimmt. Nicht zu
+  verwechseln mit `account_group` oben.
+</ResponseField>
+
+<ResponseField name="category" type="string">
+  Auswertungskategorie innerhalb von `group`, als nummeriertes Label — einer der Werte
+  `"01 – Erträge"`, `"02 – Ausgaben"`, `"03 – Investitionen"`, `"04 – Forderungen &
+  Verbindlichkeiten / Finanzamt"`, `"05 – Geldkonten"`, `"06 – Kapitalkonten"`,
+  `"07 – Anlagevermögen"`.
+</ResponseField>
+
+<ResponseField name="nr" type="integer">
+  Untergruppen-Nummer innerhalb von `category`, von 1 bis 13. Viele Konten teilen dasselbe
+  Paar `category`/`nr` — das Feld gruppiert Konten, identifiziert also keins. Und es ist keine
+  Kontonummer: es ist nie gleich `account_number`.
+</ResponseField>
+
+<ResponseField name="property_success_model" type="integer">
+  Nicht dokumentierter numerischer Code, ohne begleitendes Label-Feld. Vor der Nutzung beim
+  Support nachfragen.
+</ResponseField>
+
+<ResponseField name="property_tax_type" type="integer">
+  Nicht dokumentierter numerischer Code, ohne begleitendes Label-Feld. Nicht dasselbe wie
+  `Property.properties.tax_model`, das ein lesbarer String ist. Vor der Nutzung beim Support
+  nachfragen.
+</ResponseField>
+
 <ResponseField name="accounting_entity" type="string">
   Nicht dokumentiert. Möglicherweise derselbe Join-Begriff wie
   `Property.properties.accounting_property_id` — vor einer Verknüpfung darauf beim Support
@@ -61,6 +91,13 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 <ResponseField name="account_tax_appliance" type="integer">
   Nicht dokumentierter Steuer-Code. Vor der Nutzung beim Support nachfragen.
 </ResponseField>
+
+<Note>
+  `group`, `category` und `nr` bilden die Auswertungsklassifikation und sind gemeinsam auf
+  rund einem Zehntel der Zeilen befüllt — ein Konto, bei dem alle drei `null` sind, ist
+  einfach nicht in diese Klassifikation eingeordnet, das ist kein Fehler.
+  `property_success_model` und `property_tax_type` sind auf jeder Zeile befüllt.
+</Note>
 
 ## booking_header
 
@@ -137,11 +174,10 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Fremdschlüssel auf `Property.property_structure`, entspricht
-  `property_structure.account_id`. Immer befüllt und der einzige Weg, eine Buchung auf eine
-  einzelne Einheit herunterzubrechen — `booking_header` führt kein `floor_area_id`.
-  `property_structure` hat noch keinen `/v1/`-Endpunkt, also über den unversionierten Pfad
-  abrufen.
+  Fremdschlüssel auf [`Property.property_structure`](/de/v1/data-model/property#property_structure),
+  entspricht `property_structure.account_id`. Immer befüllt und der einzige Weg, eine
+  Buchung auf eine einzelne Einheit herunterzubrechen — `booking_header` führt kein
+  `floor_area_id`.
 </ResponseField>
 
 ## booking_positions

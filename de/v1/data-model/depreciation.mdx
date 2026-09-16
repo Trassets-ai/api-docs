@@ -1,18 +1,13 @@
 ---
-title: "v1 Depreciation Datenmodell: Anlagegüter"
+title: "v1 Depreciation Datenmodell: Anlagegüter und Buchungen"
 sidebarTitle: "Depreciation"
-description: "Feldreferenz für die v1-Depreciation-Tabelle assets, inklusive des afa_period-Objekts und des Paars asset_id/asset_number."
+description: "Feldreferenz für die v1-Depreciation-Tabellen assets und depreciation, inklusive des afa_period-Objekts und des Paars asset_id/asset_number."
 ---
 
-Die v1-Depreciation-Domäne umfasst eine Tabelle: `assets`, die den Regeln der
-[Response-Struktur](/de/v1/response-shape-conventions) folgt.
-
-<Note>
-  Die Tabelle `depreciation` (Abschreibungsbuchungen) hat noch keinen `/v1/`-Endpunkt — bis
-  dahin über [`Depreciation.depreciation`](/de/data-model/depreciation#depreciation)
-  abrufen. Solange lässt sich ein vollständiger Abschreibungsplan für ein Anlagegut nicht
-  allein aus `/v1/` zusammenstellen.
-</Note>
+Die v1-Depreciation-Domäne umfasst zwei Tabellen: `assets` (die Anlagegüter-Stammdaten) und
+`depreciation` (die Buchungen darauf), beide nach den Regeln der
+[Response-Struktur](/de/v1/response-shape-conventions). Über `asset_id` verknüpft ergeben
+sie den vollständigen Abschreibungsplan eines Anlageguts.
 
 ## assets
 
@@ -78,3 +73,41 @@ Die v1-Depreciation-Domäne umfasst eine Tabelle: `assets`, die den Regeln der
   `"Handelsrecht"`, `"Steuerrecht"`) — handels- und steuerrechtliche Abschreibung können
   sich beim selben Anlagegut unterscheiden.
 </ResponseField>
+
+## depreciation
+
+`GET /v1/depreciation/depreciation` — die einzelnen Abschreibungsbuchungen. Eine Zeile pro
+Buchung: ein über 50 Jahre abgeschriebenes Anlagegut hat hier viele Zeilen und in `assets`
+genau eine.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="asset_id" type="integer" required>
+  Anlagegut, auf das gebucht wird. Verknüpft sich mit `assets.asset_id` oben.
+</ResponseField>
+
+<ResponseField name="asset_number" type="string">
+  Lesbare Anlagegut-Nummer, übernommen aus `assets.asset_number`.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Datum der Abschreibungsbuchung.
+</ResponseField>
+
+<ResponseField name="booking_net_value" type="string">
+  Abgeschriebener Nettobetrag. Dezimalwert als String serialisiert — vor Rechenoperationen
+  casten.
+</ResponseField>
+
+<ResponseField name="booking_text" type="string">
+  Freitextbeschreibung der Buchung.
+</ResponseField>
+
+<Note>
+  Das sind ausschließlich die Abschreibungsbuchungen — sie sind nicht Teil von
+  [`Accounting.booking_positions`](/de/v1/data-model/accounting) und tragen keine
+  `booking_header_id`, lassen sich also über `/v1/` nicht auf eine Buchhaltungsbuchung
+  zurückführen.
+</Note>

@@ -1,16 +1,11 @@
 ---
-title: "v1 Property Datenmodell: Objekte, Kreditor-Dienstleistungen und technische Objekte"
+title: "v1 Property Datenmodell: Objekte, Struktur, Kreditor-Dienstleistungen und technische Objekte"
 sidebarTitle: "Property"
-description: "Feldreferenz für die v1-Property-Tabellen properties, property_creditor_services und technical_objects, inklusive des entrances-Arrays, des mandate_period-Objekts und des bedingten property_structure_account_id-Fallbacks."
+description: "Feldreferenz für die v1-Property-Tabellen properties, property_structure, property_creditor_services und technical_objects, inklusive des entrances-Arrays, des mandate_period-Objekts, des levels-Arrays und des bedingten property_structure_account_id-Fallbacks."
 ---
 
-Die v1-Property-Domäne umfasst drei Tabellen: `properties`, `property_creditor_services`
-und `technical_objects`.
-
-<Note>
-  `property_structure` hat noch keinen `/v1/`-Endpunkt — bis dahin über
-  [`Property.property_structure`](/de/data-model/property#property_structure) abrufen.
-</Note>
+Die v1-Property-Domäne umfasst vier Tabellen: `properties`, `property_structure`,
+`property_creditor_services` und `technical_objects`.
 
 ## properties
 
@@ -86,6 +81,188 @@ und `technical_objects`.
   Link zum Objektdokument im Dokumentenmanagementsystem, falls vorhanden.
 </ResponseField>
 
+## property_structure
+
+`GET /v1/property/property_structure` — der Hierarchiebaum, der Gebäude, Geschosse,
+Kostenstellen und Flächen (Einheiten) innerhalb eines Objekts verbindet.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="account_id" type="string" required>
+  Fachlicher Schlüssel für diesen Strukturknoten (Kostenstelle oder Fläche) — das Format
+  variiert je Knotentyp (z. B. `"ALLE/5"` für eine Kostenstelle, `"9990/91021"` für eine
+  Fläche). Referenziert von
+  `Property.technical_objects.property_structure_account_id`,
+  `Accounting.booking_header.property_structure_account_id` und
+  `Accounting.booking_positions.property_structure_account_id`. Unabhängig vom
+  integer-`account_id` auf `Accounting.accounts`/`booking_positions`/`budgets` — siehe das
+  [Feldglossar](/de/v1/data-model/field-glossary) für diese Unterscheidung.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Flächen-ID, nur bei Zeilen befüllt, deren `account_type.code` gleich `"F"` ist (eine
+  Fläche/Einheit).
+</ResponseField>
+
+<ResponseField name="levels" type="object[]">
+  Hierarchiepfad vom Objekt zu diesem Knoten, ein Eintrag pro Ebene (z. B. Geschoss, dann
+  Fläche) — `{name, type}`. Leer bei Kostenstellenknoten.
+</ResponseField>
+
+<ResponseField name="account_type" type="object">
+  Knotentyp — `{code, label}` (z. B. `{"code": "F", "label": "Fläche"}`, `{"code": "K",
+  "label": "Kostenstelle"}`). Es gibt deutlich mehr Codes als Kostenstelle/Fläche (Gebäude,
+  Geschoss, Gebäudeteil und kundenspezifische Gruppierungen) — `code` als opake
+  Klassifikation behandeln, nicht als vollständig aufzählbares Enum.
+</ResponseField>
+
+<ResponseField name="mandate_period" type="object">
+  Verwaltungsmandats-Zeitraum für diesen Knoten — `{start, end}` (Datumsstrings). Ein
+  fehlender Key (statt `null`) bedeutet, dass diese Grenze nicht gesetzt ist; ein leeres
+  Objekt bedeutet, dass keine der beiden gesetzt ist.
+</ResponseField>
+
+<ResponseField name="floor_area_period" type="object">
+  Zeitraum, in dem diese Fläche im System erfasst ist, gleiche Struktur wie
+  `mandate_period` oben.
+</ResponseField>
+
+<ResponseField name="active_period" type="object">
+  Zeitraum, in dem dieser Knoten aktiv ist, gleiche Struktur wie `mandate_period` oben.
+</ResponseField>
+
+<ResponseField name="bt_hdr_id" type="integer">
+  ID des Beteiligungskreises, den diese Zeile definiert. Genau auf den Zeilen befüllt, bei
+  denen `is_beteiligungskreis` `true` ist, sonst `null`.
+</ResponseField>
+
+<ResponseField name="is_beteiligungskreis" type="boolean">
+  Ob dieser Knoten ein Beteiligungskreis ist — eine Menge von Flächen, die sich eine
+  Betriebskostenposition teilen, kein physischer Gebäudeteil.
+</ResponseField>
+
+<ResponseField name="is_core_structure" type="boolean">
+  Ob dieser Knoten zur physischen Gebäudehierarchie gehört (Gebäude, Gebäudeteil, Geschoss)
+  und nicht zu Flächen oder Beteiligungskreisen.
+</ResponseField>
+
+<ResponseField name="structure_level_type" type="string">
+  Ebenenbezeichnung physischer Hierarchieknoten (`"Gebäude"`, `"Gebäudeteil"`, `"Geschoss"`),
+  `null` für alles andere. Wo gesetzt, wiederholt das Feld exakt `account_type.label` —
+  besser `account_type` nutzen, das auf jeder Zeile befüllt ist.
+</ResponseField>
+
+<ResponseField name="property_name" type="string">
+  Objektname.
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Anzeigename des Strukturknotens (Kostenstellen- oder Einheitenname).
+</ResponseField>
+
+<ResponseField name="floor_area_nr" type="string">
+  Flächennummer, nur bei Flächenzeilen befüllt.
+</ResponseField>
+
+<ResponseField name="address" type="string">
+  Adresse dieses Knotens, nur bei Flächenzeilen befüllt.
+</ResponseField>
+
+<ResponseField name="entrance" type="string">
+  Gebäudeeingang, falls dieser Knoten einen hat.
+</ResponseField>
+
+<ResponseField name="building_part" type="string">
+  Gebäudeteil/Flügel, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="floor" type="string">
+  Geschoss innerhalb des Gebäudes, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="floor_area_name" type="string">
+  Name der Fläche (Einheit), nur bei Flächenzeilen befüllt.
+</ResponseField>
+
+<ResponseField name="location" type="string">
+  Lage der Einheit innerhalb des Gebäudes (z. B. links/rechts), falls erfasst.
+</ResponseField>
+
+<ResponseField name="floor_area_type" type="string">
+  Nutzungsart der Einheit (z. B. `"Wohnung"` für Wohnnutzung), nur bei Flächenzeilen
+  befüllt.
+</ResponseField>
+
+<ResponseField name="no_marketing" type="boolean">
+  Ob diese Einheit von der Leerstands-Vermarktung ausgeschlossen ist.
+</ResponseField>
+
+<ResponseField name="target_rent_per_m2" type="string">
+  Plan-Miete pro Quadratmeter für diese Einheit. Dezimalwert als String serialisiert, keine
+  JSON-Zahl — vor Rechenoperationen casten.
+</ResponseField>
+
+<ResponseField name="market_rent_per_m2" type="string">
+  Markt-Miete pro Quadratmeter für diese Einheit. Gleiche Serialisierung wie
+  `target_rent_per_m2` oben.
+</ResponseField>
+
+<ResponseField name="heating" type="string">
+  Heizungsart dieser Einheit, falls erfasst.
+</ResponseField>
+
+<ResponseField name="vacancy_reason" type="string">
+  Grundcode für den Leerstand dieser Einheit, falls aktuell leerstehend.
+</ResponseField>
+
+<ResponseField name="vacancy_reason_comment" type="string">
+  Freitextkommentar zum Leerstandsgrund.
+</ResponseField>
+
+<ResponseField name="vacancy_reason_begin_date" type="date">
+  Datum, an dem der aktuelle Leerstand begonnen hat.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  Link zu einem Objektfoto, falls vorhanden.
+</ResponseField>
+
+<ResponseField name="m2" type="string">
+  Fläche in Quadratmetern. Dezimalwert als String serialisiert, keine JSON-Zahl — vor
+  Rechenoperationen casten.
+</ResponseField>
+
+<ResponseField name="target_rent_total" type="string">
+  Gesamte Plan-Miete für diese Einheit. Dezimalwert als String serialisiert, keine
+  JSON-Zahl — vor Rechenoperationen casten.
+</ResponseField>
+
+<ResponseField name="market_rent_total" type="string">
+  Gesamte Markt-Miete für diese Einheit. Gleiche Serialisierung wie `target_rent_total`
+  oben.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link zum zugehörigen Dokument im Dokumentenmanagementsystem, falls vorhanden.
+</ResponseField>
+
+<Note>
+  Nicht jede Spalte ist bei jedem Knotentyp befüllt — `floor_area_id`, `floor_area_nr`,
+  `address`, `floor_area_name`, `floor_area_type` und die Miet-/Leerstandsfelder sind nur
+  bei Flächenzeilen gesetzt (`account_type.code` = `"F"`); `levels` ist bei
+  Kostenstellenzeilen leer. `m2` ist auch auf Struktur- und Beteiligungsknoten befüllt — eine
+  Summe über alle Zeilen eines Objekts zählt daher doppelt, vorher auf
+  `account_type.code` = `"F"` filtern.
+</Note>
+
+<Warning>
+  `floor_area_id` kommt hier sowie bei `Stakeholder.tenants` und `Contracts.contract_ends` als
+  Zahl zurück, bei `Contracts.contract_debits` dagegen als JSON-String. Über diese Grenze
+  hinweg vor dem Join auf einen gemeinsamen Typ casten.
+</Warning>
+
 ## property_creditor_services
 
 `GET /v1/property/property_creditor_services` — welcher Kreditor welche Dienstleistung für
@@ -115,12 +292,8 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
 `GET /v1/property/technical_objects` — technische/gemessene Installationen an einem Objekt
 (Aufzüge, Heizungsanlagen, Zähler und ähnliche Anlagen).
 
-<Note>
-  `technical_objects` liefert über 20 Felder (Gewährleistungs-, Inspektions- und
-  Wartungsdaten und -Flags). Diese Seite behandelt die Identifikations-, Verknüpfungs- und
-  strukturierten Felder — der Tab **API-Referenz** listet jedes Feld auf, das der Endpunkt
-  zurückgibt.
-</Note>
+Die Inspektions-, Wartungs- und Gewährleistungsfelder sind Teil der Response, in der Praxis
+aber kaum befüllt — siehe den Warnhinweis am Ende dieses Abschnitts, bevor du darauf aufbaust.
 
 <ResponseField name="to_id" type="integer" required>
   ID des technischen Objekts.
@@ -169,10 +342,65 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
   Ob dieses Objekt einen Zähler repräsentiert.
 </ResponseField>
 
+<ResponseField name="inactive" type="boolean">
+  Ob das Objekt stillgelegt ist. Heute auf jeder Zeile `false`.
+</ResponseField>
+
+<ResponseField name="responsible_person" type="string">
+  Für das Objekt verantwortliche Person. Nur eine Handvoll unterschiedlicher Werte, und auf
+  etwa einem Drittel der Zeilen ein leerer String.
+</ResponseField>
+
+<ResponseField name="comment" type="string">
+  Freitextkommentar zum Objekt.
+</ResponseField>
+
+<ResponseField name="is_inspection_relevant" type="boolean">
+  Ob das Objekt prüfpflichtig ist. Auf rund 20 von 1.250 Zeilen `true`.
+</ResponseField>
+
+<ResponseField name="inspection_type" type="string">
+  Art der erforderlichen Prüfung.
+</ResponseField>
+
+<ResponseField name="inspection_date" type="date">
+  Datum der Prüfung. Auf genau einer Zeile befüllt — als nicht verfügbar behandeln, nicht als
+  „keine Prüfung fällig".
+</ResponseField>
+
+<ResponseField name="is_maintenance_relevant" type="boolean">
+  Ob das Objekt wartungspflichtig ist. Auf rund 20 von 1.250 Zeilen `true`.
+</ResponseField>
+
+<ResponseField name="maintenance_type" type="string">
+  Art der erforderlichen Wartung.
+</ResponseField>
+
+<ResponseField name="maintenance_date" type="date">
+  Datum der Wartung. Heute auf jeder Zeile `null`.
+</ResponseField>
+
+<ResponseField name="maintenance_creditor_id" type="string">
+  Für die Wartung beauftragter Kreditor. Heute auf jeder Zeile `null` — wer das Objekt
+  wartet, ergibt sich über `service_contract_id`.
+</ResponseField>
+
+<ResponseField name="maintenance_creditor_name" type="string">
+  Name des Wartungskreditors. Heute auf jeder Zeile ein leerer String, passend zu
+  `maintenance_creditor_id`.
+</ResponseField>
+
+<ResponseField name="warranty_period" type="object">
+  Gewährleistungszeitraum — `{start, end}` (Datumsstrings). Das Objekt ist auf jeder Zeile
+  vorhanden, beide Werte sind aber bis auf eine Ausnahme `null` — praktisch liegen hier noch
+  keine Gewährleistungsdaten.
+</ResponseField>
+
 <ResponseField name="property_structure_account_id" type="string">
-  Fremdschlüssel auf `Property.property_structure`, entspricht dessen `account_id`. Bedingt
-  befüllt: nur bei Zeilen ohne `floor_area_id` gesetzt; sonst überall `null`, dort ist
-  `floor_area_id` der Join-Key. Die beiden treten nie gemeinsam auf und sind nie beide `null`.
+  Fremdschlüssel auf [`Property.property_structure`](#property_structure), entspricht dessen
+  `account_id`. Bedingt befüllt: nur bei Zeilen ohne `floor_area_id` gesetzt; sonst überall
+  `null`, dort ist `floor_area_id` der Join-Key. Die beiden treten nie gemeinsam auf und
+  sind nie beide `null`.
 </ResponseField>
 
 <Note>
@@ -180,3 +408,9 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
   einen Zähler repräsentieren, aber dieser Endpunkt liefert nur die Stammdaten des Objekts
   (Typ, Standort, verantwortlicher Kreditor) — keine Verbrauchsablesungen.
 </Note>
+
+<Warning>
+  Die Inspektions-, Wartungs- und Gewährleistungsfelder werden ausgeliefert, sind im
+  Quellsystem aber fast durchgängig leer. Keine Compliance- oder Terminlogik darauf aufbauen,
+  ohne vorher die tatsächliche Befüllung in den eigenen Daten zu prüfen.
+</Warning>

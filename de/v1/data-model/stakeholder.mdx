@@ -1,17 +1,12 @@
 ---
-title: "v1 Stakeholder Datenmodell: Kreditoren und Mieter"
+title: "v1 Stakeholder Datenmodell: Kreditoren, Mitarbeiter, Eigentümer und Mieter"
 sidebarTitle: "Stakeholder"
-description: "Feldreferenz für die v1-Stakeholder-Tabellen creditor und tenants, inklusive des phones-Arrays auf beiden Tabellen."
+description: "Feldreferenz für die v1-Stakeholder-Tabellen creditor, employees, owner und tenants, inklusive des phones-Arrays auf creditor und tenants."
 ---
 
-Die v1-Stakeholder-Domäne umfasst zwei Tabellen: `creditor` und `tenants`, beide folgen den
-Regeln der [Response-Struktur](/de/v1/response-shape-conventions).
-
-<Note>
-  `employees` und `owner` haben noch keinen `/v1/`-Endpunkt — bis dahin über den
-  unversionierten Pfad abrufen, siehe das [vollständige
-  Datenmodell](/de/data-model/stakeholder).
-</Note>
+Die v1-Stakeholder-Domäne umfasst vier Tabellen: `creditor`, `employees`, `owner` und
+`tenants`, die alle den Regeln der
+[Response-Struktur](/de/v1/response-shape-conventions) folgen.
 
 ## creditor
 
@@ -36,6 +31,10 @@ auf anderen Tabellen.
   Kreditortyp.
 </ResponseField>
 
+<ResponseField name="address_line_1" type="string">
+  Erste Zeile der Postadresse, oberhalb von `street_nr`.
+</ResponseField>
+
 <ResponseField name="street_nr" type="string">
   Straße und Hausnummer.
 </ResponseField>
@@ -48,6 +47,14 @@ auf anderen Tabellen.
   E-Mail-Adresse.
 </ResponseField>
 
+<ResponseField name="homepage" type="string">
+  Webseite.
+</ResponseField>
+
+<ResponseField name="contact_person" type="string">
+  Benannte Ansprechperson beim Kreditor.
+</ResponseField>
+
 <ResponseField name="phones" type="string[]">
   Telefonnummern, als Array mit einem Eintrag pro Nummer — dieselbe Struktur wie bei
   `Stakeholder.tenants.phones`.
@@ -55,6 +62,10 @@ auf anderen Tabellen.
 
 <ResponseField name="iban" type="string">
   Bankkonto-IBAN.
+</ResponseField>
+
+<ResponseField name="swift" type="string">
+  SWIFT/BIC der Bank des Kreditors — dasselbe, was `owner` als `bic` führt.
 </ResponseField>
 
 <ResponseField name="bank" type="string">
@@ -65,13 +76,155 @@ auf anderen Tabellen.
   Steuer-Identifikationsnummer.
 </ResponseField>
 
+<ResponseField name="exemption_certificate" type="boolean">
+  Ob eine Freistellungsbescheinigung zur Bauabzugsteuer (§ 48b EStG) vorliegt. Relevant, wenn
+  der Kreditor Bauleistungen erbringt.
+</ResponseField>
+
+<ResponseField name="exemption_certificate_date" type="date">
+  Datum auf der Freistellungsbescheinigung. Welches Datum gemeint ist — Ausstellung oder
+  Ablauf — ist nicht dokumentiert; vor der Nutzung beim Support nachfragen.
+</ResponseField>
+
 <ResponseField name="industry" type="string">
   Branchenklassifikation.
+</ResponseField>
+
+<ResponseField name="industry_info" type="string">
+  Zusätzliche Branchenangabe. Das Verhältnis zu `industry` ist nicht dokumentiert — vor der
+  Nutzung beim Support nachfragen.
+</ResponseField>
+
+<ResponseField name="okdn" type="string">
+  Nicht dokumentiert. Vor der Nutzung beim Support nachfragen.
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">
   Link zum Dokumentenordner des Kreditors im Dokumentenmanagementsystem, falls vorhanden.
 </ResponseField>
+
+## employees
+
+`GET /v1/stakeholder/employees` — das für ein Objekt verantwortliche
+Property-Management-Team.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="team" type="string">
+  Team, dem der Mitarbeiter angehört, als lesbarer Name (z. B. `"Objektmanagement"`,
+  `"Buchhaltung / Abrechnung"`). Passt zu
+  [`Operations.projects.responsible_team`](/de/v1/data-model/operations) — so lässt sich das
+  Team eines Projekts auf seine Mitglieder auflösen. Passt **nicht** zu
+  `Operations.notifications.responsible_team`, das numerische Codes statt Namen enthält.
+</ResponseField>
+
+<ResponseField name="first_name" type="string">
+  Vorname des Mitarbeiters.
+</ResponseField>
+
+<ResponseField name="last_name" type="string">
+  Nachname des Mitarbeiters.
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  Kontakt-Telefonnummer.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Kontakt-E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="inactive" type="boolean">
+  Ob der Mitarbeiter-Datensatz inaktiv ist.
+</ResponseField>
+
+<Note>
+  Das ist die Zuordnung von Personen zu Objekten, kein allgemeines Mitarbeiterverzeichnis: ein
+  Objekt kann mehrere Zeilen haben (eine pro beteiligtem Team), und dieselbe Person erscheint
+  einmal pro Objekt, für das sie verantwortlich ist. Eine Mitarbeiter-ID gibt es nicht — zum
+  Entdoppeln über Objekte hinweg auf `mail` abgleichen.
+</Note>
+
+## owner
+
+`GET /v1/stakeholder/owner` — Stammdaten zu Objekteigentümern, einschließlich des
+Eigentumsanteils bei Objekten mit mehreren Eigentümern.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="debitor_id" type="integer" required>
+  Eigentümer-ID.
+</ResponseField>
+
+<ResponseField name="share" type="string" required>
+  Eigentumsanteil in Prozent. Dezimalwert als String serialisiert, keine JSON-Zahl — vor
+  Rechenoperationen casten. Ein Objekt kann mehrere `owner`-Zeilen haben, deren Summe den
+  gesamten Anteil ergibt.
+</ResponseField>
+
+<ResponseField name="salutation" type="string">
+  Anrede/Titel.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Name des Eigentümers (Privatperson oder Firma).
+</ResponseField>
+
+<ResponseField name="name_2" type="string">
+  Zweite Namenszeile.
+</ResponseField>
+
+<ResponseField name="street_nr" type="string">
+  Straße und Hausnummer.
+</ResponseField>
+
+<ResponseField name="zipcode_city" type="string">
+  Postleitzahl und Ort, in einem Feld kombiniert.
+</ResponseField>
+
+<ResponseField name="phone" type="string">
+  Kontakt-Telefonnummer.
+</ResponseField>
+
+<ResponseField name="partner" type="string">
+  Nicht dokumentiert. Vor der Nutzung beim Support nachfragen.
+</ResponseField>
+
+<ResponseField name="bank" type="string">
+  Bankname.
+</ResponseField>
+
+<ResponseField name="fax" type="string">
+  Faxnummer, falls hinterlegt.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Kontakt-E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="bic" type="string">
+  Bank Identifier Code (BIC), falls hinterlegt.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  IBAN des Bankkontos.
+</ResponseField>
+
+<ResponseField name="account_number" type="string">
+  Kontonummer des Eigentümers für Auszahlungen. Unabhängig von
+  `Accounting.accounts.account_number`, das ein Sachkonto bezeichnet.
+</ResponseField>
+
+<Warning>
+  `owner.debitor_id` nicht mit `creditor.creditor_id` verknüpfen. Beide sind numerische
+  Sequenzen und überschneiden sich zufällig — von den IDs, die in beiden vorkommen, gehören
+  mehr als die Hälfte zu unterschiedlichen Parteien. Eigentümer und Kreditoren sind getrennte
+  ID-Räume, zwischen denen es in `/v1/` keinen Join-Key gibt.
+</Warning>
 
 ## tenants
 
@@ -86,7 +239,8 @@ auf anderen Tabellen.
 </ResponseField>
 
 <ResponseField name="floor_area_id" type="integer">
-  Einheit, die der Mieter belegt. Referenziert `Property.property_structure`.
+  Einheit, die der Mieter belegt. Referenziert
+  [`Property.property_structure.floor_area_id`](/de/v1/data-model/property#property_structure).
 </ResponseField>
 
 <ResponseField name="person_id" type="string" required>
@@ -160,5 +314,7 @@ auf anderen Tabellen.
   einer Einheit zuzuordnen, über `property_id` und `floor_area_id` verknüpfen. `tenancy_id`
   ist das einzige Feld, das eine Zeile allein identifiziert — eine Person kann mehrere
   Mietverhältnisse im selben Objekt haben, ein Join über `property_id` plus `person_id` kann
-  also mehr als eine Zeile pro Person liefern.
+  also mehr als eine Zeile pro Person liefern. `tenancy_id` ist außerdem das Feld, auf das
+  sich [`Contracts.contract_debits` und `Contracts.contract_ends`](/de/v1/data-model/contracts)
+  beziehen.
 </Note>

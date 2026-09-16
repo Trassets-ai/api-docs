@@ -49,6 +49,35 @@ join keys.
   Account group assignment. Related to, but not derived from, `kontenmapping_ranges`.
 </ResponseField>
 
+<ResponseField name="group" type="string">
+  Top level of the reporting classification — either `"A – Einnahmen- / Ausgabenkonten"`
+  (income/expense accounts) or `"B – Bestandskonten"` (balance-sheet accounts). Fully
+  determined by `category`. Distinct from `account_group` above.
+</ResponseField>
+
+<ResponseField name="category" type="string">
+  Reporting category within `group`, as a numbered German label — one of `"01 – Erträge"`,
+  `"02 – Ausgaben"`, `"03 – Investitionen"`, `"04 – Forderungen & Verbindlichkeiten /
+  Finanzamt"`, `"05 – Geldkonten"`, `"06 – Kapitalkonten"`, `"07 – Anlagevermögen"`.
+</ResponseField>
+
+<ResponseField name="nr" type="integer">
+  Sub-group number within `category`, from 1 to 13. Many accounts share the same
+  `category`/`nr` pair, so it groups accounts rather than identifying one — and it is not an
+  account number: it never equals `account_number`.
+</ResponseField>
+
+<ResponseField name="property_success_model" type="integer">
+  Undocumented numeric code, with no label field alongside it. Contact support before relying
+  on it.
+</ResponseField>
+
+<ResponseField name="property_tax_type" type="integer">
+  Undocumented numeric code, with no label field alongside it. Not the same thing as
+  `Property.properties.tax_model`, which is a readable string. Contact support before relying
+  on it.
+</ResponseField>
+
 <ResponseField name="accounting_entity" type="string">
   Undocumented. It may carry the same join concept as
   `Property.properties.accounting_property_id` — contact support before building a join on
@@ -62,6 +91,13 @@ join keys.
 <ResponseField name="account_tax_appliance" type="integer">
   Undocumented tax code. Contact support before relying on it.
 </ResponseField>
+
+<Note>
+  `group`, `category`, and `nr` are the reporting classification and are populated together on
+  roughly a tenth of the rows — an account with all three `null` simply isn't mapped into that
+  classification, which is not an error. `property_success_model` and `property_tax_type` are
+  populated on every row.
+</Note>
 
 ## booking_header
 
@@ -138,10 +174,9 @@ join keys.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Foreign key into `Property.property_structure`, matching `property_structure.account_id`.
-  Always populated, and the only way to resolve a booking down to a single unit —
-  `booking_header` carries no `floor_area_id`. `property_structure` has no `/v1/` endpoint
-  yet, so fetch it via the unversioned path.
+  Foreign key into [`Property.property_structure`](/v1/data-model/property#property_structure),
+  matching `property_structure.account_id`. Always populated, and the only way to resolve a
+  booking down to a single unit — `booking_header` carries no `floor_area_id`.
 </ResponseField>
 
 ## booking_positions
