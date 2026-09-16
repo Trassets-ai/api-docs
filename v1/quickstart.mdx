@@ -1,0 +1,53 @@
+---
+title: "Get started with the Trassets Data API v1"
+description: "Learn how to request an API key and make your first call against the v1 preview of the Trassets Data API in three steps."
+sidebarTitle: "Quickstart"
+---
+
+This guide gets you from zero to a successful `/v1/` API call in a few minutes. You need a Unix-like shell with curl installed.
+
+<Steps>
+  <Step title="Request an API key">
+    Visit [portal.api.trassets.ai](https://portal.api.trassets.ai) and create an account. Generate an API key and store it securely. The plaintext key is shown only once.
+  </Step>
+  <Step title="Make your first request">
+    Set your key as an environment variable and query `technical_objects` — one of the tables currently reviewed and live under `/v1/`.
+
+    ```bash
+    export TRASSETS_API_KEY="sk_live_…"
+    curl "https://api.trassets.ai/v1/property/technical_objects?limit=1" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    The API returns a JSON array of objects. A typical response looks like this:
+
+    ```json
+    [
+      {
+        "to_id": 5231,
+        "property_id": 1622,
+        "floor_area_id": null,
+        "name": "Aufzug Hof",
+        "type": "Aufzug",
+        "built_date": "1998-06-01",
+        "is_meter": false
+      }
+    ]
+    ```
+
+    <Note>
+      `/v1/` only exposes a table once it has passed schema review — see the [v1 Property
+      data model](/v1/data-model/property) for the full `technical_objects` field
+      reference. Other tables are added incrementally; check the **API Reference** tab for
+      what's currently live.
+    </Note>
+
+    Success! You have authenticated and fetched your first row of data from a `/v1/` endpoint.
+  </Step>
+  <Step title="Next steps">
+    - Read [Authentication](/v1/authentication) for key management and access tiers.
+    - Check the [v1 Overview](/v1/overview) to see which tables are currently live under `/v1/`.
+    - Read [Response Shape Conventions](/v1/response-shape-conventions) to understand how `/v1/` reshapes tables compared to the unversioned API.
+    - Browse the [v1 Data Model](/v1/data-model/overview) pages for the tables reviewed so far.
+  </Step>
+</Steps>
