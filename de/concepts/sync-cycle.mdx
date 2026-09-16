@@ -32,9 +32,10 @@ Der `ETag`-Response-Header ist das Maximum von `last_sync_at` über alle synchro
 
 <Warning>
   `since` darf nicht älter als 30 Tage sein — ältere Werte werden mit einem 400-Fehler
-  abgelehnt. Diese Grenze ist im Code erzwungen, aber nirgendwo in der eigenen Dokumentation
-  der API oder in Quellcode-Kommentaren erklärt; behandle sie als harte betriebliche
-  Einschränkung, nicht als einstellbaren Parameter.
+  abgelehnt. Diese Grenze ist in der OpenAPI-Parameterbeschreibung des Endpunkts dokumentiert
+  (siehe Tab **API Reference**), aber nirgendwo wird begründet, warum genau dieser Wert
+  gewählt wurde; behandle sie als feste betriebliche Einschränkung, nicht als einstellbaren
+  Parameter.
 </Warning>
 
 ## Praktische Auswirkungen für deine Integration
