@@ -1,0 +1,54 @@
+---
+title: "Erste Schritte mit der Trassets Data API v1"
+description: "Erfahre, wie du einen API-Key beantragst und in drei Schritten deinen ersten Call an die v1-Preview der Trassets Data API machst."
+sidebarTitle: "Quickstart"
+---
+
+Diese Anleitung bringt dich in wenigen Minuten von null zum erfolgreichen `/v1/`-API-Call. Du brauchst eine Unix-ähnliche Shell mit installiertem curl.
+
+<Steps>
+  <Step title="API-Key beantragen">
+    Besuche [portal.api.trassets.ai](https://portal.api.trassets.ai) und erstelle einen Account. Erzeuge einen API-Key und speichere ihn sicher. Der Klartext-Key wird nur einmal angezeigt.
+  </Step>
+  <Step title="Deinen ersten Request stellen">
+    Setze deinen Key als Umgebungsvariable und rufe `technical_objects` ab — eine der Tabellen, die aktuell reviewt und live unter `/v1/` verfügbar ist.
+
+    ```bash
+    export TRASSETS_API_KEY="sk_live_…"
+    curl "https://api.trassets.ai/v1/property/technical_objects?limit=1" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Die API liefert ein JSON-Array von Objekten zurück. Eine typische Antwort sieht so aus:
+
+    ```json
+    [
+      {
+        "to_id": 5231,
+        "property_id": 1622,
+        "floor_area_id": null,
+        "name": "Aufzug Hof",
+        "type": "Aufzug",
+        "built_date": "1998-06-01",
+        "is_meter": false
+      }
+    ]
+    ```
+
+    <Note>
+      `/v1/` exponiert eine Tabelle erst, wenn sie das Schema-Review durchlaufen hat —
+      siehe das [v1 Property Datenmodell](/de/v1/data-model/property) für die vollständige
+      Feldreferenz von `technical_objects`. Weitere Tabellen kommen schrittweise dazu; prüfe
+      den Tab **API Reference** für den aktuellen Stand.
+    </Note>
+
+    Geschafft! Du hast dich authentifiziert und deine erste Zeile Daten über einen
+    `/v1/`-Endpunkt abgerufen.
+  </Step>
+  <Step title="Nächste Schritte">
+    - Lies [Authentifizierung](/de/v1/authentication) für Key-Management und Zugriffsstufen.
+    - Prüfe die [v1 Übersicht](/de/v1/overview), um zu sehen, welche Tabellen aktuell live unter `/v1/` sind.
+    - Lies die [Response Shape Conventions](/de/v1/response-shape-conventions), um zu verstehen, wie `/v1/` Tabellen im Vergleich zur unversionierten API umformt.
+    - Durchsuche die [v1 Datenmodell](/de/v1/data-model/overview)-Seiten für die bisher reviewten Tabellen.
+  </Step>
+</Steps>
