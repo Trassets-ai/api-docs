@@ -4,7 +4,7 @@ description: "Poll /changes with the since parameter and ETags to avoid unnecess
 sidebarTitle: "Delta Sync"
 ---
 
-Discover which tables have been updated since your last sync without fetching every endpoint. The Trassets Data API `GET /changes` endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
+Discover which tables have been updated since your last sync without fetching every endpoint. The Data API `GET /changes` endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
 
 <Tip>
   Poll `/changes` every 15–60 minutes. The underlying sync runs as a daily batch, so polling more often will not surface newer data — it only spends more of your 500 req/h budget. Combine this with the `since`/ETag pattern below so unchanged polls stay cheap.
