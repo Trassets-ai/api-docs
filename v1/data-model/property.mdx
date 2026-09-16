@@ -124,17 +124,25 @@ a property, and whether that assignment is exclusive.
   Technical object identifier.
 </ResponseField>
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Unique property identifier.
 </ResponseField>
 
 <ResponseField name="floor_area_id" type="integer">
-  Floor area the technical object is installed in, if applicable.
+  Floor area the technical object is installed in, if applicable. Set on every row that has
+  no `property_structure_account_id` — exactly one of the two is always present.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
-  Maintenance creditor responsible for the object. References `Stakeholder.creditor` — see
-  the [Stakeholder field reference](/v1/data-model/stakeholder).
+<ResponseField name="creditor_id" type="string">
+  Creditor responsible for the object. References `Stakeholder.creditor` — see
+  the [Stakeholder field reference](/v1/data-model/stakeholder). `null` on most rows.
+</ResponseField>
+
+<ResponseField name="service_contract_id" type="string">
+  Service contract covering this object. References
+  [`Contracts.service_contracts.contract_id`](/v1/data-model/contracts). `null` on most
+  rows, and not every value resolves — treat a missing match as "no contract on file"
+  rather than an error.
 </ResponseField>
 
 <ResponseField name="to_nr" type="string">
@@ -158,9 +166,9 @@ a property, and whether that assignment is exclusive.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Foreign key into `Property.property_structure`. Populated conditionally: only set for rows
-  without a `floor_area_id` (currently a small minority); everywhere else it's `null` and
-  `floor_area_id` is the join key.
+  Foreign key into `Property.property_structure`, matching its `account_id`. Populated
+  conditionally: set only for rows without a `floor_area_id`; everywhere else it's `null` and
+  `floor_area_id` is the join key. The two never appear together and never both `null`.
 </ResponseField>
 
 <Note>

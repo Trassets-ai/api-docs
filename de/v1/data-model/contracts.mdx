@@ -32,7 +32,10 @@ Die v1-Contracts-Domäne umfasst eine Tabelle: `service_contracts`, die den Rege
 </ResponseField>
 
 <ResponseField name="contract_id" type="string" required>
-  Vertrags-ID, ein formatierter String (z. B. `"2019/00015"`).
+  Vertrags-ID, ein formatierter String (z. B. `"2019/00015"`). Wird von
+  [`Property.technical_objects.service_contract_id`](/de/v1/data-model/property)
+  referenziert — so findest du den Vertrag zu einem bestimmten Aufzug, einer Heizungsanlage
+  oder einer anderen Anlage.
 </ResponseField>
 
 <ResponseField name="contract_number" type="string">

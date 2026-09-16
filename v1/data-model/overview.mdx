@@ -65,6 +65,9 @@ graph LR
   budgets -->|account_id| accounts
   notifications -->|technical_object_id| technical_objects
   notifications -->|report_id| projects
+  technical_objects -->|service_contract_id| service_contracts
+  booking_header -->|property_id + person_id| tenants
+  booking_positions -->|property_id + person_id| tenants
 
   creditor -->|creditor_id| technical_objects
   creditor -->|creditor_id| property_creditor_services
@@ -83,7 +86,9 @@ graph LR
 | `creditor_id` | Identifies a creditor. Referenced by `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header`, and `booking_positions` — unreliable on `projects`, see below. | 1 creditor → many rows across domains |
 | `technical_object_id` | Links a notification to the technical object it concerns. References `technical_objects.to_id`. | 1 technical object → many notifications |
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
-| `property_structure_account_id` | Conditional fallback foreign key into `Property.property_structure` (available via the unversioned path), present on `booking_header`, `booking_positions`, and `technical_objects`. Populated only where the table's primary join key doesn't cover the row — see each table's field reference for the exact condition. | varies per table, see field reference |
+| `service_contract_id` | Links a technical object to the service contract covering it. References `service_contracts.contract_id`. | 1 contract → many technical objects |
+| `person_id` | Links a booking to the tenant it applies to. Only valid combined with `property_id`, since the numbering restarts per property. | 1 person → 1..N tenancies per property |
+| `property_structure_account_id` | Foreign key into `Property.property_structure` (available via the unversioned path), present on `booking_header`, `booking_positions`, and `technical_objects`. Always populated on the two booking tables, where it's the only route from a booking down to a unit; on `technical_objects` it's the fallback for rows without a `floor_area_id`. | 1 unit → many rows |
 
 <Note>
   Cardinalities above describe the intended data model, not independently verified row
@@ -91,3 +96,9 @@ graph LR
   diagram — both are flagged as unreliable in the [Operations field
   reference](/v1/data-model/operations), so don't treat them as working joins.
 </Note>
+
+<Warning>
+  `person_id` comes back as a JSON string on `tenants` and `booking_header` but as a number on
+  `booking_positions`. Cast to a common type before joining across that boundary — a strict
+  equality check on the raw values silently returns no rows.
+</Warning>

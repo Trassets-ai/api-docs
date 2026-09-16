@@ -88,9 +88,11 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 
 <ResponseField name="person_id" type="string">
   Mit der Buchung verknüpfter Mieter oder Ansprechpartner, mit lokaler, objektbezogener
-  Nummerierung. Nicht mit demselben ID-Raum wie `person_id` auf
-  `Operations.notifications` verwechseln — dort ist es eine eigenständige
-  `bigint`-Sequenz aus einem anderen Subsystem.
+  Nummerierung. Verknüpft sich mit `Stakeholder.tenants` über `property_id` **und**
+  `person_id` gemeinsam — nie über `person_id` allein, da die Nummerierung pro Objekt neu
+  beginnt. Nicht jede Person ist ein Mieter, manche Zeilen haben deshalb keinen Treffer.
+  Nicht mit demselben ID-Raum wie `person_id` auf `Operations.notifications` verwechseln —
+  dort ist es eine eigenständige Sequenz aus einem anderen Subsystem.
 </ResponseField>
 
 <ResponseField name="booking_date" type="date">
@@ -136,7 +138,10 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 
 <ResponseField name="property_structure_account_id" type="string">
   Fremdschlüssel auf `Property.property_structure`, entspricht
-  `property_structure.account_id`.
+  `property_structure.account_id`. Immer befüllt und der einzige Weg, eine Buchung auf eine
+  einzelne Einheit herunterzubrechen — `booking_header` führt kein `floor_area_id`.
+  `property_structure` hat noch keinen `/v1/`-Endpunkt, also über den unversionierten Pfad
+  abrufen.
 </ResponseField>
 
 ## booking_positions
@@ -144,7 +149,7 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 `GET /v1/accounting/booking_positions` — einzelne Buchungspositionen, über
 `booking_header_id` mit einem Kopf verknüpft.
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
 </ResponseField>
 
@@ -170,19 +175,25 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
   ableitbar — die beiden entsprechen sich nicht.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
+<ResponseField name="creditor_id" type="string">
   Mit der Position verknüpfter Kreditor. Referenziert `Stakeholder.creditor` — siehe die
   [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
-  Mit der Position verknüpfter Mieter oder Ansprechpartner.
+  Mit der Position verknüpfter Mieter oder Ansprechpartner. Verknüpft sich mit
+  `Stakeholder.tenants` über `property_id` **und** `person_id` gemeinsam — die Nummerierung
+  beginnt pro Objekt neu — und der Wert muss vorher in einen String gecastet werden, da
+  `tenants.person_id` ein String ist. Nicht jede Person ist ein Mieter, manche Zeilen haben
+  deshalb keinen Treffer.
 </ResponseField>
 
 <ResponseField name="property_id_person_id" type="integer">
   Zusammengesetzter Schlüssel, der den Mieter identifiziert, auf den sich diese Position
   bezieht. Ähnelt einer Verkettung von `property_id` und `person_id`, ist aber nicht immer
-  exakt das — nutze das Feld wie geliefert, statt es selbst abzuleiten.
+  exakt das — nutze das Feld wie geliefert, statt es selbst abzuleiten. Keine `/v1/`-Tabelle
+  hat ein passendes Gegenstück, für den Weg zum Mieter also `property_id` plus `person_id`
+  nutzen.
 </ResponseField>
 
 <ResponseField name="period" type="object">
@@ -236,14 +247,15 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 
 <ResponseField name="property_structure_account_id" type="string">
   Fremdschlüssel auf `Property.property_structure`, entspricht
-  `property_structure.account_id` — derselbe Join-Key wie bei `booking_header`.
+  `property_structure.account_id` — derselbe immer befüllte Einheiten-Join-Key wie bei
+  `booking_header`.
 </ResponseField>
 
 ## budgets
 
 `GET /v1/accounting/budgets` — Budgetbeträge, eine Zeile pro Objekt, Konto und Monat.
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
 </ResponseField>
 

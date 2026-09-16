@@ -69,6 +69,9 @@ graph LR
   budgets -->|account_id| accounts
   notifications -->|technical_object_id| technical_objects
   notifications -->|report_id| projects
+  technical_objects -->|service_contract_id| service_contracts
+  booking_header -->|property_id + person_id| tenants
+  booking_positions -->|property_id + person_id| tenants
 
   creditor -->|creditor_id| technical_objects
   creditor -->|creditor_id| property_creditor_services
@@ -87,7 +90,9 @@ graph LR
 | `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header` und `booking_positions` — bei `projects` unzuverlässig, siehe unten. | 1 Kreditor → viele Zeilen über Domänen hinweg |
 | `technical_object_id` | Verknüpft eine Meldung mit dem technischen Objekt, auf das sie sich bezieht. Referenziert `technical_objects.to_id`. | 1 technisches Objekt → viele Meldungen |
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
-| `property_structure_account_id` | Bedingter Fallback-Fremdschlüssel auf `Property.property_structure` (über den unversionierten Pfad verfügbar), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Nur befüllt, wenn der primäre Join-Key der Tabelle die Zeile nicht abdeckt — die genaue Bedingung steht in der jeweiligen Feldreferenz. | variiert pro Tabelle, siehe Feldreferenz |
+| `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
+| `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. | 1 Person → 1..N Mietverhältnisse pro Objekt |
+| `property_structure_account_id` | Fremdschlüssel auf `Property.property_structure` (über den unversionierten Pfad verfügbar), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
 
 <Note>
   Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell, nicht
@@ -95,3 +100,10 @@ graph LR
   bewusst nicht Teil dieses Diagramms — beide sind in der [Operations-Feldreferenz](/de/v1/data-model/operations)
   als unzuverlässig markiert, also nicht als funktionierende Verknüpfung behandeln.
 </Note>
+
+<Warning>
+  `person_id` kommt bei `tenants` und `booking_header` als JSON-String zurück, bei
+  `booking_positions` dagegen als Zahl. Vor einem Join über diese Grenze hinweg auf einen
+  gemeinsamen Typ casten — ein strikter Gleichheitsvergleich auf den Rohwerten liefert
+  stillschweigend keine Zeilen.
+</Warning>

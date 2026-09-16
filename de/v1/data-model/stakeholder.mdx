@@ -90,7 +90,11 @@ auf anderen Tabellen.
 </ResponseField>
 
 <ResponseField name="person_id" type="string" required>
-  Mieter-ID.
+  Mieter-ID, pro Objekt und nicht global vergeben. `Accounting.booking_header` und
+  `Accounting.booking_positions` referenzieren sie — so kommst du von einer Buchung zum
+  Mieter: über `property_id` **und** `person_id` gemeinsam verknüpfen und
+  `booking_positions.person_id` vorher in einen String casten, da der Wert dort als Zahl
+  zurückkommt.
 </ResponseField>
 
 <ResponseField name="person_name" type="string">
@@ -153,5 +157,8 @@ auf anderen Tabellen.
 
 <Note>
   Dieser Endpunkt enthält keine zusammengesetzten Schlüsselfelder. Um ein Mietverhältnis
-  einer Einheit zuzuordnen, über `property_id` und `floor_area_id` verknüpfen.
+  einer Einheit zuzuordnen, über `property_id` und `floor_area_id` verknüpfen. `tenancy_id`
+  ist das einzige Feld, das eine Zeile allein identifiziert — eine Person kann mehrere
+  Mietverhältnisse im selben Objekt haben, ein Join über `property_id` plus `person_id` kann
+  also mehr als eine Zeile pro Person liefern.
 </Note>

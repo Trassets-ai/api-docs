@@ -32,7 +32,9 @@ structure](/v1/response-shape-conventions) rules.
 </ResponseField>
 
 <ResponseField name="contract_id" type="string" required>
-  Contract identifier, a formatted string (e.g. `"2019/00015"`).
+  Contract identifier, a formatted string (e.g. `"2019/00015"`). Referenced by
+  [`Property.technical_objects.service_contract_id`](/v1/data-model/property), which is how
+  you find the contract covering a given elevator, heating system, or other installation.
 </ResponseField>
 
 <ResponseField name="contract_number" type="string">

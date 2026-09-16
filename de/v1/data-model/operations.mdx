@@ -26,7 +26,7 @@ Die v1-Operations-Domäne umfasst zwei Tabellen: `notifications` und `projects`.
   Eindeutige Meldungs-ID.
 </ResponseField>
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
 </ResponseField>
 
@@ -79,17 +79,18 @@ Aufträgen.
   Lookups und Verknüpfungen.
 </ResponseField>
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
 </ResponseField>
 
-<ResponseField name="cost_center_id" type="string">
-  Kostenstelle, gegen die das Projekt gebucht wird.
+<ResponseField name="cost_center" type="object">
+  Kostenstelle, gegen die das Projekt gebucht wird — `{code, label}`.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
-  Hauptkreditor für das Projekt. Löst sich aktuell nicht gegen
-  `Stakeholder.creditor.creditor_id` auf — nicht als Fremdschlüssel verwenden.
+<ResponseField name="creditor_id" type="string">
+  Hauptkreditor für das Projekt. Die Werte liegen in einem anderen ID-Raum als
+  `Stakeholder.creditor.creditor_id` und lösen sich dort nicht auf — nicht als
+  Fremdschlüssel verwenden.
 </ResponseField>
 
 <ResponseField name="offer_id" type="integer">
@@ -128,12 +129,12 @@ Aufträgen.
   Fertigstellungsgrad in Prozent.
 </ResponseField>
 
-<ResponseField name="project_begin_date" type="date">
-  Startdatum des Projekts.
+<ResponseField name="project_period" type="object">
+  Projektlaufzeit — `{start, end}` (Datumsstrings).
 </ResponseField>
 
-<ResponseField name="project_end_date" type="date">
-  Enddatum des Projekts.
+<ResponseField name="budget_period" type="object">
+  Zeitraum, für den das Projektbudget gilt — `{start, end}` (Datumsstrings).
 </ResponseField>
 
 <ResponseField name="projektleitung" type="string">

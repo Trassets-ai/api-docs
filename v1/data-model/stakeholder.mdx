@@ -88,7 +88,10 @@ may serve multiple properties, referenced by `creditor_id` on other tables.
 </ResponseField>
 
 <ResponseField name="person_id" type="string" required>
-  Tenant identifier.
+  Tenant identifier, numbered per property rather than globally. `Accounting.booking_header`
+  and `Accounting.booking_positions` reference it, so this is how you get from a booking to
+  the tenant — join on `property_id` **and** `person_id` together, and cast
+  `booking_positions.person_id` to a string first, since it comes back as a number there.
 </ResponseField>
 
 <ResponseField name="person_name" type="string">
@@ -150,5 +153,7 @@ may serve multiple properties, referenced by `creditor_id` on other tables.
 
 <Note>
   There are no composite key fields on this endpoint. To link a tenancy to a unit, join via
-  `property_id` and `floor_area_id`.
+  `property_id` and `floor_area_id`. `tenancy_id` is the only field that identifies a row on
+  its own — one person can hold several tenancies in the same property, so a join on
+  `property_id` plus `person_id` can return more than one row per person.
 </Note>

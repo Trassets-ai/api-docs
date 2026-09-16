@@ -89,8 +89,11 @@ join keys.
 
 <ResponseField name="person_id" type="string">
   Tenant or contact person linked to the booking, using a local per-property numbering
-  scheme. Don't treat this as the same identifier space as `person_id` on
-  `Operations.notifications`, which is a separate `bigint` sequence from another subsystem.
+  scheme. Joins to `Stakeholder.tenants` on `property_id` **and** `person_id` together —
+  never on `person_id` alone, since the numbering restarts per property. Not every person is
+  a tenant, so some rows have no match. Don't treat this as the same identifier space as
+  `person_id` on `Operations.notifications`, which is a separate sequence from another
+  subsystem.
 </ResponseField>
 
 <ResponseField name="booking_date" type="date">
@@ -136,6 +139,9 @@ join keys.
 
 <ResponseField name="property_structure_account_id" type="string">
   Foreign key into `Property.property_structure`, matching `property_structure.account_id`.
+  Always populated, and the only way to resolve a booking down to a single unit —
+  `booking_header` carries no `floor_area_id`. `property_structure` has no `/v1/` endpoint
+  yet, so fetch it via the unversioned path.
 </ResponseField>
 
 ## booking_positions
@@ -143,7 +149,7 @@ join keys.
 `GET /v1/accounting/booking_positions` — individual booking line items, joined to a header
 via `booking_header_id`.
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Unique property identifier.
 </ResponseField>
 
@@ -168,19 +174,23 @@ via `booking_header_id`.
   `accounts` — the two don't correspond.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
+<ResponseField name="creditor_id" type="string">
   Creditor linked to the posting. References `Stakeholder.creditor` — see the
   [Stakeholder field reference](/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
-  Tenant or contact person linked to the posting.
+  Tenant or contact person linked to the posting. Joins to `Stakeholder.tenants` on
+  `property_id` **and** `person_id` together — the numbering restarts per property — and the
+  value has to be cast to a string first, since `tenants.person_id` is a string. Not every
+  person is a tenant, so some rows have no match.
 </ResponseField>
 
 <ResponseField name="property_id_person_id" type="integer">
   Composite key identifying the tenant this posting applies to. It resembles a
   concatenation of `property_id` and `person_id`, but isn't always exactly that — use the
-  field as given rather than deriving it yourself.
+  field as given rather than deriving it yourself. No `/v1/` table exposes a matching
+  counterpart, so to reach the tenant use `property_id` plus `person_id` instead.
 </ResponseField>
 
 <ResponseField name="period" type="object">
@@ -233,14 +243,14 @@ via `booking_header_id`.
 
 <ResponseField name="property_structure_account_id" type="string">
   Foreign key into `Property.property_structure`, matching `property_structure.account_id`
-  — the same join key as on `booking_header`.
+  — the same always-populated unit-level join key as on `booking_header`.
 </ResponseField>
 
 ## budgets
 
 `GET /v1/accounting/budgets` — budget amounts, one row per property, account, and month.
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Unique property identifier.
 </ResponseField>
 
