@@ -1,0 +1,86 @@
+---
+title: "v1 Depreciation Datenmodell: Anlagegüter"
+sidebarTitle: "Depreciation"
+description: "Feldreferenz für die v1-Depreciation-Tabelle assets, inklusive des afa_period-Objekts und des umbenannten Paars asset_id/asset_number."
+---
+
+Die v1-Depreciation-Domäne umfasst aktuell eine Tabelle: `assets`, die den
+[Response-Shape-Konventionen](/de/v1/response-shape-conventions) folgt.
+
+<Note>
+  Die Tabelle `depreciation` (Abschreibungsbuchungen) ist noch nicht live unter `/v1/` —
+  nutze vorerst das unversionierte
+  [`Depreciation.depreciation`](/de/data-model/depreciation#depreciation). Ohne sie gibt es
+  unter `/v1/` keine Möglichkeit, einen vollständigen Abschreibungsplan für ein Anlagegut zu
+  verknüpfen.
+</Note>
+
+## assets
+
+`GET /v1/depreciation/assets` — Anlagegüter-Stammdaten.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung
+  (`Depreciation.assets.property_id`) ein Integer ist.
+</ResponseField>
+
+<ResponseField name="asset_id" type="integer" required>
+  Eindeutige Anlagegut-ID. Umbenannt aus dem unversionierten `asset_hdr_id` — dasselbe
+  Umbenennungsmuster wie bei `Accounting.accounts.account_id`/`account_number` und
+  `Accounting.budgets.account_id`.
+</ResponseField>
+
+<ResponseField name="asset_number" type="string">
+  Anlagegut-Nummer. Umbenannt aus dem unversionierten `asset_id`.
+</ResponseField>
+
+<ResponseField name="asset_name" type="string">
+  Name des Anlageguts.
+</ResponseField>
+
+<ResponseField name="acquisition_date" type="date">
+  Datum des Erwerbs.
+</ResponseField>
+
+<ResponseField name="built_date" type="date">
+  Datum der Inbetriebnahme.
+</ResponseField>
+
+<ResponseField name="afa_period" type="object">
+  Abschreibungszeitraum — `{start, end}` (Datumsstrings). Ersetzt die unversionierten
+  getrennten Felder `begin_afa`/`end_afa`.
+</ResponseField>
+
+<ResponseField name="depreciation_active" type="boolean">
+  Ob für dieses Anlagegut aktuell abgeschrieben wird. Hier ein echter Boolean, während die
+  unversionierte Entsprechung ein String ist.
+</ResponseField>
+
+<ResponseField name="afa_duration" type="string">
+  Abschreibungsdauer in Jahren, als String (z. B. `"50"`).
+</ResponseField>
+
+<ResponseField name="afa_method" type="string">
+  Angewendete Abschreibungsmethode.
+</ResponseField>
+
+<ResponseField name="afa_validity" type="string">
+  Datum, ab dem die Abschreibungsmethode gilt, im Format `TT.MM.JJJJ` (z. B.
+  `"01.05.2019"`) — nicht ISO-8601 wie die übrigen Datumsfelder dieser Tabelle. Nicht
+  gleich parsen.
+</ResponseField>
+
+<ResponseField name="afa_group" type="string">
+  Abschreibungskategorie des Anlageguts (z. B. `"Gebäude"`, `"Garagen"`).
+</ResponseField>
+
+<ResponseField name="afa_buch_id" type="string">
+  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt. Nicht selbst umbenennen oder
+  umdeuten.
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Rechnungslegungsgrundlage, unter der diese Abschreibung gebucht ist (z. B.
+  `"Handelsrecht"`, `"Steuerrecht"`) — handels- und steuerrechtliche Abschreibung können
+  sich beim selben Anlagegut unterscheiden.
+</ResponseField>

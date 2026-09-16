@@ -1,7 +1,7 @@
 ---
 title: "v1 Field Glossary"
 sidebarTitle: "Field Glossary"
-description: "Reference guide to field names shared across multiple /v1/ tables, including property_id, person_id, creditor_id, and the ambiguous account_id."
+description: "Reference guide to field names shared across multiple /v1/ tables, including property_id, person_id, creditor_id, and the ambiguous account_name."
 ---
 
 This glossary defines field names that appear on more than one `/v1/` table documented in
@@ -13,13 +13,15 @@ tables, which is exactly why they're worth checking here first.
 | --- | --- | --- |
 | `property_id` | integer or string | Unique property identifier; primary join key across every `/v1/` table. Type varies by table — integer on `booking_header`, `booking_positions`, `budgets`, `notifications`, `projects`, and `technical_objects`; string on `tenants`. |
 | `person_id` | integer or string | Identifies a tenant or contact person. **Not one identifier space** — `booking_header.person_id`, `booking_positions.person_id`, `notifications.person_id`, and `tenants.person_id` come from different subsystems. Don't join across tables on this field alone. |
-| `creditor_id` | integer | Identifies a creditor (vendor or service provider). References the unversioned `Stakeholder.creditor` — there is no `/v1/` creditor endpoint yet. Unreliable on `projects`; see the [Operations field reference](/v1/data-model/operations). |
+| `creditor_id` | integer or string | Identifies a creditor (vendor or service provider). References `Stakeholder.creditor` — see the [Stakeholder field reference](/v1/data-model/stakeholder). Unreliable on `projects`; see the [Operations field reference](/v1/data-model/operations). |
 | `floor_area_id` | integer | References the unversioned `Property.property_structure` — there is no `/v1/` property_structure endpoint yet. Appears on `technical_objects` and `tenants`. |
-| `account_id` | integer | **Ambiguous across tables — not one join key.** On `booking_positions`, the account the line item is posted to (FK into the unversioned `Accounting.accounts.account_hdr_id`). On `budgets`, renamed from the unversioned `account_hdr_id` and unrelated to `booking_positions.account_id`. |
+| `account_id` | integer | Internal account identifier. One consistent join key — `booking_positions.account_id` and `budgets.account_id` both join to `accounts.account_id`; see the [Accounting field reference](/v1/data-model/accounting). |
+| `account_number` | string | Human-readable account number. Renamed from the unversioned `account_id` on both `accounts` and `budgets` — don't confuse with `account_id` above, which is a different (internal) value. |
+| `account_name` | string | **Ambiguous across tables — not one concept.** On `accounts`, the ledger account's name. On `depreciation/assets`, the accounting basis a depreciation record is booked under (e.g. `"Handelsrecht"` vs. `"Steuerrecht"`) — unrelated to the accounts table. |
 | `property_structure_account_id` | string | Conditional fallback foreign key into the unversioned `Property.property_structure`, new in v1. Appears on `booking_header`, `booking_positions`, and `technical_objects` — populated only where the table's primary join key doesn't cover the row. |
 | `cost_center_id` | string | Cost centre reference. Appears on `notifications` and `projects`; no `/v1/` cost-centre endpoint exists yet to resolve it against. |
 | `booking_date` | date | ISO-8601 date of the ledger booking. Appears on `booking_header` and `booking_positions`. |
-| `dms_link` | string | Link to the related document in the document management system, if attached. Appears on `booking_header` and `tenants`. |
+| `dms_link` | string | Link to the related document in the document management system, if attached. Appears on `booking_header`, `creditor`, `properties`, and `tenants`. |
 
 <Note>
   Fields prefixed with `sk_` are internal surrogate keys used for joins in the underlying

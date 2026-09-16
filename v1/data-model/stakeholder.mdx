@@ -1,11 +1,78 @@
 ---
-title: "v1 Stakeholder Data Model: Tenants"
+title: "v1 Stakeholder Data Model: Creditor and Tenants"
 sidebarTitle: "Stakeholder"
-description: "Field-level reference for the v1 Stakeholder table tenants, including its lease-date fields and the phones array."
+description: "Field-level reference for the v1 Stakeholder tables creditor and tenants, including the phones array on both tables."
 ---
 
-The v1 Stakeholder domain currently covers one table: `tenants`, which follows the
-[response shape conventions](/v1/response-shape-conventions).
+The v1 Stakeholder domain currently covers two tables: `creditor` and `tenants`, both of
+which follow the [response shape conventions](/v1/response-shape-conventions).
+
+<Note>
+  `employees` and `owner` aren't live under `/v1/` yet — use their unversioned equivalents
+  in the [full data model](/data-model/stakeholder) for now.
+</Note>
+
+## creditor
+
+`GET /v1/stakeholder/creditor` — vendor and creditor master data. Like the unversioned
+equivalent, this is the only v1 Stakeholder endpoint without a `property_id` column — a
+creditor is a standalone entity that may serve multiple properties, referenced by
+`creditor_id` on other tables.
+
+<ResponseField name="creditor_id" type="string" required>
+  Unique creditor identifier. A string here, where the unversioned equivalent
+  (`Stakeholder.creditor.creditor_id`) is an integer.
+</ResponseField>
+
+<ResponseField name="name_1" type="string">
+  Primary name line (company or last name).
+</ResponseField>
+
+<ResponseField name="name_2" type="string">
+  Secondary name line.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Creditor type.
+</ResponseField>
+
+<ResponseField name="street_nr" type="string">
+  Street and house number.
+</ResponseField>
+
+<ResponseField name="zipcode_city" type="string">
+  Postal code and city, combined into one field.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  Email address.
+</ResponseField>
+
+<ResponseField name="phones" type="string[]">
+  Phone numbers. Replaces the unversioned `phone_1` (and any further numbered columns) with
+  a single array, per the [response shape
+  conventions](/v1/response-shape-conventions) — same reshape as `Stakeholder.tenants.phones`.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  Bank account IBAN.
+</ResponseField>
+
+<ResponseField name="bank" type="string">
+  Bank name.
+</ResponseField>
+
+<ResponseField name="tax_id" type="string">
+  Tax identification number.
+</ResponseField>
+
+<ResponseField name="industry" type="string">
+  Industry classification.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link to the creditor's document folder in the document management system, if attached.
+</ResponseField>
 
 ## tenants
 

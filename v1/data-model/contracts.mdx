@@ -1,0 +1,78 @@
+---
+title: "v1 Contracts Data Model: Service Contracts"
+sidebarTitle: "Contracts"
+description: "Field-level reference for the v1 Contracts table service_contracts, including the contract_period object."
+---
+
+The v1 Contracts domain currently covers one table: `service_contracts`, which follows the
+[response shape conventions](/v1/response-shape-conventions).
+
+<Note>
+  `contract_debits`, `contract_debit_diffs`, and `contract_ends` aren't live under `/v1/`
+  yet — use their unversioned equivalents in the [full data
+  model](/data-model/contracts) for now.
+</Note>
+
+## service_contracts
+
+`GET /v1/contracts/service_contracts` — maintenance and service contracts.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier. A string here, where the unversioned equivalent
+  (`Contracts.service_contracts.property_id`) is an integer.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string" required>
+  Identifies the service provider. References `Stakeholder.creditor` — see the
+  [Stakeholder field reference](/v1/data-model/stakeholder). A string here, where the
+  unversioned equivalent is an integer.
+</ResponseField>
+
+<ResponseField name="creditor_name" type="string">
+  Display name of the service provider. `null` in most rows — join through `creditor_id`
+  for a reliable name instead.
+</ResponseField>
+
+<ResponseField name="contract_id" type="string" required>
+  Contract identifier (e.g. `"2019/00015"`). A formatted string here, where the unversioned
+  equivalent is a plain integer.
+</ResponseField>
+
+<ResponseField name="contract_number" type="string">
+  Human-readable contract number.
+</ResponseField>
+
+<ResponseField name="contract_name" type="string">
+  Contract name.
+</ResponseField>
+
+<ResponseField name="contract_category" type="string">
+  Contract category.
+</ResponseField>
+
+<ResponseField name="contract_type" type="string">
+  Contract type.
+</ResponseField>
+
+<ResponseField name="contract_period" type="object">
+  Contract term — `{start, end}` (date strings). Replaces the unversioned separate
+  `contract_begin`/`contract_end` fields.
+</ResponseField>
+
+<ResponseField name="contract_value" type="string">
+  Contract value. Decimal value serialized as a string (e.g. `"0.0000"`), not a JSON
+  number — cast before doing arithmetic on it.
+</ResponseField>
+
+<ResponseField name="contract_value_year" type="string">
+  Contract value normalised to an annual figure. Decimal value serialized as a string, same
+  as `contract_value`.
+</ResponseField>
+
+<ResponseField name="contract_reasoning" type="string">
+  Reason code for the contract.
+</ResponseField>
+
+<ResponseField name="contract_reasoning_comment" type="string">
+  Free-text comment on the contract reasoning.
+</ResponseField>

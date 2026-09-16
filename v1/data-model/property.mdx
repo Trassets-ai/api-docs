@@ -1,10 +1,16 @@
 ---
-title: "v1 Property Data Model: Properties and Technical Objects"
+title: "v1 Property Data Model: Properties, Creditor Services, and Technical Objects"
 sidebarTitle: "Property"
-description: "Field-level reference for the v1 Property tables properties and technical_objects, including the entrances array, mandate_period object, and the conditional property_structure_account_id fallback."
+description: "Field-level reference for the v1 Property tables properties, property_creditor_services, and technical_objects, including the entrances array, mandate_period object, and the conditional property_structure_account_id fallback."
 ---
 
-The v1 Property domain currently covers two tables: `properties` and `technical_objects`.
+The v1 Property domain currently covers three tables: `properties`,
+`property_creditor_services`, and `technical_objects`.
+
+<Note>
+  `property_structure` isn't live under `/v1/` yet — use the unversioned
+  [`Property.property_structure`](/data-model/property#property_structure) for now.
+</Note>
 
 ## properties
 
@@ -86,6 +92,31 @@ The v1 Property domain currently covers two tables: `properties` and `technical_
   Link to the property document in the document management system, if attached.
 </ResponseField>
 
+## property_creditor_services
+
+`GET /v1/property/property_creditor_services` — which creditor provides which service for
+a property, and whether that assignment is exclusive.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier. A string here, where the unversioned equivalent is an integer.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string" required>
+  References `Stakeholder.creditor` — see the [Stakeholder field
+  reference](/v1/data-model/stakeholder). A string here, where the unversioned equivalent is
+  an integer.
+</ResponseField>
+
+<ResponseField name="service" type="string">
+  Service name (e.g. cleaning, elevator maintenance).
+</ResponseField>
+
+<ResponseField name="exclusivity" type="object">
+  Whether the creditor holds an exclusive assignment for this service at this property —
+  `{code, label}` (e.g. `{"code": 1, "label": "Exklusiv"}`). Replaces the unversioned plain
+  string field, per the [response shape conventions](/v1/response-shape-conventions).
+</ResponseField>
+
 ## technical_objects
 
 `GET /v1/property/technical_objects` — technical/metered installations at a property
@@ -110,7 +141,8 @@ The v1 Property domain currently covers two tables: `properties` and `technical_
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Maintenance creditor responsible for the object. References `Stakeholder.creditor`.
+  Maintenance creditor responsible for the object. References `Stakeholder.creditor` — see
+  the [Stakeholder field reference](/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="to_nr" type="string">
