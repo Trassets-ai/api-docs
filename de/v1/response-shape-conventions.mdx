@@ -12,11 +12,12 @@ Die unversionierte API liefert Datenbanktabellen weitgehend unverändert — fla
 | Geldbeträge werden zu einem `amount`-Objekt | `"booking_sum_net": 327.0, "booking_sum_tax": 0.0, "booking_sum_gross": 327.0` | `"amount": {"net": 327.0, "tax": 0.0, "gross": 327.0}` |
 | Nummerierte Wiederholungsspalten werden zu einem Array | `"hierarchy_1": "17 10 01", "hierarchy_2": "17 10 01.06", "hierarchy_3": null, …` | `"hierarchy": ["17 10 01", "17 10 01.06"]` |
 | Code+Label-Paare werden zu einem Objekt | `"exclusivity_id": 0, "exclusivity": "Vorschlag"` | `"exclusivity": {"code": 0, "label": "Vorschlag"}` |
-| Sync-Pipeline-Artefakte entfallen | `"recommended_join_key": "1204"`, `"property_id_account_number": 1101410500` | vollständig entfernt — stattdessen über die echten ID-Felder verknüpfen |
+| Verifizierte Sync-Pipeline-Join-Keys werden umbenannt, nicht gestrichen | `"recommended_join_key": "1204"` | `"property_structure_account_id": "1204"` — bleibt erhalten, sobald als echter Fremdschlüssel verifiziert (z. B. bei `booking_positions`, `booking_header`, `technical_objects`) |
+| Nicht verifizierbare Sync-Pipeline-Artefakte entfallen | `"property_id_account_number": 1101410500` | vollständig entfernt — stattdessen über die echten ID-Felder verknüpfen |
 | ID-Felder bleiben immer flach | — | `property_id`, `account_id`, `floor_area_id` etc. werden in keiner Tabelle verschachtelt — das hält Datensätze über Endpunkte hinweg verknüpfbar |
 
 Die letzte Zeile ist die eine Garantie, die über alle anderen Änderungen hinweg gilt: Egal was sonst umstrukturiert wird, die ID-Felder, über die Datensätze heute schon zwischen Endpunkten verknüpft werden, bleiben exakt dort, wo sie sind.
 
 <Note>
-  Diese Konventionen sind in einer internen Architekturentscheidung festgehalten (Status: Proposed) und können sich noch ändern.
+  Diese Konventionen sind in einer internen Architekturentscheidung festgehalten (Status: Accepted) und werden Tabelle für Tabelle umgesetzt — die meisten `/v1/`-Tabellen folgen ihnen noch nicht vollständig.
 </Note>

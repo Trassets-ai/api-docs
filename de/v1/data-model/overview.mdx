@@ -1,0 +1,33 @@
+---
+title: "v1 Datenmodell: reviewte Tabellen"
+sidebarTitle: "Übersicht"
+description: "Die Tabellen, die aktuell unter /v1/ verfügbar sind, umgeformt nach den Response-Shape-Konventionen — Accounting, Operations und Property."
+---
+
+`/v1/` dokumentiert eine Tabelle erst, wenn sie das Schema-Review durchlaufen hat
+(`v1_reviewed`). Aktuell haben drei Domänen mindestens eine reviewte Tabelle.
+
+<CardGroup cols={2}>
+  <Card title="Accounting" icon="book" href="/de/v1/data-model/accounting">
+    `booking_header` und `booking_positions`, mit `period`-, `amount`- und
+    `amount_per_sqm`-Objekten.
+  </Card>
+
+  <Card title="Operations" icon="clipboard-list" href="/de/v1/data-model/operations">
+    `notifications` und `projects`, mit der Umbenennung zu `technical_object_id` und dem
+    `hierarchy`-Array.
+  </Card>
+
+  <Card title="Property" icon="building" href="/de/v1/data-model/property">
+    `technical_objects`, mit dem bedingten `property_structure_account_id`-Fallback.
+  </Card>
+</CardGroup>
+
+<Note>
+  `Accounting.budgets` und `Stakeholder.tenants` sind ebenfalls live unter `/v1/`, werden
+  hier aber noch nicht dokumentiert — beide haben noch offene Punkte gegenüber den
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions). Nutze vorerst ihre
+  unversionierten Entsprechungen im [vollständigen Datenmodell](/de/data-model/overview).
+  Jede andere Tabelle (`orders`, `property_structure`, `assets`, `contract_debits` usw.) ist
+  noch nicht reviewt und bleibt auf dem unversionierten Pfad.
+</Note>

@@ -12,11 +12,12 @@ The unversioned API returns database tables largely as-is — flat rows with syn
 | Money fields become an `amount` object | `"booking_sum_net": 327.0, "booking_sum_tax": 0.0, "booking_sum_gross": 327.0` | `"amount": {"net": 327.0, "tax": 0.0, "gross": 327.0}` |
 | Numbered repeating columns become an array | `"hierarchy_1": "17 10 01", "hierarchy_2": "17 10 01.06", "hierarchy_3": null, …` | `"hierarchy": ["17 10 01", "17 10 01.06"]` |
 | Code+label pairs become one object | `"exclusivity_id": 0, "exclusivity": "Vorschlag"` | `"exclusivity": {"code": 0, "label": "Vorschlag"}` |
-| Sync-pipeline artifacts are dropped | `"recommended_join_key": "1204"`, `"property_id_account_number": 1101410500` | removed entirely — join on the real ID fields instead |
+| Verified sync-pipeline join keys are renamed, not dropped | `"recommended_join_key": "1204"` | `"property_structure_account_id": "1204"` — kept once verified as a real foreign key (e.g. on `booking_positions`, `booking_header`, `technical_objects`) |
+| Unverifiable sync-pipeline artifacts are dropped | `"property_id_account_number": 1101410500` | removed entirely — join on the real ID fields instead |
 | ID fields stay flat, always | — | `property_id`, `account_id`, `floor_area_id`, etc. are never nested, in any table — this is what keeps records joinable across endpoints |
 
 The last row is the one guarantee that holds across every other change: whatever else gets restructured, the ID fields you already use to cross-reference records between endpoints stay exactly where they are.
 
 <Note>
-  These conventions are defined in an internal architecture decision record (status: Proposed) and are still subject to change.
+  These conventions are defined in an internal architecture decision record (status: Accepted) and are still applied table by table — most `/v1/` tables don't fully follow them yet.
 </Note>

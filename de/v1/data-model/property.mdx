@@ -1,0 +1,67 @@
+---
+title: "v1 Property Datenmodell: technische Objekte"
+sidebarTitle: "Property"
+description: "Feldreferenz für die v1-Property-Tabelle technical_objects, inklusive des bedingten property_structure_account_id-Fallbacks."
+---
+
+Die v1-Property-Domäne umfasst aktuell eine reviewte Tabelle: `technical_objects`.
+
+<Note>
+  `technical_objects` stellt im Live-v1-Schema über 20 Felder bereit (Gewährleistungs-,
+  Inspektions- und Wartungsdaten und -Flags). Diese Seite dokumentiert nur die wichtigsten
+  Identifikations-, Verknüpfungs- und umgeformten Felder — die vollständige, automatisch
+  generierte Feldliste findest du im Tab **API Reference**.
+</Note>
+
+## technical_objects
+
+`GET /v1/property/technical_objects` — technische/gemessene Installationen an einem Objekt
+(Aufzüge, Heizungsanlagen, Zähler und ähnliche Anlagen).
+
+<ResponseField name="to_id" type="integer" required>
+  ID des technischen Objekts.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Fläche, in der das technische Objekt installiert ist, falls zutreffend.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Für das Objekt verantwortlicher Wartungskreditor. Referenziert `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="to_nr" type="string">
+  Nummer des technischen Objekts.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Objektname.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Objekttyp.
+</ResponseField>
+
+<ResponseField name="built_date" type="date">
+  Installations-/Baudatum.
+</ResponseField>
+
+<ResponseField name="is_meter" type="boolean">
+  Ob dieses Objekt einen Zähler repräsentiert.
+</ResponseField>
+
+<ResponseField name="property_structure_account_id" type="string">
+  Fremdschlüssel auf `Property.property_structure`. Neu in v1 und bedingt befüllt: nur bei
+  Zeilen ohne `floor_area_id` gesetzt (aktuell eine kleine Minderheit); sonst überall
+  `null`, dort bleibt `floor_area_id` der Join-Key.
+</ResponseField>
+
+<Note>
+  Es gibt keinen separaten Endpunkt für Zählerstände. Eine `technical_objects`-Zeile kann
+  einen Zähler repräsentieren, aber dieser Endpunkt liefert nur die Stammdaten des Objekts
+  (Typ, Standort, verantwortlicher Kreditor) — keine Verbrauchsablesungen.
+</Note>

@@ -1,0 +1,203 @@
+---
+title: "v1 Accounting Data Model: Booking Header and Positions"
+sidebarTitle: "Accounting"
+description: "Field-level reference for the v1 Accounting tables booking_header and booking_positions, reshaped with period, amount, and amount_per_sqm objects."
+---
+
+The v1 Accounting domain currently covers two reviewed tables: `booking_header` and
+`booking_positions`. Both apply the [response shape
+conventions](/v1/response-shape-conventions) — nested `period`/`amount` objects, and
+sync-pipeline join keys renamed instead of dropped where they turned out to be real
+foreign keys.
+
+<Note>
+  `accounting.budgets` is also live under `/v1/`, but isn't documented on this page yet —
+  its response still carries a known, unresolved artifact (`property_id_account_number`)
+  that the response shape conventions call for removing. Use the unversioned
+  [`Accounting.budgets`](/data-model/accounting#budgets) for now, or check the **API
+  Reference** tab for the live v1 field list.
+</Note>
+
+## booking_header
+
+`GET /v1/accounting/booking_header` — general ledger booking headers. No `period` or
+`amount` object here: the table has only a single `booking_date` field and a single
+`booking_value` field, so those two conventions don't apply structurally.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="booking_header_id" type="integer" required>
+  Unique identifier for the booking header. Renamed from `bko_hdr_id`. `booking_positions`
+  references this as `booking_header_id`.
+</ResponseField>
+
+<ResponseField name="booking_nr" type="integer">
+  Booking number.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string">
+  Creditor linked to the booking. References `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="person_id" type="string">
+  Tenant or contact person linked to the booking, using a local per-property numbering
+  scheme. Don't treat this as the same identifier space as `person_id` on
+  `Operations.notifications`, which is a separate `bigint` sequence from another subsystem.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Date of the booking.
+</ResponseField>
+
+<ResponseField name="booking_value" type="number">
+  Total value of the booking header.
+</ResponseField>
+
+<ResponseField name="m2" type="number">
+  Floor area in square metres associated with the booking, if applicable.
+</ResponseField>
+
+<ResponseField name="booking_text" type="string">
+  Free-text description of the booking.
+</ResponseField>
+
+<ResponseField name="initial_booking_text" type="string">
+  Original booking text, before any later correction.
+</ResponseField>
+
+<ResponseField name="booking_barcode" type="string">
+  Barcode reference for the booking document, if scanned.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link to the booking document in the document management system, if attached.
+</ResponseField>
+
+<ResponseField name="cost_center_id_name_concat" type="string">
+  Combined cost-centre ID and name. Kept flat on purpose — it's the only source of this
+  label; there's no separate ID/name pair or joinable table it could be reconstructed from.
+</ResponseField>
+
+<ResponseField name="ledger_id_name_concat" type="string">
+  Combined ledger ID and name. Kept flat for the same reason as
+  `cost_center_id_name_concat`.
+</ResponseField>
+
+<ResponseField name="person_name_concat" type="string">
+  Combined person ID and name. Kept flat for the same reason as
+  `cost_center_id_name_concat`.
+</ResponseField>
+
+<ResponseField name="property_structure_account_id" type="string">
+  Foreign key into `Property.property_structure`. Renamed from `recommended_join_key` —
+  verified 1:1 against `property_structure.account_id`, so it's a real join key, not a
+  sync-pipeline artifact.
+</ResponseField>
+
+<Note>
+  `cost_center_m2` from the unversioned table is dropped here: it's 100% reconstructable
+  from `cost_center_id_name_concat` + `m2`.
+</Note>
+
+## booking_positions
+
+`GET /v1/accounting/booking_positions` — individual booking line items, joined to a header
+via `booking_header_id`. Fully reshaped: date pairs become `period`, and the net/tax/gross
+triples become `amount` and `amount_per_sqm` objects.
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="booking_position_id" type="integer" required>
+  Unique identifier for the line item. Renamed from `booking_position_hdr_id`.
+</ResponseField>
+
+<ResponseField name="booking_header_id" type="integer" required>
+  Identifier of the parent booking header. Joins to `booking_header.booking_header_id`.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer" required>
+  Account the line item is posted to. There is no `/v1/` accounts endpoint yet — join
+  against the unversioned `Accounting.accounts` for account metadata.
+</ResponseField>
+
+<ResponseField name="contra_account_id" type="integer">
+  Contra account for the posting.
+</ResponseField>
+
+<ResponseField name="contra_account_name" type="string">
+  Name of the contra account. Kept flat on purpose — a join test against `accounts` on this
+  field returned 0 matches, so it can't be reconstructed via `contra_account_id`.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="integer">
+  Creditor linked to the posting. References `Stakeholder.creditor`.
+</ResponseField>
+
+<ResponseField name="person_id" type="integer">
+  Tenant or contact person linked to the posting.
+</ResponseField>
+
+<ResponseField name="property_id_person_id" type="integer">
+  Composite key identifying the tenant this posting applies to. Looks like a concatenation
+  of `property_id` and `person_id`, but isn't — verified against the full 1.55M-row table,
+  about 0.16% of rows don't follow that pattern. Kept as its own field for that reason;
+  don't derive it yourself.
+</ResponseField>
+
+<ResponseField name="period" type="object">
+  Booking period — `{start, end}` (date strings).
+</ResponseField>
+
+<ResponseField name="amount" type="object">
+  Posting amount — `{net, tax, gross}`.
+</ResponseField>
+
+<ResponseField name="amount_per_sqm" type="object">
+  Posting amount normalised per square metre — `{net, tax, gross}`.
+</ResponseField>
+
+<ResponseField name="account_group" type="string">
+  Account group assignment.
+</ResponseField>
+
+<ResponseField name="booking_date" type="date">
+  Date of the posting.
+</ResponseField>
+
+<ResponseField name="booking_nr" type="integer">
+  Booking number.
+</ResponseField>
+
+<ResponseField name="booking_Lfd_nr" type="integer">
+  Sequential line number within the booking.
+</ResponseField>
+
+<ResponseField name="booking_type" type="integer">
+  Booking type code.
+</ResponseField>
+
+<ResponseField name="booking_position_text" type="string">
+  Free-text description of the line item.
+</ResponseField>
+
+<ResponseField name="sh" type="string">
+  Debit/credit indicator (`S`/`H`). Kept flat rather than folded into the sign of
+  `amount.net` — about 3.55% of rows (reversal/correction postings) contradict that sign
+  pattern.
+</ResponseField>
+
+<ResponseField name="HNDL" type="number">
+  Meaning not yet confirmed with the source system. About 99.2% of rows are `0.0`; where
+  non-zero, the value is often close to `amount.net` and concentrated in specific booking
+  types tied to recoverable operating costs — consistent with a correction field, but not
+  confirmed. Don't rename or reinterpret it.
+</ResponseField>
+
+<ResponseField name="property_structure_account_id" type="string">
+  Foreign key into `Property.property_structure`. Renamed from `recommended_join_key`, same
+  verified rename as in `booking_header`.
+</ResponseField>
