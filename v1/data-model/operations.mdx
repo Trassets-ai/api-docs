@@ -25,7 +25,7 @@ The v1 Operations domain covers two tables: `notifications` and `projects`.
   Unique notification identifier.
 </ResponseField>
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Unique property identifier.
 </ResponseField>
 
@@ -77,7 +77,8 @@ The v1 Operations domain covers two tables: `notifications` and `projects`.
 </ResponseField>
 
 <ResponseField name="property_id" type="integer" required>
-  Unique property identifier.
+  Unique property identifier. A number here, while `properties.property_id` and most other
+  tables return it as a string — compare the two as strings.
 </ResponseField>
 
 <ResponseField name="cost_center_id" type="string">
@@ -85,8 +86,9 @@ The v1 Operations domain covers two tables: `notifications` and `projects`.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Primary creditor for the project. Does not currently resolve against
-  `Stakeholder.creditor.creditor_id` — don't rely on it as a foreign key.
+  Primary creditor for the project. Its values sit in a different identifier space than
+  `Stakeholder.creditor.creditor_id` and don't resolve against it — don't rely on it as a
+  foreign key.
 </ResponseField>
 
 <ResponseField name="offer_id" type="integer">

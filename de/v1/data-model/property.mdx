@@ -126,17 +126,27 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
   ID des technischen Objekts.
 </ResponseField>
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
 </ResponseField>
 
 <ResponseField name="floor_area_id" type="integer">
-  Fläche, in der das technische Objekt installiert ist, falls zutreffend.
+  Fläche, in der das technische Objekt installiert ist, falls zutreffend. Bei jeder Zeile
+  ohne `property_structure_account_id` gesetzt — genau eines der beiden Felder ist immer
+  vorhanden.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
-  Für das Objekt verantwortlicher Wartungskreditor. Referenziert `Stakeholder.creditor` —
-  siehe die [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder).
+<ResponseField name="creditor_id" type="string">
+  Für das Objekt verantwortlicher Kreditor. Referenziert `Stakeholder.creditor` —
+  siehe die [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Bei den meisten
+  Zeilen `null`.
+</ResponseField>
+
+<ResponseField name="service_contract_id" type="string">
+  Wartungsvertrag, der dieses Objekt abdeckt. Referenziert
+  [`Contracts.service_contracts.contract_id`](/de/v1/data-model/contracts). Bei den meisten
+  Zeilen `null`, und nicht jeder Wert löst sich auf — einen fehlenden Treffer als „kein
+  Vertrag hinterlegt" behandeln, nicht als Fehler.
 </ResponseField>
 
 <ResponseField name="to_nr" type="string">
@@ -160,9 +170,9 @@ ein Objekt erbringt, und ob diese Zuordnung exklusiv ist.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Fremdschlüssel auf `Property.property_structure`. Bedingt befüllt: nur bei Zeilen ohne
-  `floor_area_id` gesetzt (aktuell eine kleine Minderheit); sonst überall `null`, dort ist
-  `floor_area_id` der Join-Key.
+  Fremdschlüssel auf `Property.property_structure`, entspricht dessen `account_id`. Bedingt
+  befüllt: nur bei Zeilen ohne `floor_area_id` gesetzt; sonst überall `null`, dort ist
+  `floor_area_id` der Join-Key. Die beiden treten nie gemeinsam auf und sind nie beide `null`.
 </ResponseField>
 
 <Note>
