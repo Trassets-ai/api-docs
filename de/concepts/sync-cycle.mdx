@@ -1,10 +1,10 @@
 ---
 title: "Sync-Zyklus: Wie Daten in die API gelangen"
 sidebarTitle: "Sync-Zyklus"
-description: "Verstehe den vorgelagerten Sync hinter der Trassets Data API: TRUNCATE+Reload-Semantik, last_sync_at und was GET /changes tatsächlich erkennt."
+description: "Verstehe den vorgelagerten Sync hinter der Data API: TRUNCATE+Reload-Semantik, last_sync_at und was GET /changes tatsächlich erkennt."
 ---
 
-Die Trassets Data API ist eine reine Lese-Schnittstelle über Daten, die aus einer vorgelagerten Pipeline synchronisiert werden. Zu verstehen, wie und wann dieser Sync passiert, ist essenziell, um eine korrekte Polling- oder inkrementelle Sync-Integration zu bauen.
+Die Data API ist eine reine Lese-Schnittstelle über Daten, die aus einer vorgelagerten Pipeline synchronisiert werden. Zu verstehen, wie und wann dieser Sync passiert, ist essenziell, um eine korrekte Polling- oder inkrementelle Sync-Integration zu bauen.
 
 <Note>
   Der Sync-Takt ist eine Eigenschaft der vorgelagerten Pipeline, nicht etwas, das die API konfiguriert oder offenlegt — sie hat keinen eigenen, maschinell erzwungenen Zeitplan, gegen den man das prüfen könnte. Gehe nicht von einem festen Aktualisierungsintervall aus — prüfe stattdessen immer `last_sync_at` (siehe unten).
