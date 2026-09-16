@@ -1,25 +1,18 @@
 ---
 title: "Sync Cycle: How Data Gets Into the API"
 sidebarTitle: "Sync Cycle"
-description: "Understand the Databricks-to-RDS sync pipeline behind the Trassets Data API: TRUNCATE+Reload semantics, last_sync_at, and what GET /changes actually detects."
+description: "Understand the upstream sync behind the Trassets Data API: TRUNCATE+Reload semantics, last_sync_at, and what GET /changes actually detects."
 ---
 
-The Trassets Data API is a read-only interface over data that is synced into RDS
-PostgreSQL from an upstream pipeline. Understanding how and when that sync happens is
-essential for building a correct polling or incremental-sync integration.
-
-## Pipeline architecture
-
-Data flows through three stages: **Data Lakehouse → cloud storage → OLTP database**. The
-API has no direct connection to Databricks at runtime — it only ever reads from RDS. The
-underlying Databricks jobs are named `parquet_to_s3` and `ingest_parquet_to_rds`.
+The Trassets Data API is a read-only interface over data that is synced in from an
+upstream pipeline. Understanding how and when that sync happens is essential for
+building a correct polling or incremental-sync integration.
 
 <Note>
-  Trassets' internal documentation describes this sync as running **daily**. This
-  repository's public API layer has no machine-enforced schedule of its own to verify
-  against — the sync cadence is a property of the upstream pipeline, not something the API
-  configures or exposes. Do not assume sub-daily freshness; always check `last_sync_at` (see
-  below) rather than assuming a fixed interval has elapsed.
+  The sync cadence is a property of the upstream pipeline, not something the API
+  configures or exposes — it has no machine-enforced schedule of its own to verify
+  against. Do not assume a fixed refresh interval; always check `last_sync_at` (see
+  below) instead.
 </Note>
 
 ## TRUNCATE + Reload semantics
@@ -39,26 +32,19 @@ incremental update at the table level. This has two direct consequences for inte
 
 ## When `last_sync_at` is set
 
-Sync state is tracked per `(customer_id, table_name)` in an internal status table with
-these fields: `last_sync_at` (nullable timestamp), `status` (`synced`, `pending`, or
-`error`), `row_count`, `primary_key_column`, and `error_message`.
-
 `last_sync_at` is set **only when a sync completes successfully** for that table — it stays
-`NULL` until the first successful sync, and a failed sync (`status = 'error'`) does not
-advance it. This means:
+`NULL` until the first successful sync, and a failed or in-progress sync does not advance
+it. This means:
 
-- A table with `status = 'pending'` or `status = 'error'` will never appear in
-  `GET /changes`, regardless of how recently a sync was attempted.
+- A table with no successful sync yet will never appear in `GET /changes`, regardless of
+  how recently a sync was attempted.
 - `last_sync_at` reflects **table-level** completion, not the modification time of any
   individual row inside that table.
 
 ## What `GET /changes` actually checks
 
-`GET /changes?since=<timestamp>` returns a table only if **all** of the following hold:
-
-- `status` is exactly `'synced'` (not any other status value)
-- `last_sync_at` is not `NULL`
-- `last_sync_at > since` — a **strict** greater-than comparison, not `>=`
+`GET /changes?since=<timestamp>` returns a table only if it has completed a successful sync
+with `last_sync_at > since` — a **strict** greater-than comparison, not `>=`.
 
 The `ETag` response header is the maximum `last_sync_at` across all of a customer's synced
 tables, so polling with `If-None-Match` lets you skip a request entirely when nothing has
