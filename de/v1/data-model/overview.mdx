@@ -20,7 +20,8 @@ Tabellen.
   </Card>
 
   <Card title="Depreciation" icon="chart-line-down" href="/de/v1/data-model/depreciation">
-    `assets`, mit dem `afa_period`-Objekt und dem Paar `asset_id`/`asset_number`.
+    `assets` und `depreciation`, mit dem `afa_period`-Objekt und dem Paar
+    `asset_id`/`asset_number`.
   </Card>
 
   <Card title="Operations" icon="clipboard-list" href="/de/v1/data-model/operations">
@@ -40,10 +41,9 @@ Tabellen.
 </CardGroup>
 
 <Note>
-  Diese Tabellen haben noch keinen `/v1/`-Endpunkt: `Accounting.kontenmapping_ranges`,
-  `Depreciation.depreciation` (die Buchungstabelle — `assets` ist verfügbar, die Buchungen
-  nicht) und `Operations.offers`/`orders`. Bis dahin über den unversionierten Pfad abrufen —
-  siehe das [vollständige Datenmodell](/de/data-model/overview).
+  Diese Tabellen haben noch keinen `/v1/`-Endpunkt: `Accounting.kontenmapping_ranges` und
+  `Operations.offers`/`orders`. Bis dahin über den unversionierten Pfad abrufen — siehe das
+  [vollständige Datenmodell](/de/data-model/overview).
 </Note>
 
 ## Wie die v1-Tabellen zusammenhängen
@@ -60,19 +60,31 @@ graph LR
   properties -->|property_id| projects["Operations.projects"]
   properties -->|property_id| technical_objects["Property.technical_objects<br/>(to_id)"]
   properties -->|property_id| property_creditor_services["Property.property_creditor_services"]
+  properties -->|property_id| property_structure["Property.property_structure<br/>(account_id, floor_area_id)"]
   properties -->|property_id| budgets["Accounting.budgets"]
   properties -->|property_id| tenants["Stakeholder.tenants"]
+  properties -->|property_id| owner["Stakeholder.owner"]
+  properties -->|property_id| employees["Stakeholder.employees"]
   properties -->|property_id| service_contracts["Contracts.service_contracts"]
+  properties -->|property_id| contract_debit_diffs["Contracts.contract_debit_diffs"]
   properties -->|property_id| assets["Depreciation.assets"]
 
   booking_header -->|booking_header_id| booking_positions["Accounting.booking_positions"]
   booking_positions -->|account_id| accounts["Accounting.accounts"]
   budgets -->|account_id| accounts
+  contract_debit_diffs -->|account_id| accounts
   notifications -->|technical_object_id| technical_objects
   notifications -->|report_id| projects
   technical_objects -->|service_contract_id| service_contracts
   booking_header -->|property_id + person_id| tenants
   booking_positions -->|property_id + person_id| tenants
+  tenants -->|tenancy_id| contract_debits["Contracts.contract_debits"]
+  tenants -->|tenancy_id| contract_ends["Contracts.contract_ends"]
+  tenants -->|floor_area_id| property_structure
+  booking_header -->|property_structure_account_id| property_structure
+  booking_positions -->|property_structure_account_id| property_structure
+  technical_objects -->|property_structure_account_id| property_structure
+  assets -->|asset_id| depreciation["Depreciation.depreciation"]
 
   creditor -->|creditor_id| technical_objects
   creditor -->|creditor_id| property_creditor_services
@@ -93,6 +105,9 @@ graph LR
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
 | `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. | 1 Person → 1..N Mietverhältnisse pro Objekt |
+| `tenancy_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits` und `contract_ends` teilen denselben Wert — direkt darüber verknüpfen, ohne `property_id`. | 1 Mietverhältnis → viele Soll-/Ende-Zeilen |
+| `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits` und `contract_ends`. | 1 Einheit → viele Zeilen |
+| `asset_id` | Verknüpft eine Abschreibungsbuchung mit dem Anlagegut, auf das sie abschreibt. Jede `depreciation`-Zeile löst sich gegen `assets` auf. | 1 Anlagegut → viele Buchungen |
 | `property_structure_account_id` | Fremdschlüssel auf [`Property.property_structure`](/de/v1/data-model/property#property_structure), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
 
 <Note>
@@ -106,5 +121,6 @@ graph LR
   `person_id` kommt bei `tenants` und `booking_header` als JSON-String zurück, bei
   `booking_positions` dagegen als Zahl. Vor einem Join über diese Grenze hinweg auf einen
   gemeinsamen Typ casten — ein strikter Gleichheitsvergleich auf den Rohwerten liefert
-  stillschweigend keine Zeilen.
+  stillschweigend keine Zeilen. `floor_area_id` hat dasselbe Problem umgekehrt: überall eine
+  Zahl, außer bei `contract_debits`, wo es ein String ist.
 </Warning>

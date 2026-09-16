@@ -16,7 +16,7 @@ description: "The tables available under /v1/ and how they join — Accounting, 
   </Card>
 
   <Card title="Depreciation" icon="chart-line-down" href="/v1/data-model/depreciation">
-    `assets`, with the `afa_period` object and the `asset_id`/`asset_number` pair.
+    `assets` and `depreciation`, with the `afa_period` object and the `asset_id`/`asset_number` pair.
   </Card>
 
   <Card title="Operations" icon="clipboard-list" href="/v1/data-model/operations">
@@ -33,10 +33,9 @@ description: "The tables available under /v1/ and how they join — Accounting, 
 </CardGroup>
 
 <Note>
-  These tables have no `/v1/` endpoint yet: `Accounting.kontenmapping_ranges`,
-  `Depreciation.depreciation` (the postings table — `assets` is available, the postings
-  aren't), and `Operations.offers`/`orders`. Fetch them via the unversioned path in the
-  meantime — see the [full data model](/data-model/overview).
+  These tables have no `/v1/` endpoint yet: `Accounting.kontenmapping_ranges` and
+  `Operations.offers`/`orders`. Fetch them via the unversioned path in the meantime — see the
+  [full data model](/data-model/overview).
 </Note>
 
 ## How the v1 tables connect
@@ -53,19 +52,31 @@ graph LR
   properties -->|property_id| projects["Operations.projects"]
   properties -->|property_id| technical_objects["Property.technical_objects<br/>(to_id)"]
   properties -->|property_id| property_creditor_services["Property.property_creditor_services"]
+  properties -->|property_id| property_structure["Property.property_structure<br/>(account_id, floor_area_id)"]
   properties -->|property_id| budgets["Accounting.budgets"]
   properties -->|property_id| tenants["Stakeholder.tenants"]
+  properties -->|property_id| owner["Stakeholder.owner"]
+  properties -->|property_id| employees["Stakeholder.employees"]
   properties -->|property_id| service_contracts["Contracts.service_contracts"]
+  properties -->|property_id| contract_debit_diffs["Contracts.contract_debit_diffs"]
   properties -->|property_id| assets["Depreciation.assets"]
 
   booking_header -->|booking_header_id| booking_positions["Accounting.booking_positions"]
   booking_positions -->|account_id| accounts["Accounting.accounts"]
   budgets -->|account_id| accounts
+  contract_debit_diffs -->|account_id| accounts
   notifications -->|technical_object_id| technical_objects
   notifications -->|report_id| projects
   technical_objects -->|service_contract_id| service_contracts
   booking_header -->|property_id + person_id| tenants
   booking_positions -->|property_id + person_id| tenants
+  tenants -->|tenancy_id| contract_debits["Contracts.contract_debits"]
+  tenants -->|tenancy_id| contract_ends["Contracts.contract_ends"]
+  tenants -->|floor_area_id| property_structure
+  booking_header -->|property_structure_account_id| property_structure
+  booking_positions -->|property_structure_account_id| property_structure
+  technical_objects -->|property_structure_account_id| property_structure
+  assets -->|asset_id| depreciation["Depreciation.depreciation"]
 
   creditor -->|creditor_id| technical_objects
   creditor -->|creditor_id| property_creditor_services
@@ -86,6 +97,9 @@ graph LR
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
 | `service_contract_id` | Links a technical object to the service contract covering it. References `service_contracts.contract_id`. | 1 contract → many technical objects |
 | `person_id` | Links a booking to the tenant it applies to. Only valid combined with `property_id`, since the numbering restarts per property. | 1 person → 1..N tenancies per property |
+| `tenancy_id` | Identifies a tenancy. Shared by `tenants`, `contract_debits`, and `contract_ends` as the same underlying value — join across them directly, without `property_id`. | 1 tenancy → many debit/end rows |
+| `floor_area_id` | Identifies a unit in `property_structure`. Also present on `technical_objects`, `tenants`, `contract_debits`, and `contract_ends`. | 1 unit → many rows |
+| `asset_id` | Links a depreciation posting to the asset it writes down. Every `depreciation` row resolves against `assets`. | 1 asset → many postings |
 | `property_structure_account_id` | Foreign key into [`Property.property_structure`](/v1/data-model/property#property_structure), present on `booking_header`, `booking_positions`, and `technical_objects`. Always populated on the two booking tables, where it's the only route from a booking down to a unit; on `technical_objects` it's the fallback for rows without a `floor_area_id`. | 1 unit → many rows |
 
 <Note>
@@ -98,5 +112,6 @@ graph LR
 <Warning>
   `person_id` comes back as a JSON string on `tenants` and `booking_header` but as a number on
   `booking_positions`. Cast to a common type before joining across that boundary — a strict
-  equality check on the raw values silently returns no rows.
+  equality check on the raw values silently returns no rows. `floor_area_id` has the same
+  problem in reverse: a number everywhere except `contract_debits`, where it's a string.
 </Warning>
