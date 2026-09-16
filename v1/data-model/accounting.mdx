@@ -5,10 +5,9 @@ description: "Field-level reference for the v1 Accounting tables booking_header 
 ---
 
 The v1 Accounting domain currently covers two reviewed tables: `booking_header` and
-`booking_positions`. Both apply the [response shape
-conventions](/v1/response-shape-conventions) — nested `period`/`amount` objects, and
-sync-pipeline join keys renamed instead of dropped where they turned out to be real
-foreign keys.
+`booking_positions`. Both follow the [response shape
+conventions](/v1/response-shape-conventions) — nested `period`/`amount` objects and stable
+join keys.
 
 <Note>
   `accounting.budgets` is also live under `/v1/`, but isn't documented on this page yet —
@@ -29,8 +28,8 @@ foreign keys.
 </ResponseField>
 
 <ResponseField name="booking_header_id" type="integer" required>
-  Unique identifier for the booking header. Renamed from `bko_hdr_id`. `booking_positions`
-  references this as `booking_header_id`.
+  Unique identifier for the booking header. `booking_positions` references this as
+  `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="booking_nr" type="integer">
@@ -76,43 +75,33 @@ foreign keys.
 </ResponseField>
 
 <ResponseField name="cost_center_id_name_concat" type="string">
-  Combined cost-centre ID and name. Kept flat on purpose — it's the only source of this
-  label; there's no separate ID/name pair or joinable table it could be reconstructed from.
+  Combined cost-centre ID and name — the only source of this label; there's no separate
+  ID/name pair to join against instead.
 </ResponseField>
 
 <ResponseField name="ledger_id_name_concat" type="string">
-  Combined ledger ID and name. Kept flat for the same reason as
-  `cost_center_id_name_concat`.
+  Combined ledger ID and name, for the same reason as `cost_center_id_name_concat`.
 </ResponseField>
 
 <ResponseField name="person_name_concat" type="string">
-  Combined person ID and name. Kept flat for the same reason as
-  `cost_center_id_name_concat`.
+  Combined person ID and name, for the same reason as `cost_center_id_name_concat`.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Foreign key into `Property.property_structure`. Renamed from `recommended_join_key` —
-  verified 1:1 against `property_structure.account_id`, so it's a real join key, not a
-  sync-pipeline artifact.
+  Foreign key into `Property.property_structure`, matching `property_structure.account_id`.
 </ResponseField>
-
-<Note>
-  `cost_center_m2` from the unversioned table is dropped here: it's 100% reconstructable
-  from `cost_center_id_name_concat` + `m2`.
-</Note>
 
 ## booking_positions
 
 `GET /v1/accounting/booking_positions` — individual booking line items, joined to a header
-via `booking_header_id`. Fully reshaped: date pairs become `period`, and the net/tax/gross
-triples become `amount` and `amount_per_sqm` objects.
+via `booking_header_id`.
 
 <ResponseField name="property_id" type="integer" required>
   Unique property identifier.
 </ResponseField>
 
 <ResponseField name="booking_position_id" type="integer" required>
-  Unique identifier for the line item. Renamed from `booking_position_hdr_id`.
+  Unique identifier for the line item.
 </ResponseField>
 
 <ResponseField name="booking_header_id" type="integer" required>
@@ -129,8 +118,8 @@ triples become `amount` and `amount_per_sqm` objects.
 </ResponseField>
 
 <ResponseField name="contra_account_name" type="string">
-  Name of the contra account. Kept flat on purpose — a join test against `accounts` on this
-  field returned 0 matches, so it can't be reconstructed via `contra_account_id`.
+  Name of the contra account. Not derivable by joining `contra_account_id` against
+  `accounts` — the two don't correspond.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
@@ -142,10 +131,9 @@ triples become `amount` and `amount_per_sqm` objects.
 </ResponseField>
 
 <ResponseField name="property_id_person_id" type="integer">
-  Composite key identifying the tenant this posting applies to. Looks like a concatenation
-  of `property_id` and `person_id`, but isn't — verified against the full 1.55M-row table,
-  about 0.16% of rows don't follow that pattern. Kept as its own field for that reason;
-  don't derive it yourself.
+  Composite key identifying the tenant this posting applies to. It resembles a
+  concatenation of `property_id` and `person_id`, but isn't always exactly that — use the
+  field as given rather than deriving it yourself.
 </ResponseField>
 
 <ResponseField name="period" type="object">
@@ -185,9 +173,8 @@ triples become `amount` and `amount_per_sqm` objects.
 </ResponseField>
 
 <ResponseField name="sh" type="string">
-  Debit/credit indicator (`S`/`H`). Kept flat rather than folded into the sign of
-  `amount.net` — about 3.55% of rows (reversal/correction postings) contradict that sign
-  pattern.
+  Debit/credit indicator (`S`/`H`). Don't infer it from the sign of `amount.net` — about
+  3.55% of rows (reversal/correction postings) have a sign that contradicts this indicator.
 </ResponseField>
 
 <ResponseField name="HNDL" type="number">
@@ -198,6 +185,6 @@ triples become `amount` and `amount_per_sqm` objects.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Foreign key into `Property.property_structure`. Renamed from `recommended_join_key`, same
-  verified rename as in `booking_header`.
+  Foreign key into `Property.property_structure`, matching `property_structure.account_id`
+  — the same join key as on `booking_header`.
 </ResponseField>

@@ -19,7 +19,7 @@ Die v1-Operations-Domäne umfasst aktuell zwei reviewte Tabellen: `notifications
 `GET /v1/operations/notifications` — Wartungsmeldungen und Schadensmeldungen.
 
 <ResponseField name="report_id" type="integer" required>
-  Eindeutige Meldungs-ID. Umbenannt von `report_hdr_id`.
+  Eindeutige Meldungs-ID.
 </ResponseField>
 
 <ResponseField name="property_id" type="integer" required>
@@ -27,8 +27,8 @@ Die v1-Operations-Domäne umfasst aktuell zwei reviewte Tabellen: `notifications
 </ResponseField>
 
 <ResponseField name="technical_object_id" type="integer">
-  Technisches Objekt, auf das sich die Meldung bezieht. Umbenannt von
-  `to_hdr_id`/`to_reference_id` und gegen `Property.technical_objects.to_id` verifiziert.
+  Technisches Objekt, auf das sich die Meldung bezieht. Referenziert
+  `Property.technical_objects.to_id`.
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
@@ -67,12 +67,12 @@ Die v1-Operations-Domäne umfasst aktuell zwei reviewte Tabellen: `notifications
 Aufträgen.
 
 <ResponseField name="project_id" type="integer" required>
-  Eindeutige Projekt-ID. Umbenannt von `project_hdr_id`.
+  Eindeutige Projekt-ID.
 </ResponseField>
 
 <ResponseField name="project_number" type="string">
-  Projektnummer. Das ist, was die unversionierte API `project_id` nennt — hier umbenannt,
-  um nicht mit der echten ID oben zu kollidieren.
+  Lesbare Projektnummer — zu unterscheiden von `project_id` oben, das ist die ID für
+  Lookups und Verknüpfungen.
 </ResponseField>
 
 <ResponseField name="property_id" type="integer" required>
@@ -84,9 +84,9 @@ Aufträgen.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Hauptkreditor für das Projekt. Join-Test gegen `Stakeholder.creditor.creditor_id`: 0 %
-  Treffer. Als derzeit nicht auflösbar behandeln, nicht als funktionierenden
-  Fremdschlüssel — ein vorbestehendes Datenproblem, unabhängig von der v1-Umformung.
+  Hauptkreditor für das Projekt. Löst sich aktuell nicht gegen
+  `Stakeholder.creditor.creditor_id` auf — als unzuverlässig behandeln, nicht als
+  funktionierenden Fremdschlüssel, bis die Quelldaten korrigiert sind.
 </ResponseField>
 
 <ResponseField name="offer_id" type="integer">
@@ -98,15 +98,16 @@ Aufträgen.
 </ResponseField>
 
 <ResponseField name="to_hdr_id" type="integer">
-  Bewusst unverändert und flach. Sieht wie eine Referenz auf ein technisches Objekt aus,
-  ein Join-Test widerlegt das aber (nur 3,5 % Treffer gegen `technical_objects.to_id`, auch
-  gegen `orders`/`notifications` kein besserer Treffer). Die Zielentität ist ungeklärt —
-  nicht als `technical_object_id` oder funktionierenden Fremdschlüssel behandeln.
+  Sieht dem Namen nach wie eine Referenz auf ein technisches Objekt aus, ist es aber
+  nicht — nur rund 3,5 % Treffer gegen `technical_objects.to_id`, auch gegen
+  `orders`/`notifications` kein besserer Treffer. Die Zielentität ist ungeklärt; nicht als
+  funktionierenden Fremdschlüssel behandeln.
 </ResponseField>
 
 <ResponseField name="hierarchy" type="string[]">
-  Position in der Kostenaufschlüsselungs-Hierarchie. Ersetzt die nummerierten Spalten
-  `hierarchy_1`…`hierarchy_20` — leere Stufen werden aus dem Array weggelassen.
+  Position in der Kostenaufschlüsselungs-Hierarchie, als geordnetes Array von der obersten
+  Ebene abwärts. Leere Stufen werden weggelassen, die Array-Länge variiert also pro
+  Projekt.
 </ResponseField>
 
 <ResponseField name="project_type" type="string">
