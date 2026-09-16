@@ -173,11 +173,13 @@ Die v1-Accounting-Domäne umfasst aktuell drei Tabellen: `booking_header`,
   Kennzeichen widerspricht.
 </ResponseField>
 
-<ResponseField name="HNDL" type="number">
-  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt. Rund 99,2 % der Zeilen sind
-  `0.0`; wo ungleich null, liegt der Wert oft nahe an `amount.net` und konzentriert sich auf
-  bestimmte Buchungstypen im Umfeld umlagefähiger Betriebskosten — passt zu einem
-  Korrekturfeld, ist aber nicht bestätigt. Nicht selbst umbenennen oder umdeuten.
+<ResponseField name="HNDL" type="string">
+  Dezimalwert als String serialisiert (z. B. `"0.0000"`), keine JSON-Zahl — vor
+  Rechenoperationen casten. Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt. Rund
+  99,2 % der Zeilen sind `"0.0000"`; wo ungleich null, liegt der Wert oft nahe an
+  `amount.net` und konzentriert sich auf bestimmte Buchungstypen im Umfeld umlagefähiger
+  Betriebskosten — passt zu einem Korrekturfeld, ist aber nicht bestätigt. Nicht selbst
+  umbenennen oder umdeuten.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
@@ -208,6 +210,7 @@ Die v1-Accounting-Domäne umfasst aktuell drei Tabellen: `booking_header`,
   Monat, für den die Budgetzeile gilt.
 </ResponseField>
 
-<ResponseField name="budget" type="number" required>
-  Budgetbetrag für den jeweiligen Monat und das jeweilige Konto.
+<ResponseField name="budget" type="string" required>
+  Budgetbetrag für den jeweiligen Monat und das jeweilige Konto. Dezimalwert als String
+  serialisiert (z. B. `"24862.3300"`), keine JSON-Zahl — vor Rechenoperationen casten.
 </ResponseField>
