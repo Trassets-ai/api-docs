@@ -1,0 +1,78 @@
+---
+title: "v1 Contracts Datenmodell: Dienstleistungsverträge"
+sidebarTitle: "Contracts"
+description: "Feldreferenz für die v1-Contracts-Tabelle service_contracts, inklusive des contract_period-Objekts."
+---
+
+Die v1-Contracts-Domäne umfasst aktuell eine Tabelle: `service_contracts`, die den
+[Response-Shape-Konventionen](/de/v1/response-shape-conventions) folgt.
+
+<Note>
+  `contract_debits`, `contract_debit_diffs` und `contract_ends` sind noch nicht live unter
+  `/v1/` — nutze vorerst ihre unversionierten Entsprechungen im [vollständigen
+  Datenmodell](/de/data-model/contracts).
+</Note>
+
+## service_contracts
+
+`GET /v1/contracts/service_contracts` — Wartungs- und Dienstleistungsverträge.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung
+  (`Contracts.service_contracts.property_id`) ein Integer ist.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string" required>
+  Identifiziert den Dienstleister. Referenziert `Stakeholder.creditor` — siehe die
+  [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Hier ein String, während die
+  unversionierte Entsprechung ein Integer ist.
+</ResponseField>
+
+<ResponseField name="creditor_name" type="string">
+  Anzeigename des Dienstleisters. In den meisten Zeilen `null` — verknüpfe stattdessen über
+  `creditor_id` für einen zuverlässigen Namen.
+</ResponseField>
+
+<ResponseField name="contract_id" type="string" required>
+  Vertrags-ID (z. B. `"2019/00015"`). Hier ein formatierter String, während die
+  unversionierte Entsprechung ein reiner Integer ist.
+</ResponseField>
+
+<ResponseField name="contract_number" type="string">
+  Lesbare Vertragsnummer.
+</ResponseField>
+
+<ResponseField name="contract_name" type="string">
+  Vertragsname.
+</ResponseField>
+
+<ResponseField name="contract_category" type="string">
+  Vertragskategorie.
+</ResponseField>
+
+<ResponseField name="contract_type" type="string">
+  Vertragstyp.
+</ResponseField>
+
+<ResponseField name="contract_period" type="object">
+  Vertragslaufzeit — `{start, end}` (Datumsstrings). Ersetzt die unversionierten getrennten
+  Felder `contract_begin`/`contract_end`.
+</ResponseField>
+
+<ResponseField name="contract_value" type="string">
+  Vertragswert. Dezimalwert als String serialisiert (z. B. `"0.0000"`), keine JSON-Zahl —
+  vor Rechenoperationen casten.
+</ResponseField>
+
+<ResponseField name="contract_value_year" type="string">
+  Auf ein Jahr normalisierter Vertragswert. Dezimalwert als String serialisiert, wie
+  `contract_value`.
+</ResponseField>
+
+<ResponseField name="contract_reasoning" type="string">
+  Begründungscode für den Vertrag.
+</ResponseField>
+
+<ResponseField name="contract_reasoning_comment" type="string">
+  Freitextkommentar zur Vertragsbegründung.
+</ResponseField>

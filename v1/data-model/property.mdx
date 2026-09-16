@@ -1,21 +1,132 @@
 ---
-title: "v1 Property Data Model: Technical Objects"
+title: "v1 Property Data Model: Properties, Creditor Services, and Technical Objects"
 sidebarTitle: "Property"
-description: "Field-level reference for the v1 Property table technical_objects, including the conditional property_structure_account_id fallback."
+description: "Field-level reference for the v1 Property tables properties, property_creditor_services, and technical_objects, including the entrances array, mandate_period object, and the conditional property_structure_account_id fallback."
 ---
 
-The v1 Property domain currently covers one reviewed table: `technical_objects`.
+The v1 Property domain currently covers three tables: `properties`,
+`property_creditor_services`, and `technical_objects`.
+
+<Note>
+  `property_structure` isn't live under `/v1/` yet — use the unversioned
+  [`Property.property_structure`](/data-model/property#property_structure) for now.
+</Note>
+
+## properties
+
+`GET /v1/property/properties` — one row per property object.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier. A string here, where the unversioned equivalent
+  (`Property.properties.property_id`) is an integer.
+</ResponseField>
+
+<ResponseField name="entrances" type="string[]">
+  Building entrance / street address components. Replaces the unversioned
+  `entrance_1`–`entrance_5` numbered columns with a single array, per the [response shape
+  conventions](/v1/response-shape-conventions).
+</ResponseField>
+
+<ResponseField name="mandate_period" type="object">
+  Management mandate period — `{start, end}` (date strings). Replaces the unversioned
+  separate `begin_mandate`/`end_mandate` fields.
+</ResponseField>
+
+<ResponseField name="accounting_property_id" type="string">
+  Verified join key into the accounting-side property reference. Renamed from a
+  sync-pipeline field on the unversioned table; the exact target table isn't documented
+  elsewhere yet, so treat it as a stable identifier rather than deriving further structure
+  from it.
+</ResponseField>
+
+<ResponseField name="obj_name" type="string">
+  Property name.
+</ResponseField>
+
+<ResponseField name="postcode" type="string">
+  Postal code.
+</ResponseField>
+
+<ResponseField name="adr_city" type="string">
+  City component of the property's address.
+</ResponseField>
+
+<ResponseField name="city" type="string">
+  City. Distinct from `adr_city` — which of the two to use for display isn't confirmed with
+  the source system.
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  Country.
+</ResponseField>
+
+<ResponseField name="construction_year" type="integer">
+  Year the property was built.
+</ResponseField>
+
+<ResponseField name="longitude" type="number">
+  Longitude coordinate.
+</ResponseField>
+
+<ResponseField name="latitude" type="number">
+  Latitude coordinate.
+</ResponseField>
+
+<ResponseField name="state_name" type="string">
+  Federal state.
+</ResponseField>
+
+<ResponseField name="use_type" type="string">
+  Usage type of the property.
+</ResponseField>
+
+<ResponseField name="property_type" type="string">
+  Property type.
+</ResponseField>
+
+<ResponseField name="tax_model" type="string">
+  Tax model applied to the property.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link to the property document in the document management system, if attached.
+</ResponseField>
+
+## property_creditor_services
+
+`GET /v1/property/property_creditor_services` — which creditor provides which service for
+a property, and whether that assignment is exclusive.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier. A string here, where the unversioned equivalent is an integer.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string" required>
+  References `Stakeholder.creditor` — see the [Stakeholder field
+  reference](/v1/data-model/stakeholder). A string here, where the unversioned equivalent is
+  an integer.
+</ResponseField>
+
+<ResponseField name="service" type="string">
+  Service name (e.g. cleaning, elevator maintenance).
+</ResponseField>
+
+<ResponseField name="exclusivity" type="object">
+  Whether the creditor holds an exclusive assignment for this service at this property —
+  `{code, label}` (e.g. `{"code": 1, "label": "Exklusiv"}`). Replaces the unversioned plain
+  string field, per the [response shape conventions](/v1/response-shape-conventions).
+</ResponseField>
+
+## technical_objects
+
+`GET /v1/property/technical_objects` — technical/metered installations at a property
+(elevators, heating systems, meters, and similar equipment).
 
 <Note>
   `technical_objects` exposes 20+ fields in the live v1 schema (warranty, inspection, and
   maintenance dates and flags). This page documents the key identifying, join, and reshaped
   fields — see the **API Reference** tab for the complete, auto-generated field list.
 </Note>
-
-## technical_objects
-
-`GET /v1/property/technical_objects` — technical/metered installations at a property
-(elevators, heating systems, meters, and similar equipment).
 
 <ResponseField name="to_id" type="integer" required>
   Technical object identifier.
@@ -30,7 +141,8 @@ The v1 Property domain currently covers one reviewed table: `technical_objects`.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Maintenance creditor responsible for the object. References `Stakeholder.creditor`.
+  Maintenance creditor responsible for the object. References `Stakeholder.creditor` — see
+  the [Stakeholder field reference](/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="to_nr" type="string">

@@ -1,18 +1,79 @@
 ---
-title: "v1 Stakeholder Datenmodell: Mieter"
+title: "v1 Stakeholder Datenmodell: Kreditoren und Mieter"
 sidebarTitle: "Stakeholder"
-description: "Feldreferenz für die v1-Stakeholder-Tabelle tenants, inklusive ihrer Mietvertrags-Datumsfelder und der noch nicht zu einem Array zusammengefassten Telefon-Spalten."
+description: "Feldreferenz für die v1-Stakeholder-Tabellen creditor und tenants, inklusive des phones-Arrays auf beiden Tabellen."
 ---
 
-Die v1-Stakeholder-Domäne umfasst aktuell eine Tabelle: `tenants`.
+Die v1-Stakeholder-Domäne umfasst aktuell zwei Tabellen: `creditor` und `tenants`, beide
+folgen den [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
 
 <Note>
-  `tenants` folgt noch nicht vollständig den
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions) — die durchnummerierten
-  Spalten `phone_1`/`phone_2`/`phone_3` wurden noch nicht zu einem Array zusammengefasst.
-  Trotzdem hier dokumentiert, da der Rest der Tabelle stabil ist; diese drei Felder können
-  sich in einer künftigen Revision noch ändern.
+  `employees` und `owner` sind noch nicht live unter `/v1/` — nutze vorerst ihre
+  unversionierten Entsprechungen im [vollständigen Datenmodell](/de/data-model/stakeholder).
 </Note>
+
+## creditor
+
+`GET /v1/stakeholder/creditor` — Lieferanten- und Kreditorenstammdaten. Wie die
+unversionierte Entsprechung ist dies der einzige v1-Stakeholder-Endpunkt ohne
+`property_id`-Spalte — ein Kreditor ist eine eigenständige Entität, die mehreren Objekten
+dienen kann, referenziert über `creditor_id` auf anderen Tabellen.
+
+<ResponseField name="creditor_id" type="string" required>
+  Eindeutige Kreditor-ID. Hier ein String, während die unversionierte Entsprechung
+  (`Stakeholder.creditor.creditor_id`) ein Integer ist.
+</ResponseField>
+
+<ResponseField name="name_1" type="string">
+  Erste Namenszeile (Firma oder Nachname).
+</ResponseField>
+
+<ResponseField name="name_2" type="string">
+  Zweite Namenszeile.
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  Kreditortyp.
+</ResponseField>
+
+<ResponseField name="street_nr" type="string">
+  Straße und Hausnummer.
+</ResponseField>
+
+<ResponseField name="zipcode_city" type="string">
+  Postleitzahl und Ort, in einem Feld kombiniert.
+</ResponseField>
+
+<ResponseField name="mail" type="string">
+  E-Mail-Adresse.
+</ResponseField>
+
+<ResponseField name="phones" type="string[]">
+  Telefonnummern. Ersetzt das unversionierte `phone_1` (und etwaige weitere durchnummerierte
+  Spalten) durch ein einzelnes Array, gemäß den
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions) — dieselbe Umformung wie
+  bei `Stakeholder.tenants.phones`.
+</ResponseField>
+
+<ResponseField name="iban" type="string">
+  Bankkonto-IBAN.
+</ResponseField>
+
+<ResponseField name="bank" type="string">
+  Bankname.
+</ResponseField>
+
+<ResponseField name="tax_id" type="string">
+  Steuer-Identifikationsnummer.
+</ResponseField>
+
+<ResponseField name="industry" type="string">
+  Branchenklassifikation.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link zum Dokumentenordner des Kreditors im Dokumentenmanagementsystem, falls vorhanden.
+</ResponseField>
 
 ## tenants
 
@@ -65,17 +126,10 @@ Die v1-Stakeholder-Domäne umfasst aktuell eine Tabelle: `tenants`.
   Kontakt-E-Mail-Adresse.
 </ResponseField>
 
-<ResponseField name="phone_1" type="string">
-  Zusätzliche Telefonnummer.
-</ResponseField>
-
-<ResponseField name="phone_2" type="string">
-  Zusätzliche Telefonnummer.
-</ResponseField>
-
-<ResponseField name="phone_3" type="string">
-  Zusätzliche Telefonnummer. Diese drei durchnummerierten Spalten wurden noch nicht zu
-  einem Array zusammengefasst — siehe Hinweis oben.
+<ResponseField name="phones" type="string[]">
+  Zusätzliche Telefonnummern. Ersetzt die unversionierten durchnummerierten Spalten
+  `phone_1`/`phone_2`/`phone_3` durch ein einzelnes Array, gemäß den
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions).
 </ResponseField>
 
 <ResponseField name="iban" type="string">

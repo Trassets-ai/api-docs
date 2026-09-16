@@ -1,14 +1,72 @@
 ---
-title: "v1 Accounting Datenmodell: Buchungskopf, -positionen und Budgets"
+title: "v1 Accounting Datenmodell: Konten, Buchungskopf, -positionen und Budgets"
 sidebarTitle: "Accounting"
-description: "Feldreferenz für die v1-Accounting-Tabellen booking_header, booking_positions und budgets, umgeformt mit period-, amount- und amount_per_sqm-Objekten."
+description: "Feldreferenz für die v1-Accounting-Tabellen accounts, booking_header, booking_positions und budgets, umgeformt mit period-, amount- und amount_per_sqm-Objekten."
 ---
 
-Die v1-Accounting-Domäne umfasst aktuell drei Tabellen: `booking_header`,
-`booking_positions` und `budgets`. `booking_header` und `booking_positions` folgen den
+Die v1-Accounting-Domäne umfasst aktuell vier Tabellen: `accounts`, `booking_header`,
+`booking_positions` und `budgets`. Alle vier folgen den
 [Response-Shape-Konventionen](/de/v1/response-shape-conventions) — verschachtelte
-`period`-/`amount`-Objekte und stabile Join-Keys; `budgets` trägt noch ein offenes Artefakt,
-siehe unten.
+`period`-/`amount`-Objekte und stabile Join-Keys.
+
+<Note>
+  `kontenmapping_ranges` ist noch nicht live unter `/v1/` — nutze vorerst das
+  unversionierte
+  [`Accounting.kontenmapping_ranges`](/de/data-model/accounting#kontenmapping_ranges).
+</Note>
+
+## accounts
+
+`GET /v1/accounting/accounts` — der Kontenplan.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID. Hier ein String, während die unversionierte Entsprechung ein
+  Integer ist.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer" required>
+  Interne Konto-ID. Umbenannt aus dem unversionierten `account_hdr_id` — wird von
+  `booking_positions` und `budgets` als `account_id` referenziert.
+</ResponseField>
+
+<ResponseField name="account_number" type="string">
+  Kontonummer. Umbenannt aus dem unversionierten `account_id`. Bei manchen Zeilen `null`
+  (z. B. Summen-/Sammelkonten).
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Kontoname.
+</ResponseField>
+
+<ResponseField name="account_balance_type" type="object">
+  Saldoseiten-Code des Kontos — `{code, label}` (z. B. `{"code": 1, "label":
+  "Aufwandskonto"}`). Ersetzt das unversionierte reine String-Feld, gemäß den
+  [Response-Shape-Konventionen](/de/v1/response-shape-conventions). `label` fehlt bei
+  manchen `code`-Werten.
+</ResponseField>
+
+<ResponseField name="account_type_name" type="string">
+  Lesbarer Kontotyp.
+</ResponseField>
+
+<ResponseField name="account_group" type="string">
+  Kontogruppenzuordnung. Verwandt mit, aber nicht abgeleitet aus dem unversionierten
+  `kontenmapping_ranges`.
+</ResponseField>
+
+<ResponseField name="accounting_entity" type="string">
+  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt — könnte derselbe Join-Begriff
+  wie `Property.properties.accounting_property_id` sein, ist aber nicht verifiziert. Ohne
+  Bestätigung keine Verknüpfung darauf aufbauen.
+</ResponseField>
+
+<ResponseField name="account_tax_code" type="integer">
+  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt.
+</ResponseField>
+
+<ResponseField name="account_tax_appliance" type="integer">
+  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt.
+</ResponseField>
 
 ## booking_header
 
@@ -30,7 +88,8 @@ siehe unten.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string">
-  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
+  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor` — siehe die
+  [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
@@ -105,8 +164,7 @@ siehe unten.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
-  Konto, auf das die Position gebucht wird. Es gibt noch keinen `/v1/`-Accounts-Endpunkt —
-  verknüpfe für Kontostammdaten mit dem unversionierten `Accounting.accounts`.
+  Konto, auf das die Position gebucht wird. Verknüpft sich mit `accounts.account_id` oben.
 </ResponseField>
 
 <ResponseField name="contra_account_id" type="integer">
@@ -119,7 +177,8 @@ siehe unten.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="integer">
-  Mit der Position verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
+  Mit der Position verknüpfter Kreditor. Referenziert `Stakeholder.creditor` — siehe die
+  [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder).
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
@@ -174,11 +233,13 @@ siehe unten.
   Kennzeichen widerspricht.
 </ResponseField>
 
-<ResponseField name="HNDL" type="number">
-  Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt. Rund 99,2 % der Zeilen sind
-  `0.0`; wo ungleich null, liegt der Wert oft nahe an `amount.net` und konzentriert sich auf
-  bestimmte Buchungstypen im Umfeld umlagefähiger Betriebskosten — passt zu einem
-  Korrekturfeld, ist aber nicht bestätigt. Nicht selbst umbenennen oder umdeuten.
+<ResponseField name="HNDL" type="string">
+  Dezimalwert als String serialisiert (z. B. `"0.0000"`), keine JSON-Zahl — vor
+  Rechenoperationen casten. Fachliche Bedeutung noch nicht mit dem Quellsystem geklärt. Rund
+  99,2 % der Zeilen sind `"0.0000"`; wo ungleich null, liegt der Wert oft nahe an
+  `amount.net` und konzentriert sich auf bestimmte Buchungstypen im Umfeld umlagefähiger
+  Betriebskosten — passt zu einem Korrekturfeld, ist aber nicht bestätigt. Nicht selbst
+  umbenennen oder umdeuten.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
@@ -195,9 +256,8 @@ siehe unten.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
-  Konto, für das das Budget gilt. Umbenannt aus dem unversionierten `account_hdr_id` —
-  verknüpft sich mit dem unversionierten `Accounting.accounts.account_hdr_id` (es gibt noch
-  keinen `/v1/`-Accounts-Endpunkt).
+  Konto, für das das Budget gilt. Dieselbe Umbenennung wie bei `accounts` — verknüpft sich
+  mit `accounts.account_id` oben.
 </ResponseField>
 
 <ResponseField name="account_number" type="integer">
@@ -209,13 +269,7 @@ siehe unten.
   Monat, für den die Budgetzeile gilt.
 </ResponseField>
 
-<ResponseField name="budget" type="number" required>
-  Budgetbetrag für den jeweiligen Monat und das jeweilige Konto.
-</ResponseField>
-
-<ResponseField name="property_id_account_number" type="integer">
-  Sync-Pipeline-Artefakt, noch nicht aufgelöst. Die
-  [Response-Shape-Konventionen](/de/v1/response-shape-conventions) sehen vor, unverifizierbare
-  Artefakte wie dieses zu entfernen — nicht darauf aufbauen, es kann in einer künftigen
-  Revision entfernt werden.
+<ResponseField name="budget" type="string" required>
+  Budgetbetrag für den jeweiligen Monat und das jeweilige Konto. Dezimalwert als String
+  serialisiert (z. B. `"24862.3300"`), keine JSON-Zahl — vor Rechenoperationen casten.
 </ResponseField>

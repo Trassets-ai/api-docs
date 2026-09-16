@@ -1,0 +1,80 @@
+---
+title: "v1 Depreciation Data Model: Assets"
+sidebarTitle: "Depreciation"
+description: "Field-level reference for the v1 Depreciation table assets, including the afa_period object and the renamed asset_id/asset_number pair."
+---
+
+The v1 Depreciation domain currently covers one table: `assets`, which follows the
+[response shape conventions](/v1/response-shape-conventions).
+
+<Note>
+  The `depreciation` postings table isn't live under `/v1/` yet — use the unversioned
+  [`Depreciation.depreciation`](/data-model/depreciation#depreciation) for now. Without it,
+  there's no `/v1/` way to join a full depreciation schedule for an asset.
+</Note>
+
+## assets
+
+`GET /v1/depreciation/assets` — fixed-asset master data.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier. A string here, where the unversioned equivalent
+  (`Depreciation.assets.property_id`) is an integer.
+</ResponseField>
+
+<ResponseField name="asset_id" type="integer" required>
+  Unique asset identifier. Renamed from the unversioned `asset_hdr_id` — same rename pattern
+  as `Accounting.accounts.account_id`/`account_number` and `Accounting.budgets.account_id`.
+</ResponseField>
+
+<ResponseField name="asset_number" type="string">
+  Asset number. Renamed from the unversioned `asset_id`.
+</ResponseField>
+
+<ResponseField name="asset_name" type="string">
+  Asset name.
+</ResponseField>
+
+<ResponseField name="acquisition_date" type="date">
+  Date the asset was acquired.
+</ResponseField>
+
+<ResponseField name="built_date" type="date">
+  Date the asset was put into service.
+</ResponseField>
+
+<ResponseField name="afa_period" type="object">
+  Depreciation schedule — `{start, end}` (date strings). Replaces the unversioned separate
+  `begin_afa`/`end_afa` fields.
+</ResponseField>
+
+<ResponseField name="depreciation_active" type="boolean">
+  Whether depreciation is currently active for this asset. A proper boolean here, where the
+  unversioned equivalent is a string.
+</ResponseField>
+
+<ResponseField name="afa_duration" type="string">
+  Depreciation duration in years, as a string (e.g. `"50"`).
+</ResponseField>
+
+<ResponseField name="afa_method" type="string">
+  Depreciation method applied.
+</ResponseField>
+
+<ResponseField name="afa_validity" type="string">
+  Date the depreciation method became valid, formatted `DD.MM.YYYY` (e.g. `"01.05.2019"`) —
+  not ISO-8601 like the other date fields on this table. Don't parse it the same way.
+</ResponseField>
+
+<ResponseField name="afa_group" type="string">
+  Depreciation category the asset belongs to (e.g. `"Gebäude"`, `"Garagen"`).
+</ResponseField>
+
+<ResponseField name="afa_buch_id" type="string">
+  Meaning not yet confirmed with the source system. Don't rename or reinterpret it.
+</ResponseField>
+
+<ResponseField name="account_name" type="string">
+  Accounting basis this depreciation record is booked under (e.g. `"Handelsrecht"`,
+  `"Steuerrecht"`) — German GAAP vs. tax law depreciation can differ for the same asset.
+</ResponseField>
