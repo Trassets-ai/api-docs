@@ -19,6 +19,16 @@ Die letzte Regel ist die eine Garantie, die überall gilt: Die ID-Felder, über 
 Datensätze zwischen Endpunkten verknüpfst, liegen in jeder Response auf oberster Ebene —
 Verknüpfungen über Endpunkte hinweg hängen damit nie von der umgebenden Struktur ab.
 
+<Warning>
+  Objekte führen nur die Schlüssel, die einen Wert haben. Ein `period` ohne Enddatum kommt als
+  `{"start": "2020-06-01"}` zurück, eines ohne beide Grenzen als `{}` — die fehlenden Schlüssel
+  sind **nicht vorhanden**, nicht `null`. `period.end` also defensiv lesen, statt beide Grenzen
+  vorauszusetzen: bei `Property.property_structure` führen `active_period` und `mandate_period`
+  nie beide gleichzeitig, und bei `Contracts.service_contracts` hat die Mehrheit der Zeilen nur
+  `contract_period.start`. Dasselbe gilt für Code/Label-Paare, bei denen `label` zu einem
+  vorhandenen `code` fehlen kann.
+</Warning>
+
 <Note>
   Noch folgt nicht jede Tabelle allen Regeln. Die [Datenmodell](/de/v1/data-model/overview)-Seiten
   dokumentieren die tatsächliche Struktur der jeweiligen Tabellen, und der Tab

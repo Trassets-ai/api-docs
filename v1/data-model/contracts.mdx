@@ -187,6 +187,11 @@ flow.
 to track upcoming expiries, deadlines for exercising options, and the current exercise
 status.
 
+<Note>
+  This endpoint requires a `property_id` query parameter — a request without it returns
+  `400 Bad Request`. It's the only `/v1/` endpoint with a mandatory filter.
+</Note>
+
 <ResponseField name="tenancy_id" type="string" required>
   Identifies the tenancy this record applies to. Same value as
   [`Stakeholder.tenants.tenancy_id`](/v1/data-model/stakeholder) and this table's own

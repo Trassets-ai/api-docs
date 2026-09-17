@@ -126,22 +126,26 @@ join keys.
 <ResponseField name="person_id" type="string">
   Tenant or contact person linked to the booking, using a local per-property numbering
   scheme. Joins to `Stakeholder.tenants` on `property_id` **and** `person_id` together —
-  never on `person_id` alone, since the numbering restarts per property. Not every person is
-  a tenant, so some rows have no match. Don't treat this as the same identifier space as
-  `person_id` on `Operations.notifications`, which is a separate sequence from another
-  subsystem.
+  never on `person_id` alone, since the numbering restarts per property. Treat the value as an
+  opaque string: it keeps its leading zeros and some values carry a suffix (`"2001-1"`), so
+  converting it to a number and back breaks the match. This is also the field to route through
+  when you need the tenant behind a `booking_positions` row. Not every person is a tenant, so
+  some rows have no match. Don't treat this as the same identifier space as `person_id` on
+  `Operations.notifications`, which is a separate sequence from another subsystem.
 </ResponseField>
 
 <ResponseField name="booking_date" type="date">
   Date of the booking.
 </ResponseField>
 
-<ResponseField name="booking_value" type="number">
-  Total value of the booking header.
+<ResponseField name="booking_value" type="string">
+  Total value of the booking header. Decimal value serialized as a string (e.g. `"-500.0000"`),
+  not a JSON number — cast before doing arithmetic on it.
 </ResponseField>
 
-<ResponseField name="m2" type="number">
-  Floor area in square metres associated with the booking, if applicable.
+<ResponseField name="m2" type="string">
+  Floor area in square metres associated with the booking, if applicable. Same string
+  serialization as `booking_value`.
 </ResponseField>
 
 <ResponseField name="booking_text" type="string">
@@ -215,10 +219,13 @@ via `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
-  Tenant or contact person linked to the posting. Joins to `Stakeholder.tenants` on
-  `property_id` **and** `person_id` together — the numbering restarts per property — and the
-  value has to be cast to a string first, since `tenants.person_id` is a string. Not every
-  person is a tenant, so some rows have no match.
+  Tenant or contact person linked to the posting, as a number. Don't join it against
+  `Stakeholder.tenants` directly: `tenants.person_id` is an opaque string that keeps leading
+  zeros in varying widths (`"001"`, `"0001"`) and sometimes carries a suffix (`"2001-1"`), so
+  casting this number to a string does not reproduce it — the join silently returns no rows.
+  Route through `booking_header_id` instead and use
+  [`booking_header.person_id`](#booking_header), which is already in the string form `tenants`
+  uses.
 </ResponseField>
 
 <ResponseField name="property_id_person_id" type="integer">

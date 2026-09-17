@@ -127,21 +127,26 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
   Mit der Buchung verknüpfter Mieter oder Ansprechpartner, mit lokaler, objektbezogener
   Nummerierung. Verknüpft sich mit `Stakeholder.tenants` über `property_id` **und**
   `person_id` gemeinsam — nie über `person_id` allein, da die Nummerierung pro Objekt neu
-  beginnt. Nicht jede Person ist ein Mieter, manche Zeilen haben deshalb keinen Treffer.
-  Nicht mit demselben ID-Raum wie `person_id` auf `Operations.notifications` verwechseln —
-  dort ist es eine eigenständige Sequenz aus einem anderen Subsystem.
+  beginnt. Den Wert als opake Zeichenkette behandeln: er behält seine führenden Nullen und
+  trägt teils ein Suffix (`"2001-1"`), eine Umwandlung in eine Zahl und zurück bricht den
+  Treffer also. Über dieses Feld läuft auch der Weg zum Mieter hinter einer
+  `booking_positions`-Zeile. Nicht jede Person ist ein Mieter, manche Zeilen haben deshalb
+  keinen Treffer. Nicht mit demselben ID-Raum wie `person_id` auf `Operations.notifications`
+  verwechseln — dort ist es eine eigenständige Sequenz aus einem anderen Subsystem.
 </ResponseField>
 
 <ResponseField name="booking_date" type="date">
   Datum der Buchung.
 </ResponseField>
 
-<ResponseField name="booking_value" type="number">
-  Gesamtwert des Buchungskopfs.
+<ResponseField name="booking_value" type="string">
+  Gesamtwert des Buchungskopfs. Dezimalwert als String serialisiert (z. B. `"-500.0000"`),
+  keine JSON-Zahl — vor Rechenoperationen casten.
 </ResponseField>
 
-<ResponseField name="m2" type="number">
-  Mit der Buchung verbundene Fläche in Quadratmetern, falls zutreffend.
+<ResponseField name="m2" type="string">
+  Mit der Buchung verbundene Fläche in Quadratmetern, falls zutreffend. Gleiche
+  String-Serialisierung wie `booking_value`.
 </ResponseField>
 
 <ResponseField name="booking_text" type="string">
@@ -217,11 +222,13 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
-  Mit der Position verknüpfter Mieter oder Ansprechpartner. Verknüpft sich mit
-  `Stakeholder.tenants` über `property_id` **und** `person_id` gemeinsam — die Nummerierung
-  beginnt pro Objekt neu — und der Wert muss vorher in einen String gecastet werden, da
-  `tenants.person_id` ein String ist. Nicht jede Person ist ein Mieter, manche Zeilen haben
-  deshalb keinen Treffer.
+  Mit der Position verknüpfter Mieter oder Ansprechpartner, als Zahl. Nicht direkt gegen
+  `Stakeholder.tenants` verknüpfen: `tenants.person_id` ist eine opake Zeichenkette, die
+  führende Nullen in wechselnder Breite behält (`"001"`, `"0001"`) und teils ein Suffix trägt
+  (`"2001-1"`). Ein Cast dieser Zahl auf String ergibt den Wert deshalb nicht — die Verknüpfung
+  liefert stillschweigend keine Zeilen. Stattdessen über `booking_header_id` gehen und
+  [`booking_header.person_id`](#booking_header) verwenden, das schon in der String-Form
+  vorliegt, die `tenants` nutzt.
 </ResponseField>
 
 <ResponseField name="property_id_person_id" type="integer">

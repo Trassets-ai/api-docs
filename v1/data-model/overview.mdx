@@ -96,7 +96,7 @@ graph LR
 | `technical_object_id` | Links a notification to the technical object it concerns. References `technical_objects.to_id`. | 1 technical object → many notifications |
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
 | `service_contract_id` | Links a technical object to the service contract covering it. References `service_contracts.contract_id`. | 1 contract → many technical objects |
-| `person_id` | Links a booking to the tenant it applies to. Only valid combined with `property_id`, since the numbering restarts per property. | 1 person → 1..N tenancies per property |
+| `person_id` | Links a booking to the tenant it applies to. Only valid combined with `property_id`, since the numbering restarts per property. A string on `tenants`/`booking_header`, a number on `booking_positions` — see the warning below before joining across that boundary. | 1 person → 1..N tenancies per property |
 | `tenancy_id` | Identifies a tenancy. Shared by `tenants`, `contract_debits`, and `contract_ends` as the same underlying value — join across them directly, without `property_id`. | 1 tenancy → many debit/end rows |
 | `floor_area_id` | Identifies a unit in `property_structure`. Also present on `technical_objects`, `tenants`, `contract_debits`, and `contract_ends`. | 1 unit → many rows |
 | `asset_id` | Links a depreciation posting to the asset it writes down. Every `depreciation` row resolves against `assets`. | 1 asset → many postings |
@@ -111,7 +111,10 @@ graph LR
 
 <Warning>
   `person_id` comes back as a JSON string on `tenants` and `booking_header` but as a number on
-  `booking_positions`. Cast to a common type before joining across that boundary — a strict
-  equality check on the raw values silently returns no rows. `floor_area_id` has the same
-  problem in reverse: a number everywhere except `contract_debits`, where it's a string.
+  `booking_positions`, and the string form is opaque — leading zeros in varying widths and some
+  values with a `"2001-1"` style suffix. Casting the number to a string does **not** reproduce
+  it, so don't join `booking_positions` to a tenant on `person_id` at all: go through
+  `booking_header_id` and use the header's `person_id`. `floor_area_id` has a milder version of
+  the same problem: a number everywhere except `contract_debits`, where it's a string, but there
+  a plain cast does work.
 </Warning>

@@ -52,12 +52,13 @@ The v1 Property domain covers four tables: `properties`, `property_structure`,
   Year the property was built.
 </ResponseField>
 
-<ResponseField name="longitude" type="number">
-  Longitude coordinate.
+<ResponseField name="longitude" type="string">
+  Longitude coordinate. Decimal value serialized as a string (e.g. `"10.01074219"`), not a JSON
+  number — cast before doing arithmetic on it.
 </ResponseField>
 
-<ResponseField name="latitude" type="number">
-  Latitude coordinate.
+<ResponseField name="latitude" type="string">
+  Latitude coordinate. Same string serialization as `longitude`.
 </ResponseField>
 
 <ResponseField name="state_name" type="string">

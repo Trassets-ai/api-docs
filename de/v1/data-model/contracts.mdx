@@ -190,6 +190,12 @@ Sollstellungen mit dem realisierten Zahlungsfluss abzugleichen.
 Verlängerungen/Optionen. Nutze dies, um anstehende Vertragsabläufe, Fristen für die
 Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
 
+<Note>
+  Dieser Endpunkt verlangt den Query-Parameter `property_id` — eine Anfrage ohne ihn
+  beantwortet die API mit `400 Bad Request`. Es ist der einzige `/v1/`-Endpunkt mit einem
+  Pflichtfilter.
+</Note>
+
 <ResponseField name="tenancy_id" type="string" required>
   Identifiziert das Mietverhältnis, auf das sich dieser Datensatz bezieht. Derselbe Wert
   wie [`Stakeholder.tenants.tenancy_id`](/de/v1/data-model/stakeholder) und das
