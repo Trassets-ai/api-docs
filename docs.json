@@ -212,12 +212,34 @@
                 "tab": "API Reference",
                 "groups": [
                   {
+                    "group": "Overview",
+                    "pages": [
+                      "v1/api-reference/introduction"
+                    ]
+                  },
+                  {
                     "group": "Endpoints",
                     "openapi": {
                       "source": "https://api.trassets.ai/openapi-v1.json",
                       "directory": "v1/api-reference",
                       "overlays": ["overlays/add-servers.yaml"]
                     }
+                  },
+                  {
+                    "group": "Catalog",
+                    "pages": ["v1/api-reference/unversioned/catalog"]
+                  },
+                  {
+                    "group": "Delta Sync",
+                    "pages": ["v1/api-reference/unversioned/changes"]
+                  },
+                  {
+                    "group": "Meta",
+                    "pages": ["v1/api-reference/unversioned/meta-values"]
+                  },
+                  {
+                    "group": "Raw Data",
+                    "pages": ["v1/api-reference/unversioned/raw-tables", "v1/api-reference/unversioned/raw-table"]
                   }
                 ]
               }
@@ -275,12 +297,34 @@
                 "tab": "API-Referenz",
                 "groups": [
                   {
+                    "group": "Übersicht",
+                    "pages": [
+                      "de/v1/api-reference/introduction"
+                    ]
+                  },
+                  {
                     "group": "Endpunkte",
                     "openapi": {
                       "source": "https://api.trassets.ai/openapi-v1.json",
                       "directory": "v1/api-reference",
                       "overlays": ["overlays/add-servers.yaml"]
                     }
+                  },
+                  {
+                    "group": "Catalog",
+                    "pages": ["v1/api-reference/unversioned/catalog"]
+                  },
+                  {
+                    "group": "Delta Sync",
+                    "pages": ["v1/api-reference/unversioned/changes"]
+                  },
+                  {
+                    "group": "Meta",
+                    "pages": ["v1/api-reference/unversioned/meta-values"]
+                  },
+                  {
+                    "group": "Raw Data",
+                    "pages": ["v1/api-reference/unversioned/raw-tables", "v1/api-reference/unversioned/raw-table"]
                   }
                 ]
               }

@@ -1,0 +1,76 @@
+---
+title: "Data API v1 Referenz: Endpunkt-Übersicht"
+sidebarTitle: "Introduction"
+description: "Überblick über die /v1/-Endpunkte: Basis-URL, Authentifizierung, Response-Header, Fehler und die unversionierten Endpunkte ohne /v1/-Pendant."
+---
+
+Die `/v1/`-Endpunkte sind die versionierte Schnittstelle auf dieselben Immobiliendaten. Basis-URL: `https://api.trassets.ai`. Sende deinen API-Key im `X-API-Key`-Header bei jedem Request. Alle Antworten sind JSON.
+
+Jede `/v1/`-Response ist ein JSON-Array auf oberster Ebene — es gibt keinen umgebenden Envelope. Siehe [Response-Struktur](/de/v1/response-shape-conventions) für die Objekt-, Array- und Code/Label-Muster, denen die Tabellen folgen.
+
+## Endpunkt-Typen
+
+| Typ | Pfad-Muster | Pagination | Anwendungsfall |
+| --- | --- | --- | --- |
+| Category-Endpunkte | `/v1/{category}/{api_table}` | Offset-basiert (`limit` / `offset`) plus Cursor-Unterstützung | Business-Abfragen, Dashboards, inkrementelle Abrufe |
+| Raw-Endpunkte | `/raw/{table_name}` | Cursor-basiert (`cursor` aus `next_cursor` im Body) | Bulk-Sync, vollständige Exporte, Data Warehousing |
+
+Raw-Endpunkte sind unversioniert: Sie legen Quelltabellen unterhalb der Modellschicht offen, deshalb gibt es keine `/v1/`-Variante.
+
+### Response-Header
+
+Category-Endpunkte liefern die Pagination-Metadaten in Headern, nicht im Body:
+
+- `X-Total-Count` — Gesamtzahl der Zeilen, die zur Abfrage passen
+- `X-Has-More` — `"true"` oder `"false"`
+- `X-Next-Offset` — der Offset für die nächste Seite
+- `X-Next-Cursor` — ein opaker Cursor, wenn eine volle Seite zurückgegeben wird
+
+## Fehlerformat
+
+Fehler folgen [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`application/problem+json`). Jedes Fehlerobjekt enthält `type`, `title`, `status`, `detail` und `instance`. Siehe [Fehler](/de/concepts/errors) für eine vollständige Liste der Status-Codes und Hinweise zu Wiederholungsversuchen.
+
+## Versionierung
+
+Tabellen werden schrittweise nach `/v1/` migriert, parallel zum unversionierten Basis-Pfad — beide funktionieren heute, ohne Weiterleitung und ohne bestätigtes Sunset-Datum für unversionierte Pfade. Siehe [Versionierung](/de/concepts/versioning) für den aktuellen Rollout-Stand.
+
+## Endpunkt-Gruppen
+
+<CardGroup cols={2}>
+  <Card title="Property" icon="building">
+    Objekte, Strukturbaum, technische Objekte und Kreditoren-Dienstleistungszuordnungen — siehe die Gruppe **Property** in der Seitenleiste.
+  </Card>
+
+  <Card title="Contracts" icon="file-contract">
+    Mietsollstellungen, Sollstellungsdifferenzen, Dienstleistungsverträge und Vertragslaufzeiten — siehe die Gruppe **Contracts** in der Seitenleiste.
+  </Card>
+
+  <Card title="Accounting" icon="calculator">
+    Konten, Budgets und Buchungen — siehe die Gruppe **Accounting** in der Seitenleiste.
+  </Card>
+
+  <Card title="Depreciation" icon="chart-line-down">
+    Anlagegüter und Abschreibungsbuchungen — siehe die Gruppe **Depreciation** in der Seitenleiste.
+  </Card>
+
+  <Card title="Operations" icon="clipboard-list">
+    Meldungen und Projekte — siehe die Gruppe **Operations** in der Seitenleiste.
+  </Card>
+
+  <Card title="Stakeholder" icon="users">
+    Kreditoren, Mitarbeiter, Eigentümer und Mieter — siehe die Gruppe **Stakeholder** in der Seitenleiste.
+  </Card>
+</CardGroup>
+
+Nicht jede unversionierte Tabelle hat schon ein `/v1/`-Pendant — `kontenmapping_ranges`, `offers` und `orders` gibt es weiterhin nur auf dem Basis-Pfad. Die [Datenmodell-Übersicht](/de/v1/data-model/overview) listet, was `/v1/` heute abdeckt.
+
+## Unversionierte Endpunkte
+
+Vier Endpunkt-Gruppen existieren einmal für die gesamte API und tragen kein `/v1/`-Präfix. Sie stehen in der Seitenleiste unterhalb der Kategorien.
+
+| Gruppe | Endpunkt | Was unter `/v1/` zu erwarten ist |
+| --- | --- | --- |
+| Catalog | `GET /catalog` | Listet die **unversionierten** Kategorien und Tabellen, nicht das `/v1/`-Set. Für das `/v1/`-Inventar die [Datenmodell-Übersicht](/de/v1/data-model/overview) nutzen. |
+| Delta Sync | `GET /changes` | Liefert Sync-Zeitstempel pro Tabelle; das Feld `endpoint_url` zeigt auf unversionierte Pfade. Benötigt den Parameter `since` (ISO-8601 UTC). |
+| Meta | `GET /meta/{api_table}/values/{column}` | Lookup-Werte für eine Spalte, sofern für deinen Key konfiguriert. Andernfalls `404 Not Found` mit `"No lookup values configured"`. |
+| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Quelltabellen unterhalb der Modellschicht — von der `/v1/`-Migration unberührt. |
