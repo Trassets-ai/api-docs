@@ -24,7 +24,7 @@ Category-Endpunkte liefern die Pagination-Metadaten in Headern, nicht im Body:
 - `X-Total-Count` — Gesamtzahl der Zeilen, die zur Abfrage passen
 - `X-Has-More` — `"true"` oder `"false"`
 - `X-Next-Offset` — der Offset für die nächste Seite
-- `X-Next-Cursor` — ein opaker Cursor, wenn eine volle Seite zurückgegeben wird
+- `X-Next-Cursor` — ein opaker Cursor, wenn eine volle Seite zurückgegeben wird, bei den Endpunkten mit Cursor-Unterstützung; fehlt, wenn die Tabelle keine Cursor-Spalte hat, siehe [Pagination](/de/concepts/pagination)
 
 ## Fehlerformat
 

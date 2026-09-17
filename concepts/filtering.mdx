@@ -17,6 +17,16 @@ GET /contracts/contract_debits?property_id=1234&date_begin=2024-01-01
 
 There is no range, wildcard, or `OR` syntax — a query parameter matches rows where that column equals the given value exactly. To narrow further, combine multiple parameters; they are ANDed together.
 
+### Required filters
+
+Filters are optional on almost every endpoint, but a few require one and reject a request that omits it with `400 Bad Request`:
+
+```json
+{ "detail": "Missing required filter(s): ['property_id']" }
+```
+
+`/contracts/contract_ends` (and its `/v1/` counterpart) is the current case — it always needs a `property_id`. Required parameters are marked as required per endpoint in the **API Reference** tab, so check there rather than assuming an unfiltered call will work.
+
 <Note>
   Raw endpoints (`/raw/{table_name}`) do not support these filters — they always return the full unfiltered table, paginated via cursor. See [Endpoint Types](/concepts/endpoint-types).
 </Note>

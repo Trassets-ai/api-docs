@@ -23,8 +23,17 @@ Category-Endpunkte akzeptieren die Query-Parameter `limit` und `offset`. Die API
 </ResponseField>
 
 <ResponseField name="X-Next-Cursor" type="string">
-  Ein undurchsichtiger Cursor für die nächste Seite. Nur vorhanden, wenn eine vollständige Seite zurückgegeben wurde. Du kannst diesen anstelle von `offset` als `cursor`-Query-Parameter im nächsten Request übergeben.
+  Ein undurchsichtiger Cursor für die nächste Seite. Nur vorhanden, wenn eine vollständige Seite zurückgegeben wurde **und** der Endpunkt Cursor-Pagination unterstützt — siehe den Hinweis unten. Du kannst diesen anstelle von `offset` als `cursor`-Query-Parameter im nächsten Request übergeben.
 </ResponseField>
+
+<Note>
+  Nicht jeder Category-Endpunkt unterstützt Cursor-Pagination. Ist für die zugrunde liegende
+  Tabelle keine Sortierspalte und kein Primärschlüssel konfiguriert, kommt kein
+  `X-Next-Cursor`-Header zurück, und ein `?cursor=` beantwortet die API mit
+  `400 Bad Request` und `"Cursor-based pagination not available: table has no sort_col or
+  primary key configured"`. Nimm den Header als Signal: Fehlt er auf einer vollständigen
+  Seite, paginiere über `limit`/`offset` — das funktioniert bei jedem Category-Endpunkt.
+</Note>
 
 Dieses Beispiel ruft Seite 2 mit einem Offset von 100 ab:
 

@@ -186,6 +186,12 @@ Sollstellungen mit dem realisierten Zahlungsfluss abzugleichen.
 Verlängerungen/Optionen. Nutze dies, um anstehende Vertragsabläufe, Fristen für die
 Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
 
+<Note>
+  Dieser Endpunkt verlangt den Query-Parameter `property_id` — eine Anfrage ohne ihn
+  beantwortet die API mit `400 Bad Request` und `"Missing required filter(s):
+  ['property_id']"`. Siehe [Filterung](/de/concepts/filtering).
+</Note>
+
 <ResponseField name="property_id" type="integer" required>
   Eindeutige Objekt-ID.
 </ResponseField>
