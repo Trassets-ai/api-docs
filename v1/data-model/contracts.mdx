@@ -1,11 +1,11 @@
 ---
-title: "v1 Contracts Data Model: Debits, Diffs, Service Contracts, and Contract Ends"
+title: "v1 Contracts Data Model: Debits, Diffs, Service Contracts, Contract Ends, and Index Rent"
 sidebarTitle: "Contracts"
-description: "Field-level reference for the v1 Contracts tables service_contracts, contract_debits, contract_debit_diffs, and contract_ends, including the debit_period, debit_type, period, and option_state objects."
+description: "Field-level reference for the v1 Contracts tables service_contracts, contract_debits, contract_debit_diffs, contract_ends, and index_rent, including the debit_period, debit_type, period, option_state, validity_period, and calculation_model objects."
 ---
 
-The v1 Contracts domain covers four tables: `service_contracts`, `contract_debits`,
-`contract_debit_diffs`, and `contract_ends`, all of which follow the [response
+The v1 Contracts domain covers five tables: `service_contracts`, `contract_debits`,
+`contract_debit_diffs`, `contract_ends`, and `index_rent`, all of which follow the [response
 structure](/v1/response-shape-conventions) rules.
 
 ## service_contracts
@@ -280,4 +280,137 @@ status.
 
 <ResponseField name="termination_reason" type="string">
   Termination reason, if the lease has been terminated.
+</ResponseField>
+
+## index_rent
+
+`GET /v1/contracts/index_rent` — index-linked rent adjustment agreements (`Indexmiete`): which
+consumer price index a rent is tied to, the thresholds and rules that trigger an adjustment,
+and the validity window of each agreed state. One row per tenancy × debit type × index state;
+superseded states stay in the table, so filter on `is_current` for the state in force today.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="tenancy_id" type="string" required>
+  Identifies the tenancy this agreement applies to. Same value as
+  [`Stakeholder.tenants.tenancy_id`](/v1/data-model/stakeholder), `contract_debits.tenancy_id`,
+  and `contract_ends.tenancy_id` — join directly on this field.
+</ResponseField>
+
+<ResponseField name="validity_period" type="object">
+  Validity interval of this index state — `{start, end}` (date strings). `end` is
+  `"9999-12-31"` (a sentinel, not `null`) while the state is still open, which is the case for
+  every row where `is_current` is `true`.
+</ResponseField>
+
+<ResponseField name="calculation_model" type="object">
+  Rule that determines when an adjustment takes effect — `{code, label}`. Codes: `1` = nach BGB
+  ($557b), `2` = Ab Berechnungsdatum (beide Bedingungen), `3` = Ab Berechnungsdatum (mindestens
+  eine Bedingung), `4` = Ab Mitteilungsdatum (beide Bedingungen), `5` = Ab Mitteilungsdatum
+  (mindestens eine Bedingung), `6` = zum nächsten Quartal (beide Bedingungen), `7` = zum
+  nächsten Quartal (mindestens eine Bedingung). `code` `0` means no model is set in the source
+  system and comes with `label: null`.
+</ResponseField>
+
+<ResponseField name="is_current" type="boolean">
+  Whether this is the state currently in force. `false` marks a superseded state kept for
+  history.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer">
+  The debit type (`Sollart`) the index agreement applies to — the same code as
+  [`contract_debits.debit_type.code`](#contract_debits) (e.g. `11` = Nettokaltmiete Wohnung,
+  `12` = Gewerbemiete (m. USt.)). Despite the name it is **not** a ledger account and does not
+  join to [`Accounting.accounts.account_id`](/v1/data-model/accounting), even though both are
+  integers — see the [Field Glossary](/v1/data-model/field-glossary).
+</ResponseField>
+
+<ResponseField name="index_name" type="string">
+  Name of the price index the rent is tied to, as maintained in the source system (e.g.
+  `"VPI 2020"`, `"Verbraucherpreisindex"`). Free text, not a fixed code list, and `null` where
+  no index is named.
+</ResponseField>
+
+<ResponseField name="base_year" type="integer">
+  Base year of that index (e.g. `2020`).
+</ResponseField>
+
+<ResponseField name="index_value_used" type="string">
+  Index value at the start of the index reference, used as the basis for comparison. Decimal
+  value serialized as a string, not a JSON number — cast before doing arithmetic on it. `null`
+  where the index series holds no value for that month.
+</ResponseField>
+
+<ResponseField name="min_date" type="date">
+  Start of the contract-aligned validity window. Same as `validity_period.start`, except on the
+  earliest state of a tenancy, where it reaches back to `begin_contract` if the contract started
+  first.
+</ResponseField>
+
+<ResponseField name="max_date" type="date">
+  End of the contract-aligned validity window: `validity_period.end` capped at `end_contract`.
+  `"9999-12-31"` where the state is open and no contract end is on file. Use
+  `min_date`/`max_date` for gap-free day coverage across a tenancy, and `validity_period` for
+  the raw state boundaries.
+</ResponseField>
+
+<ResponseField name="begin_contract" type="date">
+  Start of the underlying lease.
+</ResponseField>
+
+<ResponseField name="end_contract" type="date">
+  End of the underlying lease. `null` for open-ended leases, which is the majority.
+</ResponseField>
+
+<ResponseField name="adjustment_threshold" type="string">
+  Index change that must be reached before the rent may be adjusted, in the unit given by
+  `adjustment_unit`. Decimal value serialized as a string.
+</ResponseField>
+
+<ResponseField name="adjustment_unit" type="string">
+  Unit of `adjustment_threshold` — `"Prozent"` or `"Punkte"`.
+</ResponseField>
+
+<ResponseField name="passing_value" type="string">
+  Share of the index change passed on to the rent, in percent (`"100.0000"` = fully passed on).
+  Decimal value serialized as a string.
+</ResponseField>
+
+<ResponseField name="adjustment_locked" type="boolean">
+  Whether adjustments are currently blocked for this agreement. Reflects the setting as of the
+  last sync only — the source system keeps no history of it, so this value is the same on
+  superseded states as on the current one.
+</ResponseField>
+
+<ResponseField name="adjustment_locked_until" type="date">
+  Date up to which adjustments are blocked. Set independently of `adjustment_locked`, so check
+  both.
+</ResponseField>
+
+<ResponseField name="notification_required" type="boolean">
+  Whether the tenant must be notified before an adjustment takes effect.
+</ResponseField>
+
+<ResponseField name="adjustment_after_months" type="integer">
+  Number of months that must pass before the next adjustment is permitted. Applies to
+  `adjustment_type` `"Anpassung nach Ablauf Monaten"`.
+</ResponseField>
+
+<ResponseField name="calculation_period" type="integer">
+  Length of the comparison period in months used to compute the index change.
+</ResponseField>
+
+<ResponseField name="recalculation_after_months" type="integer">
+  Maximum number of months an adjustment may be applied retroactively.
+</ResponseField>
+
+<ResponseField name="comment" type="string">
+  Free-text remark on the index agreement. `null` on most rows.
+</ResponseField>
+
+<ResponseField name="adjustment_type" type="string">
+  How the adjustment date is determined — `"Anpassung zu Datum"` (on a fixed date) or
+  `"Anpassung nach Ablauf Monaten"` (after `adjustment_after_months` have elapsed).
 </ResponseField>
