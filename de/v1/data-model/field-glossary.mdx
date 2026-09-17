@@ -1,7 +1,7 @@
 ---
 title: "v1 Feldglossar"
 sidebarTitle: "Feldglossar"
-description: "Referenzleitfaden zu Feldnamen, die über mehrere /v1/-Tabellen hinweg vorkommen, einschließlich property_id, person_id, creditor_id, tenancy_id und den mehrdeutigen Feldern account_name und period."
+description: "Referenzleitfaden zu Feldnamen, die über mehrere /v1/-Tabellen hinweg vorkommen, einschließlich property_id, person_id, creditor_id, floor_area_person_id und den mehrdeutigen Feldern account_name und period."
 ---
 
 Dieses Glossar definiert Feldnamen, die auf mehr als einer im [v1 Datenmodell](/de/v1/data-model/overview)
@@ -13,7 +13,7 @@ Bedeutungen, genau deshalb lohnt sich der Blick hierher.
 | --- | --- | --- |
 | `property_id` | string | Eindeutige Objekt-ID; primärer Verknüpfungsschlüssel über jede `/v1/`-Tabelle und auf allen gegen `properties` auflösbar. |
 | `person_id` | string oder integer | Identifiziert einen Mieter oder eine Kontaktperson. `booking_header`, `booking_positions`, `tenants` und `contract_debit_diffs` teilen einen ID-Raum, der pro Objekt vergeben wird — über `property_id` **und** `person_id` gemeinsam verknüpfen und `booking_positions.person_id` (eine Zahl) vorher in einen String casten. `notifications.person_id` ist eine separate Sequenz aus einem anderen Subsystem und gehört nicht in diesen ID-Raum. |
-| `tenancy_id` | string | Identifiziert ein bestimmtes Mietverhältnis. Kommt bei `tenants`, `contract_debits`, `contract_ends` und `index_rent` vor und ist auf allen vier derselbe zugrunde liegende Wert — direkt über dieses Feld verknüpfen, ohne Objekt-Scoping. |
+| `floor_area_person_id` | integer oder string | Identifiziert ein bestimmtes Mietverhältnis. Kommt bei `tenants`, `contract_debits`, `contract_ends` und `index_rent` vor und ist auf allen vier derselbe zugrunde liegende Wert — direkt über dieses Feld verknüpfen, ohne Objekt-Scoping. Überall ein Integer, außer bei `contract_debits`, dort ein String; vor dem Join casten. Zusammengesetzt aus `floor_area_id` und `person_id` — das Feld wie angegeben nutzen, nicht selbst herleiten. |
 | `creditor_id` | string | Identifiziert einen Kreditor (Lieferant oder Dienstleister). Referenziert `Stakeholder.creditor` — siehe die [Stakeholder-Feldreferenz](/de/v1/data-model/stakeholder). Bei `projects` unzuverlässig; siehe die [Operations-Feldreferenz](/de/v1/data-model/operations). |
 | `floor_area_id` | integer oder string | Referenziert [`Property.property_structure`](/de/v1/data-model/property#property_structure). Kommt bei `technical_objects`, `tenants`, `contract_ends` und `property_structure` selbst als Integer vor — außer bei `contract_debits`, dort als String; vor dem Join casten. |
 | `account_id` | integer oder string | Interne Sachkonto-ID. Ein einheitlicher Join-Key bei `accounts`, `booking_positions`, `budgets` und `contract_debit_diffs` — alle verknüpfen sich mit `accounts.account_id`; siehe die [Accounting-Feldreferenz](/de/v1/data-model/accounting). Zwei Tabellen verwenden den Namen für etwas anderes: `property_structure.account_id` ist ein fachlicher String-Schlüssel auf Strukturknoten (siehe die [Property-Feldreferenz](/de/v1/data-model/property#property_structure)), und `index_rent.account_id` ist ein Sollart-Code, der `contract_debits.debit_type.code` entspricht — ein Integer wie der Sachkonto-Schlüssel, aber aus einem anderen Wertebereich, weshalb ein Join gegen `accounts` unbemerkt leer bleibt (siehe die [Contracts-Feldreferenz](/de/v1/data-model/contracts#index_rent)). |

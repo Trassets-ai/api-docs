@@ -86,17 +86,17 @@ Datensatz repräsentiert eine geplante Sollstellung mit einem Gültigkeitsinterv
   String, während `property_structure.floor_area_id` ein Integer ist — vor dem Join casten.
 </ResponseField>
 
-<ResponseField name="tenancy_id" type="string">
+<ResponseField name="floor_area_person_id" type="string">
   Identifiziert das Mietverhältnis, auf das sich diese Sollstellung bezieht. Derselbe Wert
-  wie [`Stakeholder.tenants.tenancy_id`](/de/v1/data-model/stakeholder) — direkt über dieses
-  Feld verknüpfen.
+  wie [`Stakeholder.tenants.floor_area_person_id`](/de/v1/data-model/stakeholder), hier aber
+  ein String, während es dort ein Integer ist — vor dem Join casten.
 </ResponseField>
 
 <ResponseField name="property_id_person_id" type="integer">
   Zusammengesetzter Schlüssel, der den Mieter identifiziert, auf den sich diese Sollstellung
   bezieht. Ähnelt einer Verkettung aus `property_id` und einer Personennummer, ist es aber
   nicht immer exakt — das Feld wie angegeben nutzen, nicht selbst herleiten. Nutze
-  stattdessen `tenancy_id` oben, um zum Mieter zu gelangen.
+  stattdessen `floor_area_person_id` oben, um zum Mieter zu gelangen.
 </ResponseField>
 
 <ResponseField name="ledger_id" type="string">
@@ -196,10 +196,11 @@ Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
   Pflichtfilter.
 </Note>
 
-<ResponseField name="tenancy_id" type="string" required>
+<ResponseField name="floor_area_person_id" type="integer" required>
   Identifiziert das Mietverhältnis, auf das sich dieser Datensatz bezieht. Derselbe Wert
-  wie [`Stakeholder.tenants.tenancy_id`](/de/v1/data-model/stakeholder) und das
-  `contract_debits.tenancy_id` dieser Domäne — direkt über dieses Feld verknüpfen.
+  wie [`Stakeholder.tenants.floor_area_person_id`](/de/v1/data-model/stakeholder) und das
+  `contract_debits.floor_area_person_id` dieser Domäne — über das erste direkt verknüpfen, für
+  das zweite casten, da es dort ein String ist.
 </ResponseField>
 
 <ResponseField name="floor_area_id" type="integer">
@@ -299,11 +300,11 @@ der jeweils vereinbarte Stand gilt. Eine Zeile pro Mietverhältnis × Sollart ×
   Eindeutige Objekt-ID.
 </ResponseField>
 
-<ResponseField name="tenancy_id" type="string" required>
+<ResponseField name="floor_area_person_id" type="integer" required>
   Identifiziert das Mietverhältnis, für das die Vereinbarung gilt. Derselbe Wert wie
-  [`Stakeholder.tenants.tenancy_id`](/de/v1/data-model/stakeholder),
-  `contract_debits.tenancy_id` und `contract_ends.tenancy_id` — verknüpfe direkt über dieses
-  Feld.
+  [`Stakeholder.tenants.floor_area_person_id`](/de/v1/data-model/stakeholder),
+  `contract_debits.floor_area_person_id` und `contract_ends.floor_area_person_id` — überall
+  direkt verknüpfen, außer bei `contract_debits`, wo es ein String ist und einen Cast braucht.
 </ResponseField>
 
 <ResponseField name="validity_period" type="object">

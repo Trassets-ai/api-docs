@@ -233,8 +233,9 @@ co-owned properties.
   Unique property identifier.
 </ResponseField>
 
-<ResponseField name="tenancy_id" type="string" required>
-  Unique identifier for this tenancy.
+<ResponseField name="floor_area_person_id" type="integer" required>
+  Unique identifier for this tenancy. Composed of `floor_area_id` and `person_id`, but use
+  the field as given rather than deriving it yourself.
 </ResponseField>
 
 <ResponseField name="floor_area_id" type="integer">
@@ -307,10 +308,12 @@ co-owned properties.
 </ResponseField>
 
 <Note>
-  There are no composite key fields on this endpoint. To link a tenancy to a unit, join via
-  `property_id` and `floor_area_id`. `tenancy_id` is the only field that identifies a row on
-  its own — one person can hold several tenancies in the same property, so a join on
-  `property_id` plus `person_id` can return more than one row per person. `tenancy_id` is also
-  what [`Contracts.contract_debits` and `Contracts.contract_ends`](/v1/data-model/contracts)
-  reference.
+  To link a tenancy to a unit, join via `property_id` and `floor_area_id`.
+  `floor_area_person_id` is the only field that identifies a row on its own — one person can
+  hold several tenancies in the same property, so a join on `property_id` plus `person_id` can
+  return more than one row per person. `floor_area_person_id` is also what
+  [`Contracts.contract_debits`, `Contracts.contract_ends`, and
+  `Contracts.index_rent`](/v1/data-model/contracts) reference — an integer here and on
+  `contract_ends`/`index_rent`, but a string on `contract_debits`, so cast before joining
+  against that one.
 </Note>

@@ -1,7 +1,7 @@
 ---
 title: "v1 Field Glossary"
 sidebarTitle: "Field Glossary"
-description: "Reference guide to field names shared across multiple /v1/ tables, including property_id, person_id, creditor_id, tenancy_id, and the ambiguous account_name and period."
+description: "Reference guide to field names shared across multiple /v1/ tables, including property_id, person_id, creditor_id, floor_area_person_id, and the ambiguous account_name and period."
 ---
 
 This glossary defines field names that appear on more than one `/v1/` table documented in
@@ -13,7 +13,7 @@ tables, which is exactly why they're worth checking here first.
 | --- | --- | --- |
 | `property_id` | string | Unique property identifier; primary join key across every `/v1/` table, and it resolves against `properties` on all of them. |
 | `person_id` | string or integer | Identifies a tenant or contact person. `booking_header`, `booking_positions`, `tenants`, and `contract_debit_diffs` share one identifier space, scoped per property — join on `property_id` **and** `person_id` together, and cast `booking_positions.person_id` (a number) to a string first. `notifications.person_id` is a separate sequence from another subsystem and does not belong to that space. |
-| `tenancy_id` | string | Identifies a specific tenancy. Appears on `tenants`, `contract_debits`, `contract_ends`, and `index_rent`, and is the same underlying value on all four — join across them directly on this field, no per-property scoping needed. |
+| `floor_area_person_id` | integer or string | Identifies a specific tenancy. Appears on `tenants`, `contract_debits`, `contract_ends`, and `index_rent`, and is the same underlying value on all four — join across them directly on this field, no per-property scoping needed. An integer everywhere except `contract_debits`, where it's a string; cast before joining. It's composed of `floor_area_id` and `person_id`, but use the field as given rather than deriving it yourself. |
 | `creditor_id` | string | Identifies a creditor (vendor or service provider). References `Stakeholder.creditor` — see the [Stakeholder field reference](/v1/data-model/stakeholder). Unreliable on `projects`; see the [Operations field reference](/v1/data-model/operations). |
 | `floor_area_id` | integer or string | References [`Property.property_structure`](/v1/data-model/property#property_structure). Appears on `technical_objects`, `tenants`, `contract_ends`, and `property_structure` itself as an integer — except on `contract_debits`, where it's a string; cast before joining. |
 | `account_id` | integer or string | Internal ledger account identifier. One consistent join key on `accounts`, `booking_positions`, `budgets`, and `contract_debit_diffs` — all join to `accounts.account_id`; see the [Accounting field reference](/v1/data-model/accounting). Two tables reuse the name for something else: `property_structure.account_id` is a string business key on structure nodes (see the [Property field reference](/v1/data-model/property#property_structure)), and `index_rent.account_id` is a debit-type code matching `contract_debits.debit_type.code` — an integer like the ledger key, but from a different value space, so a join against `accounts` silently returns nothing (see the [Contracts field reference](/v1/data-model/contracts#index_rent)). |
