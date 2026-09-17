@@ -14,9 +14,9 @@ Tabellen.
   </Card>
 
   <Card title="Contracts" icon="file-contract" href="/de/v1/data-model/contracts">
-    `service_contracts`, `contract_debits`, `contract_debit_diffs` und `contract_ends`, mit
-    den Objekten `contract_period`, `debit_period`, `debit_type`, `period` und
-    `option_state`.
+    `service_contracts`, `contract_debits`, `contract_debit_diffs`, `contract_ends` und
+    `index_rent`, mit den Objekten `contract_period`, `debit_period`, `debit_type`, `period`,
+    `option_state`, `validity_period` und `calculation_model`.
   </Card>
 
   <Card title="Depreciation" icon="chart-line-down" href="/de/v1/data-model/depreciation">
@@ -80,6 +80,7 @@ graph LR
   booking_positions -->|property_id + person_id| tenants
   tenants -->|tenancy_id| contract_debits["Contracts.contract_debits"]
   tenants -->|tenancy_id| contract_ends["Contracts.contract_ends"]
+  tenants -->|tenancy_id| index_rent["Contracts.index_rent"]
   tenants -->|floor_area_id| property_structure
   booking_header -->|property_structure_account_id| property_structure
   booking_positions -->|property_structure_account_id| property_structure
@@ -105,7 +106,7 @@ graph LR
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
 | `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_header` ein String, bei `booking_positions` eine Zahl — vor einem Join über diese Grenze den Warnhinweis unten lesen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
-| `tenancy_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits` und `contract_ends` teilen denselben Wert — direkt darüber verknüpfen, ohne `property_id`. | 1 Mietverhältnis → viele Soll-/Ende-Zeilen |
+| `tenancy_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits`, `contract_ends` und `index_rent` teilen denselben Wert — direkt darüber verknüpfen, ohne `property_id`. | 1 Mietverhältnis → viele Soll-/Ende-/Index-Zeilen |
 | `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits` und `contract_ends`. | 1 Einheit → viele Zeilen |
 | `asset_id` | Verknüpft eine Abschreibungsbuchung mit dem Anlagegut, auf das sie abschreibt. Jede `depreciation`-Zeile löst sich gegen `assets` auf. | 1 Anlagegut → viele Buchungen |
 | `property_structure_account_id` | Fremdschlüssel auf [`Property.property_structure`](/de/v1/data-model/property#property_structure), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |

@@ -1,11 +1,11 @@
 ---
-title: "v1 Contracts Datenmodell: Sollstellungen, Abweichungen, Dienstleistungsverträge und Vertragsenden"
+title: "v1 Contracts Datenmodell: Sollstellungen, Abweichungen, Dienstleistungsverträge, Vertragsenden und Indexmiete"
 sidebarTitle: "Contracts"
-description: "Feldreferenz für die v1-Contracts-Tabellen service_contracts, contract_debits, contract_debit_diffs und contract_ends, inklusive der Objekte debit_period, debit_type, period und option_state."
+description: "Feldreferenz für die v1-Contracts-Tabellen service_contracts, contract_debits, contract_debit_diffs, contract_ends und index_rent, inklusive der Objekte debit_period, debit_type, period, option_state, validity_period und calculation_model."
 ---
 
-Die v1-Contracts-Domäne umfasst vier Tabellen: `service_contracts`, `contract_debits`,
-`contract_debit_diffs` und `contract_ends`, die alle den Regeln der
+Die v1-Contracts-Domäne umfasst fünf Tabellen: `service_contracts`, `contract_debits`,
+`contract_debit_diffs`, `contract_ends` und `index_rent`, die alle den Regeln der
 [Response-Struktur](/de/v1/response-shape-conventions) folgen.
 
 ## service_contracts
@@ -286,4 +286,139 @@ Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
 
 <ResponseField name="termination_reason" type="string">
   Kündigungsgrund, falls das Mietverhältnis gekündigt wurde.
+</ResponseField>
+
+## index_rent
+
+`GET /v1/contracts/index_rent` — Indexmietvereinbarungen: an welchen Verbraucherpreisindex eine
+Miete gekoppelt ist, welche Schwellen und Regeln eine Anpassung auslösen und in welchem Zeitraum
+der jeweils vereinbarte Stand gilt. Eine Zeile pro Mietverhältnis × Sollart × Index-Stand;
+überholte Stände bleiben in der Tabelle — filtere auf `is_current` für den heute gültigen Stand.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="tenancy_id" type="string" required>
+  Identifiziert das Mietverhältnis, für das die Vereinbarung gilt. Derselbe Wert wie
+  [`Stakeholder.tenants.tenancy_id`](/de/v1/data-model/stakeholder),
+  `contract_debits.tenancy_id` und `contract_ends.tenancy_id` — verknüpfe direkt über dieses
+  Feld.
+</ResponseField>
+
+<ResponseField name="validity_period" type="object">
+  Gültigkeitszeitraum dieses Index-Stands — `{start, end}` (Datumsstrings). `end` ist
+  `"9999-12-31"` (ein Platzhalterdatum, nicht `null`), solange der Stand offen ist — das gilt für
+  jede Zeile mit `is_current` = `true`.
+</ResponseField>
+
+<ResponseField name="calculation_model" type="object">
+  Regel, die bestimmt, ab wann eine Anpassung wirksam wird — `{code, label}`. Codes: `1` = nach
+  BGB ($557b), `2` = Ab Berechnungsdatum (beide Bedingungen), `3` = Ab Berechnungsdatum
+  (mindestens eine Bedingung), `4` = Ab Mitteilungsdatum (beide Bedingungen), `5` = Ab
+  Mitteilungsdatum (mindestens eine Bedingung), `6` = zum nächsten Quartal (beide Bedingungen),
+  `7` = zum nächsten Quartal (mindestens eine Bedingung). `code` `0` bedeutet, dass im
+  Quellsystem kein Modell gesetzt ist, und kommt mit `label: null`.
+</ResponseField>
+
+<ResponseField name="is_current" type="boolean">
+  Ob dies der aktuell gültige Stand ist. `false` kennzeichnet einen überholten Stand, der zur
+  Historie erhalten bleibt.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer">
+  Die Sollart, für die die Indexvereinbarung gilt — derselbe Code wie
+  [`contract_debits.debit_type.code`](#contract_debits) (z. B. `11` = Nettokaltmiete Wohnung,
+  `12` = Gewerbemiete (m. USt.)). Trotz des Namens **kein** Sachkonto: Das Feld verknüpft nicht
+  mit [`Accounting.accounts.account_id`](/de/v1/data-model/accounting), obwohl beide Integer sind
+  — siehe [Feldglossar](/de/v1/data-model/field-glossary).
+</ResponseField>
+
+<ResponseField name="index_name" type="string">
+  Bezeichnung des Preisindex, an den die Miete gekoppelt ist, wie im Quellsystem gepflegt (z. B.
+  `"VPI 2020"`, `"Verbraucherpreisindex"`). Freitext, keine feste Codeliste, und `null`, wenn
+  kein Index benannt ist.
+</ResponseField>
+
+<ResponseField name="base_year" type="integer">
+  Basisjahr dieses Index (z. B. `2020`).
+</ResponseField>
+
+<ResponseField name="index_value_used" type="string">
+  Indexwert zu Beginn des Indexbezugs, der als Vergleichsbasis dient. Dezimalwert als String
+  serialisiert, keine JSON-Zahl — vor Rechenoperationen casten. `null`, wenn die Indexreihe für
+  diesen Monat keinen Wert enthält.
+</ResponseField>
+
+<ResponseField name="min_date" type="date">
+  Beginn des vertragsbereinigten Gültigkeitsfensters. Entspricht `validity_period.start` — außer
+  beim frühesten Stand eines Mietverhältnisses, wo es bis `begin_contract` zurückreicht, falls
+  der Vertrag früher begann.
+</ResponseField>
+
+<ResponseField name="max_date" type="date">
+  Ende des vertragsbereinigten Gültigkeitsfensters: `validity_period.end`, begrenzt auf
+  `end_contract`. `"9999-12-31"`, wenn der Stand offen ist und kein Vertragsende hinterlegt ist.
+  Nutze `min_date`/`max_date` für eine lückenlose Tagesabdeckung über ein Mietverhältnis und
+  `validity_period` für die rohen Grenzen des Stands.
+</ResponseField>
+
+<ResponseField name="begin_contract" type="date">
+  Beginn des zugrunde liegenden Mietvertrags.
+</ResponseField>
+
+<ResponseField name="end_contract" type="date">
+  Ende des zugrunde liegenden Mietvertrags. `null` bei unbefristeten Verträgen — das ist die
+  Mehrheit.
+</ResponseField>
+
+<ResponseField name="adjustment_threshold" type="string">
+  Indexveränderung, die erreicht sein muss, bevor die Miete angepasst werden darf, in der Einheit
+  aus `adjustment_unit`. Dezimalwert als String serialisiert.
+</ResponseField>
+
+<ResponseField name="adjustment_unit" type="string">
+  Einheit von `adjustment_threshold` — `"Prozent"` oder `"Punkte"`.
+</ResponseField>
+
+<ResponseField name="passing_value" type="string">
+  Anteil der Indexveränderung, der an die Miete weitergegeben wird, in Prozent (`"100.0000"` =
+  vollständige Weitergabe). Dezimalwert als String serialisiert.
+</ResponseField>
+
+<ResponseField name="adjustment_locked" type="boolean">
+  Ob Anpassungen für diese Vereinbarung derzeit gesperrt sind. Gibt nur den Stand des letzten
+  Syncs wieder — das Quellsystem führt dazu keine Historie, deshalb steht auf überholten Ständen
+  derselbe Wert wie auf dem aktuellen.
+</ResponseField>
+
+<ResponseField name="adjustment_locked_until" type="date">
+  Datum, bis zu dem Anpassungen gesperrt sind. Unabhängig von `adjustment_locked` gesetzt —
+  prüfe beide Felder.
+</ResponseField>
+
+<ResponseField name="notification_required" type="boolean">
+  Ob der Mieter vor Wirksamwerden einer Anpassung benachrichtigt werden muss.
+</ResponseField>
+
+<ResponseField name="adjustment_after_months" type="integer">
+  Anzahl der Monate, die vor der nächsten zulässigen Anpassung verstreichen müssen. Gilt bei
+  `adjustment_type` = `"Anpassung nach Ablauf Monaten"`.
+</ResponseField>
+
+<ResponseField name="calculation_period" type="integer">
+  Länge des Vergleichszeitraums in Monaten, über den die Indexveränderung berechnet wird.
+</ResponseField>
+
+<ResponseField name="recalculation_after_months" type="integer">
+  Maximale Anzahl Monate, um die eine Anpassung rückwirkend angewendet werden darf.
+</ResponseField>
+
+<ResponseField name="comment" type="string">
+  Freitextbemerkung zur Indexvereinbarung. In den meisten Zeilen `null`.
+</ResponseField>
+
+<ResponseField name="adjustment_type" type="string">
+  Wie das Anpassungsdatum bestimmt wird — `"Anpassung zu Datum"` (zu einem festen Datum) oder
+  `"Anpassung nach Ablauf Monaten"` (nach Ablauf von `adjustment_after_months`).
 </ResponseField>
