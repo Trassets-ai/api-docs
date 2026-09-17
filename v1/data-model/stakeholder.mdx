@@ -233,7 +233,7 @@ co-owned properties.
   Unique property identifier.
 </ResponseField>
 
-<ResponseField name="floor_area_person_id" type="integer" required>
+<ResponseField name="floor_area_person_id" type="string" required>
   Unique identifier for this tenancy. Composed of `floor_area_id` and `person_id`, but use
   the field as given rather than deriving it yourself.
 </ResponseField>
@@ -313,7 +313,6 @@ co-owned properties.
   hold several tenancies in the same property, so a join on `property_id` plus `person_id` can
   return more than one row per person. `floor_area_person_id` is also what
   [`Contracts.contract_debits`, `Contracts.contract_ends`, and
-  `Contracts.index_rent`](/v1/data-model/contracts) reference — an integer here and on
-  `contract_ends`/`index_rent`, but a string on `contract_debits`, so cast before joining
-  against that one.
+  `Contracts.index_rent`](/v1/data-model/contracts) reference — a string on all four tables,
+  so those joins need no cast.
 </Note>

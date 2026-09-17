@@ -234,7 +234,7 @@ Eigentumsanteils bei Objekten mit mehreren Eigentümern.
   Eindeutige Objekt-ID.
 </ResponseField>
 
-<ResponseField name="floor_area_person_id" type="integer" required>
+<ResponseField name="floor_area_person_id" type="string" required>
   Eindeutige ID dieses Mietverhältnisses. Zusammengesetzt aus `floor_area_id` und `person_id`
   — das Feld wie angegeben nutzen, nicht selbst herleiten.
 </ResponseField>
@@ -317,7 +317,6 @@ Eigentumsanteils bei Objekten mit mehreren Eigentümern.
   `property_id` plus `person_id` kann also mehr als eine Zeile pro Person liefern.
   `floor_area_person_id` ist außerdem das Feld, auf das sich
   [`Contracts.contract_debits`, `Contracts.contract_ends` und
-  `Contracts.index_rent`](/de/v1/data-model/contracts) beziehen — hier und bei
-  `contract_ends`/`index_rent` ein Integer, bei `contract_debits` dagegen ein String, dort also
-  vor dem Join casten.
+  `Contracts.index_rent`](/de/v1/data-model/contracts) beziehen — auf allen vier Tabellen ein
+  String, diese Joins brauchen also keinen Cast.
 </Note>

@@ -86,16 +86,16 @@ represents a scheduled debit with a validity interval.
 </ResponseField>
 
 <ResponseField name="floor_area_person_id" type="string">
-  Identifies the tenancy this debit applies to. Same value as
-  [`Stakeholder.tenants.floor_area_person_id`](/v1/data-model/stakeholder), but a string here
-  while it's an integer there — cast before joining.
+  Identifies the tenancy this debit applies to. Same value and same type as
+  [`Stakeholder.tenants.floor_area_person_id`](/v1/data-model/stakeholder) — join directly, no
+  cast needed.
 </ResponseField>
 
 <ResponseField name="property_id_person_id" type="integer">
   Composite key identifying the tenant this debit applies to. It resembles a concatenation
   of `property_id` and a person number, but isn't always exactly that — use the field as
   given rather than deriving it yourself. Use `floor_area_person_id` above to reach the
-  tenant instead.
+  tenant instead — that one is a documented join key.
 </ResponseField>
 
 <ResponseField name="ledger_id" type="string">
@@ -192,11 +192,10 @@ status.
   `400 Bad Request`. It's the only `/v1/` endpoint with a mandatory filter.
 </Note>
 
-<ResponseField name="floor_area_person_id" type="integer" required>
-  Identifies the tenancy this record applies to. Same value as
+<ResponseField name="floor_area_person_id" type="string" required>
+  Identifies the tenancy this record applies to. Same value and same type as
   [`Stakeholder.tenants.floor_area_person_id`](/v1/data-model/stakeholder) and this domain's
-  own `contract_debits.floor_area_person_id` — join directly on the former, cast for the
-  latter, where it's a string.
+  own `contract_debits.floor_area_person_id` — join directly on either, no cast needed.
 </ResponseField>
 
 <ResponseField name="floor_area_id" type="integer">
@@ -294,11 +293,11 @@ superseded states stay in the table, so filter on `is_current` for the state in 
   Unique property identifier.
 </ResponseField>
 
-<ResponseField name="floor_area_person_id" type="integer" required>
-  Identifies the tenancy this agreement applies to. Same value as
+<ResponseField name="floor_area_person_id" type="string" required>
+  Identifies the tenancy this agreement applies to. Same value and same type as
   [`Stakeholder.tenants.floor_area_person_id`](/v1/data-model/stakeholder),
   `contract_debits.floor_area_person_id`, and `contract_ends.floor_area_person_id` — join
-  directly on all of them except `contract_debits`, where it's a string and needs a cast.
+  directly on any of them, no cast needed.
 </ResponseField>
 
 <ResponseField name="validity_period" type="object">
