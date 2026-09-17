@@ -104,7 +104,7 @@ graph LR
 | `technical_object_id` | Verknüpft eine Meldung mit dem technischen Objekt, auf das sie sich bezieht. Referenziert `technical_objects.to_id`. | 1 technisches Objekt → viele Meldungen |
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
-| `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. | 1 Person → 1..N Mietverhältnisse pro Objekt |
+| `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_header` ein String, bei `booking_positions` eine Zahl — vor einem Join über diese Grenze den Warnhinweis unten lesen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
 | `tenancy_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits` und `contract_ends` teilen denselben Wert — direkt darüber verknüpfen, ohne `property_id`. | 1 Mietverhältnis → viele Soll-/Ende-Zeilen |
 | `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits` und `contract_ends`. | 1 Einheit → viele Zeilen |
 | `asset_id` | Verknüpft eine Abschreibungsbuchung mit dem Anlagegut, auf das sie abschreibt. Jede `depreciation`-Zeile löst sich gegen `assets` auf. | 1 Anlagegut → viele Buchungen |
@@ -119,8 +119,11 @@ graph LR
 
 <Warning>
   `person_id` kommt bei `tenants` und `booking_header` als JSON-String zurück, bei
-  `booking_positions` dagegen als Zahl. Vor einem Join über diese Grenze hinweg auf einen
-  gemeinsamen Typ casten — ein strikter Gleichheitsvergleich auf den Rohwerten liefert
-  stillschweigend keine Zeilen. `floor_area_id` hat dasselbe Problem umgekehrt: überall eine
-  Zahl, außer bei `contract_debits`, wo es ein String ist.
+  `booking_positions` dagegen als Zahl — und die String-Form ist opak: führende Nullen in
+  wechselnder Breite, manche Werte mit einem Suffix der Art `"2001-1"`. Ein Cast der Zahl auf
+  String ergibt den Wert **nicht**. `booking_positions` deshalb gar nicht über `person_id` mit
+  einem Mieter verknüpfen, sondern über `booking_header_id` gehen und die `person_id` des
+  Buchungskopfs nutzen. `floor_area_id` hat eine mildere Variante desselben Problems: überall
+  eine Zahl, außer bei `contract_debits`, wo es ein String ist — dort genügt aber ein einfacher
+  Cast.
 </Warning>

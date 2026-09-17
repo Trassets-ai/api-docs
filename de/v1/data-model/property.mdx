@@ -53,12 +53,13 @@ Die v1-Property-Domäne umfasst vier Tabellen: `properties`, `property_structure
   Baujahr des Objekts.
 </ResponseField>
 
-<ResponseField name="longitude" type="number">
-  Längengrad.
+<ResponseField name="longitude" type="string">
+  Längengrad. Dezimalwert als String serialisiert (z. B. `"10.01074219"`), keine JSON-Zahl —
+  vor Rechenoperationen casten.
 </ResponseField>
 
-<ResponseField name="latitude" type="number">
-  Breitengrad.
+<ResponseField name="latitude" type="string">
+  Breitengrad. Gleiche String-Serialisierung wie `longitude`.
 </ResponseField>
 
 <ResponseField name="state_name" type="string">
