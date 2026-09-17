@@ -78,9 +78,9 @@ graph LR
   technical_objects -->|service_contract_id| service_contracts
   booking_header -->|property_id + person_id| tenants
   booking_positions -->|property_id + person_id| tenants
-  tenants -->|tenancy_id| contract_debits["Contracts.contract_debits"]
-  tenants -->|tenancy_id| contract_ends["Contracts.contract_ends"]
-  tenants -->|tenancy_id| index_rent["Contracts.index_rent"]
+  tenants -->|floor_area_person_id| contract_debits["Contracts.contract_debits"]
+  tenants -->|floor_area_person_id| contract_ends["Contracts.contract_ends"]
+  tenants -->|floor_area_person_id| index_rent["Contracts.index_rent"]
   tenants -->|floor_area_id| property_structure
   booking_header -->|property_structure_account_id| property_structure
   booking_positions -->|property_structure_account_id| property_structure
@@ -106,7 +106,7 @@ graph LR
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
 | `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_header` ein String, bei `booking_positions` eine Zahl — vor einem Join über diese Grenze den Warnhinweis unten lesen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
-| `tenancy_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits`, `contract_ends` und `index_rent` teilen denselben Wert — direkt darüber verknüpfen, ohne `property_id`. | 1 Mietverhältnis → viele Soll-/Ende-/Index-Zeilen |
+| `floor_area_person_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits`, `contract_ends` und `index_rent` teilen denselben Wert — direkt darüber verknüpfen, ohne `property_id`. Überall ein Integer, außer bei `contract_debits`, wo es ein String ist — dort vor dem Join casten. | 1 Mietverhältnis → viele Soll-/Ende-/Index-Zeilen |
 | `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits` und `contract_ends`. | 1 Einheit → viele Zeilen |
 | `asset_id` | Verknüpft eine Abschreibungsbuchung mit dem Anlagegut, auf das sie abschreibt. Jede `depreciation`-Zeile löst sich gegen `assets` auf. | 1 Anlagegut → viele Buchungen |
 | `property_structure_account_id` | Fremdschlüssel auf [`Property.property_structure`](/de/v1/data-model/property#property_structure), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
@@ -124,7 +124,7 @@ graph LR
   wechselnder Breite, manche Werte mit einem Suffix der Art `"2001-1"`. Ein Cast der Zahl auf
   String ergibt den Wert **nicht**. `booking_positions` deshalb gar nicht über `person_id` mit
   einem Mieter verknüpfen, sondern über `booking_header_id` gehen und die `person_id` des
-  Buchungskopfs nutzen. `floor_area_id` hat eine mildere Variante desselben Problems: überall
-  eine Zahl, außer bei `contract_debits`, wo es ein String ist — dort genügt aber ein einfacher
-  Cast.
+  Buchungskopfs nutzen. `floor_area_id` und `floor_area_person_id` haben eine mildere Variante
+  desselben Problems: überall eine Zahl, außer bei `contract_debits`, wo es Strings sind — dort
+  genügt aber ein einfacher Cast.
 </Warning>
