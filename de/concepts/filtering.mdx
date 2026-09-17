@@ -17,6 +17,16 @@ GET /contracts/contract_debits?property_id=1234&date_begin=2024-01-01
 
 Es gibt keine Bereichs-, Wildcard- oder `OR`-Syntax — ein Query-Parameter matcht Zeilen, bei denen diese Spalte exakt dem angegebenen Wert entspricht. Mehrere Parameter lassen sich kombinieren und werden UND-verknüpft.
 
+### Pflichtfilter
+
+Filter sind bei fast jedem Endpunkt optional, einige verlangen aber einen und beantworten eine Anfrage ohne ihn mit `400 Bad Request`:
+
+```json
+{ "detail": "Missing required filter(s): ['property_id']" }
+```
+
+Aktuell betrifft das `/contracts/contract_ends` (und die `/v1/`-Variante) — dort ist `property_id` immer nötig. Pflichtparameter sind pro Endpunkt im Tab **API-Referenz** als erforderlich markiert; verlasse dich also darauf statt auf die Annahme, ein ungefilterter Aufruf funktioniere.
+
 <Note>
   Raw-Endpunkte (`/raw/{table_name}`) unterstützen diese Filter nicht — sie liefern immer die vollständige, unfilterte Tabelle, paginiert per Cursor. Siehe [Endpoint Types](/de/concepts/endpoint-types).
 </Note>

@@ -23,8 +23,17 @@ Category endpoints accept `limit` and `offset` query parameters. The API returns
 </ResponseField>
 
 <ResponseField name="X-Next-Cursor" type="string">
-  An opaque cursor for the next page. Present only when a full page was returned. You can pass this as the `cursor` query parameter on the next request instead of using `offset`.
+  An opaque cursor for the next page. Present only when a full page was returned **and** the endpoint supports cursor pagination — see the note below. You can pass this as the `cursor` query parameter on the next request instead of using `offset`.
 </ResponseField>
+
+<Note>
+  Not every category endpoint supports cursor pagination. Where the underlying table has no
+  sort column or primary key configured, no `X-Next-Cursor` header comes back, and passing
+  `?cursor=` returns `400 Bad Request` with `"Cursor-based pagination not available: table has
+  no sort_col or primary key configured"`. Treat the presence of the header as the signal:
+  if it's missing on a full page, page through with `limit`/`offset`, which works on every
+  category endpoint.
+</Note>
 
 This example fetches page 2 with an offset of 100:
 

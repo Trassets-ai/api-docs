@@ -22,7 +22,7 @@ Category endpoints return normalized, business-ready data. They support `limit` 
 - `X-Total-Count` — total rows matching the query
 - `X-Has-More` — `"true"` or `"false"`
 - `X-Next-Offset` — the offset for the next page
-- `X-Next-Cursor` — an opaque cursor when a full page is returned
+- `X-Next-Cursor` — an opaque cursor when a full page is returned, on the endpoints that support cursor pagination; absent where the table has no cursor column, see [Pagination](/concepts/pagination)
 
 ### Raw endpoints
 

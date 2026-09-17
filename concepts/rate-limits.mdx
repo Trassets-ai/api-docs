@@ -22,7 +22,11 @@ When you hit the rate limit, the API responds with an RFC 7807 problem JSON body
 
 ## Handling Rate Limits
 
-Every response includes `X-RateLimit-Limit` and `X-RateLimit-Remaining` headers so you can throttle proactively instead of waiting for a 429.
+Every response includes three headers so you can throttle proactively instead of waiting for a 429:
+
+- `X-RateLimit-Limit` — requests allowed in the window (`500`)
+- `X-RateLimit-Remaining` — requests left in the current window
+- `X-RateLimit-Reset` — Unix timestamp in seconds at which the window resets
 
 If you do receive a 429 response, use the `Retry-After` header instead of guessing a wait time:
 
