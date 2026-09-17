@@ -33,8 +33,9 @@ description: "The tables available under /v1/ and how they join — Accounting, 
 </CardGroup>
 
 <Note>
-  These tables have no `/v1/` endpoint yet: `Accounting.kontenmapping_ranges` and
-  `Operations.offers`/`orders`. Fetch them via the unversioned path in the meantime — see the
+  `Operations.offers` and `orders` have no `/v1/` endpoint yet — fetch them via the
+  unversioned path in the meantime. `Accounting.kontenmapping_ranges` is not getting one at
+  all and stays on the unversioned path permanently. All three are documented in the
   [full data model](/data-model/overview).
 </Note>
 
