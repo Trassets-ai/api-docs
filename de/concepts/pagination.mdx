@@ -38,7 +38,7 @@ Category-Endpunkte akzeptieren die Query-Parameter `limit` und `offset`. Die API
 Dieses Beispiel ruft Seite 2 mit einem Offset von 100 ab:
 
 ```bash
-curl -G "https://api.trassets.ai/property/properties" \
+curl -G "https://api.trassets.ai/v1/property/properties" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=100" \
   -d "offset=100"
@@ -72,15 +72,15 @@ Dieses Beispiel ruft die erste Seite ab und nutzt dann den Cursor, um fortzufahr
 
 ```bash
 # First page
-curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+curl -G "https://api.trassets.ai/raw/sollart" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=5000"
 
 # Next page (use the next_cursor value from the previous response)
-curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+curl -G "https://api.trassets.ai/raw/sollart" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=5000" \
-  -d "cursor=eyJjb2wiOiAiY29udHJhY3RfaWQiLCAidmFsIjogMX0="
+  -d "cursor=eyJjb2wiOiAiSERSX0lEIiwgInZhbCI6IDF9"
 ```
 
 Wenn `next_cursor` `null` ist, ist der Export abgeschlossen.

@@ -15,7 +15,7 @@ Use these endpoints for day-to-day integrations, dashboards, and incremental dat
 Example request to a category endpoint:
 
 ```bash
-curl -G "https://api.trassets.ai/property/properties" \
+curl -G "https://api.trassets.ai/v1/property/properties" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=10" \
   -d "offset=0"
@@ -30,7 +30,7 @@ Use these endpoints for bulk synchronization, full-table exports, and loading da
 Example request to a raw endpoint:
 
 ```bash
-curl -G "https://api.trassets.ai/raw/ixhaus_contracts" \
+curl -G "https://api.trassets.ai/raw/sollart" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=5000"
 ```
