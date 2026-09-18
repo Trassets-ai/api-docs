@@ -20,10 +20,10 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
     ```json
     [
       {
-        "table_name": "ixhaus_contracts",
-        "primary_key": "contract_id",
+        "table_name": "kontenmapping_ranges",
+        "primary_key": "Objektbereich",
         "status": "synced",
-        "row_count": 12500,
+        "row_count": 71,
         "last_sync_at": "2026-04-10T08:00:00"
       }
     ]
@@ -33,7 +33,7 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
     Fordere die erste Seite der gewünschten Tabelle an. Setze `limit` bis zum Maximum von `10000`.
 
     ```bash
-    curl -s "https://api.trassets.ai/raw/ixhaus_contracts?limit=10000" \
+    curl -s "https://api.trassets.ai/raw/kontenmapping_ranges?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -42,12 +42,12 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
     ```json
     {
       "data": [
-        { "contract_id": 1, "tenant": "Müller GmbH" }
+        { "Objektbereich": "1-9999", "Position": "Netto Mieteinnahmen" }
       ],
       "count": 1,
-      "next_cursor": "eyJjb2wiOiAiY29udHJhY3RfaWQiLCAidmFsIjogMX0=",
-      "table_name": "ixhaus_contracts",
-      "total_rows": 12500
+      "next_cursor": "eyJjb2wiOiAiT2JqZWt0YmVyZWljaCIsICJ2YWwiOiAiMS05OTk5In0=",
+      "table_name": "kontenmapping_ranges",
+      "total_rows": 71
     }
     ```
   </Step>
@@ -56,7 +56,7 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
 
     ```bash
     #!/bin/bash
-    TABLE="ixhaus_contracts"
+    TABLE="kontenmapping_ranges"
     CURSOR=""
     
     while true; do
@@ -81,7 +81,7 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
     Prüfe bei jeder Seite den Response-Header `X-Snapshot-At`. Alle Zeilen innerhalb einer einzelnen Cursor-Sequenz sind zu diesem Zeitstempel konsistent. Wenn sich der Header zwischen den Seiten ändert, starte den Export neu, um eine einheitliche Snapshot-Sicht sicherzustellen.
 
     ```bash
-    curl -sI "https://api.trassets.ai/raw/ixhaus_contracts?limit=10000" \
+    curl -sI "https://api.trassets.ai/raw/kontenmapping_ranges?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY" | grep -i x-snapshot-at
     ```
   </Step>
@@ -134,7 +134,7 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
 
 
     if __name__ == "__main__":
-        rows, snapshot_at = export_table("ixhaus_contracts")
+        rows, snapshot_at = export_table("kontenmapping_ranges")
         print(f"Exported {len(rows)} rows as of snapshot {snapshot_at}")
     ```
   </Step>

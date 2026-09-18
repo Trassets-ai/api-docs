@@ -178,9 +178,11 @@
                     "group": "Core Concepts",
                     "pages": [
                       "v1/response-shape-conventions",
+                      "concepts/endpoint-types",
                       "concepts/errors",
                       "concepts/rate-limits",
                       "concepts/filtering",
+                      "concepts/pagination",
                       "concepts/sync-cycle",
                       "concepts/versioning"
                     ]
@@ -263,9 +265,11 @@
                     "group": "Kernkonzepte",
                     "pages": [
                       "de/v1/response-shape-conventions",
+                      "de/concepts/endpoint-types",
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
                       "de/concepts/filtering",
+                      "de/concepts/pagination",
                       "de/concepts/sync-cycle",
                       "de/concepts/versioning"
                     ]
