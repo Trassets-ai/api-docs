@@ -6,11 +6,6 @@ description: "Field-level reference for the v1 Operations tables notifications a
 
 The v1 Operations domain covers two tables: `notifications` and `projects`.
 
-<Note>
-  `offers` and `orders` have no `/v1/` endpoint yet — fetch them via the unversioned path in
-  the meantime, see the [full data model](/data-model/operations).
-</Note>
-
 ## How Operations connects to other domains
 
 `property_id` links both tables back to `Property.properties`; `technical_object_id`
@@ -189,8 +184,8 @@ For the full cross-domain diagram and join-key cardinalities, see the
 </ResponseField>
 
 <ResponseField name="offer_id" type="integer">
-  Related offer, populated on roughly 60% of rows. `offers` has no `/v1/` endpoint yet (see
-  the note above), so this can't be resolved through `/v1/` today.
+  Related offer, populated on roughly 60% of rows. `offers` has no `/v1/` endpoint yet, so this
+  can't be resolved through `/v1/` today.
 </ResponseField>
 
 <ResponseField name="offer_nr" type="string">

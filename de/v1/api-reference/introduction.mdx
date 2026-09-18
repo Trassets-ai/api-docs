@@ -1,7 +1,7 @@
 ---
 title: "Data API v1 Referenz: Endpunkt-Übersicht"
 sidebarTitle: "Introduction"
-description: "Überblick über die /v1/-Endpunkte: Basis-URL, Authentifizierung, Response-Header, Fehler und die unversionierten Endpunkte ohne /v1/-Pendant."
+description: "Überblick über die /v1/-Endpunkte: Basis-URL, Authentifizierung, Response-Header, Fehler und die Endpunkt-Gruppen ohne Versions-Präfix."
 ---
 
 Die `/v1/`-Endpunkte sind die versionierte Schnittstelle auf dieselben Immobiliendaten. Basis-URL: `https://api.trassets.ai`. Sende deinen API-Key im `X-API-Key`-Header bei jedem Request. Alle Antworten sind JSON.
@@ -15,7 +15,7 @@ Jede `/v1/`-Response ist ein JSON-Array auf oberster Ebene — es gibt keinen um
 | Category-Endpunkte | `/v1/{category}/{api_table}` | Offset-basiert (`limit` / `offset`) plus Cursor-Unterstützung | Business-Abfragen, Dashboards, inkrementelle Abrufe |
 | Raw-Endpunkte | `/raw/{table_name}` | Cursor-basiert (`cursor` aus `next_cursor` im Body) | Bulk-Sync, vollständige Exporte, Data Warehousing |
 
-Raw-Endpunkte sind unversioniert: Sie legen Quelltabellen unterhalb der Modellschicht offen, deshalb gibt es keine `/v1/`-Variante.
+Raw-Endpunkte tragen kein Versions-Präfix: Sie legen Quelltabellen unterhalb der Modellschicht offen, deshalb gibt es keine `/v1/`-Variante.
 
 ### Response-Header
 
@@ -32,7 +32,7 @@ Fehler folgen [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versionierung
 
-Tabellen werden schrittweise nach `/v1/` migriert, parallel zum unversionierten Basis-Pfad — beide funktionieren heute, ohne Weiterleitung und ohne bestätigtes Sunset-Datum für unversionierte Pfade. Siehe [Versionierung](/de/concepts/versioning) für den aktuellen Rollout-Stand.
+Tabellen werden schrittweise nach `/v1/` migriert. Siehe [Versionierung](/de/concepts/versioning) für den aktuellen Rollout-Stand.
 
 ## Endpunkt-Gruppen
 
@@ -62,15 +62,15 @@ Tabellen werden schrittweise nach `/v1/` migriert, parallel zum unversionierten 
   </Card>
 </CardGroup>
 
-Nicht jede unversionierte Tabelle hat ein `/v1/`-Pendant. `offers` und `orders` gibt es bislang nur auf dem Basis-Pfad, `kontenmapping_ranges` bleibt dauerhaft dort. Die [Datenmodell-Übersicht](/de/v1/data-model/overview) listet, was `/v1/` heute abdeckt.
+Die [Datenmodell-Übersicht](/de/v1/data-model/overview) listet, was `/v1/` heute abdeckt.
 
-## Unversionierte Endpunkte
+## Endpunkt-Gruppen ohne Versions-Präfix
 
 Vier Endpunkt-Gruppen existieren einmal für die gesamte API und tragen kein `/v1/`-Präfix. Sie stehen in der Seitenleiste unterhalb der Kategorien.
 
 | Gruppe | Endpunkt | Was unter `/v1/` zu erwarten ist |
 | --- | --- | --- |
-| Catalog | `GET /catalog` | Listet die **unversionierten** Kategorien und Tabellen, nicht das `/v1/`-Set. Für das `/v1/`-Inventar die [Datenmodell-Übersicht](/de/v1/data-model/overview) nutzen. |
-| Delta Sync | `GET /changes` | Liefert Sync-Zeitstempel pro Tabelle; das Feld `endpoint_url` zeigt auf unversionierte Pfade. Benötigt den Parameter `since` (ISO-8601 UTC). |
+| Catalog | `GET /catalog` | Listet alle Kategorien und Tabellen, die die API bereitstellt. Für das `/v1/`-Inventar die [Datenmodell-Übersicht](/de/v1/data-model/overview) nutzen. |
+| Delta Sync | `GET /changes` | Liefert Sync-Zeitstempel pro Tabelle. Benötigt den Parameter `since` (ISO-8601 UTC). |
 | Meta | `GET /meta/{api_table}/values/{column}` | Lookup-Werte für eine Spalte, sofern für deinen Key konfiguriert. Andernfalls `404 Not Found` mit `"No lookup values configured"`. |
-| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Quelltabellen unterhalb der Modellschicht — von der `/v1/`-Migration unberührt. |
+| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Quelltabellen unterhalb der Modellschicht, ohne eigenes Versions-Präfix. |

@@ -5,7 +5,7 @@ description: "Vorschau auf die versionierte Data API: welche Tabellen unter /v1/
 ---
 
 <Warning>
-  `/v1/` ist live, aber noch nicht vollständig: Tabellen kommen einzeln hinzu. Der Tab **API-Referenz** zeigt immer den aktuellen Stand — eine in der unversionierten API gelistete Tabelle ist nicht automatisch auch unter `/v1/` erreichbar.
+  `/v1/` ist live, aber noch nicht vollständig: Tabellen kommen einzeln hinzu. Der Tab **API-Referenz** zeigt immer den aktuellen Stand — nicht davon ausgehen, dass eine Tabelle unter `/v1/` erreichbar ist, nur weil sie schon mal genutzt wurde.
 </Warning>
 
-`/v1/` liefert Daten unter dem Pfad-Präfix `/v1/{category}/{api_table}`, mit Responses nach den Regeln der [Response-Struktur](/de/v1/response-shape-conventions). Für eine Tabelle, die noch keinen `/v1/`-Endpunkt hat, weiterhin den unversionierten Pfad nutzen.
+`/v1/` liefert Daten unter dem Pfad-Präfix `/v1/{category}/{api_table}`, mit Responses nach den Regeln der [Response-Struktur](/de/v1/response-shape-conventions).

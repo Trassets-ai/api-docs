@@ -24,9 +24,3 @@ tables, which is exactly why they're worth checking here first.
 | `cost_center_id` | string | Cost centre reference. Appears on `notifications` and `projects`; no `/v1/` cost-centre endpoint exists yet to resolve it against. |
 | `booking_date` | date | ISO-8601 date of the ledger booking. Appears on `booking_header` and `booking_positions`. |
 | `dms_link` | string | Link to the related document in the document management system, if attached. Appears on `booking_header`, `creditor`, `properties`, `property_structure`, and `tenants`. |
-
-<Note>
-  Fields prefixed with `sk_` are internal surrogate keys. None of the tables documented under
-  `/v1/` currently expose one, but if you encounter one via the **API Reference** tab, don't
-  rely on it as a stable identifier.
-</Note>
