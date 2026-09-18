@@ -15,6 +15,49 @@ join keys.
   unversioned path.
 </Note>
 
+## How Accounting connects to other domains
+
+`property_id` links `booking_header` and `budgets` back to `Property.properties`.
+`account_id` chains `booking_positions` and `budgets` into `accounts`, and reaches out to
+`Contracts.contract_debit_diffs`.
+
+```mermaid
+graph LR
+  subgraph Accounting
+    booking_header["booking_header"]
+    booking_positions["booking_positions"]
+    accounts["accounts"]
+    budgets["budgets"]
+  end
+
+  properties["Property.properties"]
+  property_structure["Property.property_structure"]
+  contract_debit_diffs["Contracts.contract_debit_diffs"]
+  tenants["Stakeholder.tenants"]
+  creditor["Stakeholder.creditor"]
+
+  properties -.->|property_id| booking_header
+  properties -.->|property_id| budgets
+
+  booking_header -->|booking_header_id| booking_positions
+  booking_positions -->|account_id| accounts
+  budgets -->|account_id| accounts
+  contract_debit_diffs -.->|account_id| accounts
+
+  booking_header -.->|property_id + person_id| tenants
+  booking_positions -.->|property_id + person_id| tenants
+  booking_header -.->|property_structure_account_id| property_structure
+  booking_positions -.->|property_structure_account_id| property_structure
+
+  creditor -.->|creditor_id| booking_header
+  creditor -.->|creditor_id| booking_positions
+```
+
+*Solid edges are joins within a domain; dashed edges cross into another domain.*
+
+For the full cross-domain diagram and join-key cardinalities, see the
+[v1 data model overview](/v1/data-model/overview#how-the-v1-tables-connect).
+
 ## accounts
 
 `GET /v1/accounting/accounts` — the chart of accounts.

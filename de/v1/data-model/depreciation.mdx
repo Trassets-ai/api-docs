@@ -9,6 +9,29 @@ Die v1-Depreciation-Domäne umfasst zwei Tabellen: `assets` (die Anlagegüter-St
 [Response-Struktur](/de/v1/response-shape-conventions). Über `asset_id` verknüpft ergeben
 sie den vollständigen Abschreibungsplan eines Anlageguts.
 
+## Wie Depreciation mit anderen Domänen zusammenhängt
+
+`property_id` verknüpft `assets` mit `Property.properties`; `asset_id` verkettet `assets`
+mit `depreciation`.
+
+```mermaid
+graph LR
+  subgraph Depreciation
+    assets["assets"]
+    depreciation["depreciation"]
+  end
+
+  properties["Property.properties"]
+
+  properties -.->|property_id| assets
+  assets -->|asset_id| depreciation
+```
+
+*Durchgezogene Kanten sind Joins innerhalb einer Domäne; gestrichelte Kanten gehen in eine andere Domäne.*
+
+Das vollständige domänenübergreifende Diagramm und die Kardinalitäten der Join-Keys stehen
+in der [v1-Datenmodell-Übersicht](/de/v1/data-model/overview#wie-die-v1-tabellen-zusammenhängen).
+
 ## assets
 
 `GET /v1/depreciation/assets` — Anlagegüter-Stammdaten.

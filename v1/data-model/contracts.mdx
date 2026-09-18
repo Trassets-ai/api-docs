@@ -8,6 +8,45 @@ The v1 Contracts domain covers five tables: `service_contracts`, `contract_debit
 `contract_debit_diffs`, `contract_ends`, and `index_rent`, all of which follow the [response
 structure](/v1/response-shape-conventions) rules.
 
+## How Contracts connects to other domains
+
+`property_id` links `service_contracts` and `contract_debit_diffs` back to
+`Property.properties`; `floor_area_person_id` links `contract_debits`, `contract_ends`, and
+`index_rent` to `Stakeholder.tenants`.
+
+```mermaid
+graph LR
+  subgraph Contracts
+    service_contracts["service_contracts"]
+    contract_debit_diffs["contract_debit_diffs"]
+    contract_debits["contract_debits"]
+    contract_ends["contract_ends"]
+    index_rent["index_rent"]
+  end
+
+  properties["Property.properties"]
+  technical_objects["Property.technical_objects"]
+  accounts["Accounting.accounts"]
+  tenants["Stakeholder.tenants"]
+  creditor["Stakeholder.creditor"]
+
+  properties -.->|property_id| service_contracts
+  properties -.->|property_id| contract_debit_diffs
+
+  technical_objects -.->|service_contract_id| service_contracts
+  contract_debit_diffs -.->|account_id| accounts
+  creditor -.->|creditor_id| service_contracts
+
+  tenants -.->|floor_area_person_id| contract_debits
+  tenants -.->|floor_area_person_id| contract_ends
+  tenants -.->|floor_area_person_id| index_rent
+```
+
+*Solid edges are joins within a domain; dashed edges cross into another domain. This domain has no direct internal joins — every table here links out to another domain instead.*
+
+For the full cross-domain diagram and join-key cardinalities, see the
+[v1 data model overview](/v1/data-model/overview#how-the-v1-tables-connect).
+
 ## service_contracts
 
 `GET /v1/contracts/service_contracts` — maintenance and service contracts.

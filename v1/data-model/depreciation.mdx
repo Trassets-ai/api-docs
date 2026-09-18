@@ -9,6 +9,29 @@ The v1 Depreciation domain covers two tables: `assets` (the fixed-asset master d
 structure](/v1/response-shape-conventions) rules. Join them on `asset_id` to assemble a
 full depreciation schedule for an asset.
 
+## How Depreciation connects to other domains
+
+`property_id` links `assets` back to `Property.properties`; `asset_id` chains `assets`
+into `depreciation`.
+
+```mermaid
+graph LR
+  subgraph Depreciation
+    assets["assets"]
+    depreciation["depreciation"]
+  end
+
+  properties["Property.properties"]
+
+  properties -.->|property_id| assets
+  assets -->|asset_id| depreciation
+```
+
+*Solid edges are joins within a domain; dashed edges cross into another domain.*
+
+For the full cross-domain diagram and join-key cardinalities, see the
+[v1 data model overview](/v1/data-model/overview#how-the-v1-tables-connect).
+
 ## assets
 
 `GET /v1/depreciation/assets` — fixed-asset master data.

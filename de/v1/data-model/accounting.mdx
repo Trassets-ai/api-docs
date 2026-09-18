@@ -15,6 +15,49 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
   unversionierten Pfad verfügbar.
 </Note>
 
+## Wie Accounting mit anderen Domänen zusammenhängt
+
+`property_id` verknüpft `booking_header` und `budgets` mit `Property.properties`.
+`account_id` verkettet `booking_positions` und `budgets` mit `accounts` und reicht bis zu
+`Contracts.contract_debit_diffs`.
+
+```mermaid
+graph LR
+  subgraph Accounting
+    booking_header["booking_header"]
+    booking_positions["booking_positions"]
+    accounts["accounts"]
+    budgets["budgets"]
+  end
+
+  properties["Property.properties"]
+  property_structure["Property.property_structure"]
+  contract_debit_diffs["Contracts.contract_debit_diffs"]
+  tenants["Stakeholder.tenants"]
+  creditor["Stakeholder.creditor"]
+
+  properties -.->|property_id| booking_header
+  properties -.->|property_id| budgets
+
+  booking_header -->|booking_header_id| booking_positions
+  booking_positions -->|account_id| accounts
+  budgets -->|account_id| accounts
+  contract_debit_diffs -.->|account_id| accounts
+
+  booking_header -.->|property_id + person_id| tenants
+  booking_positions -.->|property_id + person_id| tenants
+  booking_header -.->|property_structure_account_id| property_structure
+  booking_positions -.->|property_structure_account_id| property_structure
+
+  creditor -.->|creditor_id| booking_header
+  creditor -.->|creditor_id| booking_positions
+```
+
+*Durchgezogene Kanten sind Joins innerhalb einer Domäne; gestrichelte Kanten gehen in eine andere Domäne.*
+
+Das vollständige domänenübergreifende Diagramm und die Kardinalitäten der Join-Keys stehen
+in der [v1-Datenmodell-Übersicht](/de/v1/data-model/overview#wie-die-v1-tabellen-zusammenhängen).
+
 ## accounts
 
 `GET /v1/accounting/accounts` — der Kontenplan.

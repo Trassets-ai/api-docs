@@ -8,6 +8,55 @@ The v1 Stakeholder domain covers four tables: `creditor`, `employees`, `owner`, 
 `tenants`, all of which follow the [response structure](/v1/response-shape-conventions)
 rules.
 
+## How Stakeholder connects to other domains
+
+`property_id` links `tenants`, `owner`, and `employees` back to `Property.properties`.
+`creditor` is the exception — a standalone entity referenced via `creditor_id`, with no
+`property_id` of its own.
+
+```mermaid
+graph LR
+  subgraph Stakeholder
+    creditor["creditor"]
+    employees["employees"]
+    owner["owner"]
+    tenants["tenants"]
+  end
+
+  properties["Property.properties"]
+  technical_objects["Property.technical_objects"]
+  property_creditor_services["Property.property_creditor_services"]
+  property_structure["Property.property_structure"]
+  booking_header["Accounting.booking_header"]
+  booking_positions["Accounting.booking_positions"]
+  service_contracts["Contracts.service_contracts"]
+  contract_debits["Contracts.contract_debits"]
+  contract_ends["Contracts.contract_ends"]
+  index_rent["Contracts.index_rent"]
+
+  properties -.->|property_id| tenants
+  properties -.->|property_id| owner
+  properties -.->|property_id| employees
+
+  creditor -.->|creditor_id| technical_objects
+  creditor -.->|creditor_id| property_creditor_services
+  creditor -.->|creditor_id| service_contracts
+  creditor -.->|creditor_id| booking_header
+  creditor -.->|creditor_id| booking_positions
+
+  booking_header -.->|property_id + person_id| tenants
+  booking_positions -.->|property_id + person_id| tenants
+  tenants -.->|floor_area_person_id| contract_debits
+  tenants -.->|floor_area_person_id| contract_ends
+  tenants -.->|floor_area_person_id| index_rent
+  tenants -.->|floor_area_id| property_structure
+```
+
+*Solid edges are joins within a domain; dashed edges cross into another domain. This domain has no direct internal joins — every table here links out to another domain instead.*
+
+For the full cross-domain diagram and join-key cardinalities, see the
+[v1 data model overview](/v1/data-model/overview#how-the-v1-tables-connect).
+
 ## creditor
 
 `GET /v1/stakeholder/creditor` — vendor and creditor master data. This is the only

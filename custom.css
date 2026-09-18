@@ -10,3 +10,13 @@
   margin-left: auto !important;
   margin-right: auto !important;
 }
+
+/* Mermaid diagrams: smooth grey card instead of the default transparent frame. */
+[data-component-part="mermaid"] {
+  background-color: #f5f5f5 !important;
+  border-radius: 0.75rem !important;
+}
+
+.dark [data-component-part="mermaid"] {
+  background-color: #26282c !important;
+}

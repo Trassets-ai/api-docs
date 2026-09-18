@@ -45,47 +45,85 @@ description: "The tables available under /v1/ and how they join — Accounting, 
 
 ```mermaid
 graph LR
-  properties["Property.properties<br/>(property_id)"]
-  creditor["Stakeholder.creditor<br/>(creditor_id)"]
+  subgraph Property
+    properties["properties"]
+    technical_objects["technical_objects"]
+    property_creditor_services["property_creditor_services"]
+    property_structure["property_structure"]
+  end
 
-  properties -->|property_id| booking_header["Accounting.booking_header"]
-  properties -->|property_id| notifications["Operations.notifications"]
-  properties -->|property_id| projects["Operations.projects"]
-  properties -->|property_id| technical_objects["Property.technical_objects<br/>(to_id)"]
-  properties -->|property_id| property_creditor_services["Property.property_creditor_services"]
-  properties -->|property_id| property_structure["Property.property_structure<br/>(account_id, floor_area_id)"]
-  properties -->|property_id| budgets["Accounting.budgets"]
-  properties -->|property_id| tenants["Stakeholder.tenants"]
-  properties -->|property_id| owner["Stakeholder.owner"]
-  properties -->|property_id| employees["Stakeholder.employees"]
-  properties -->|property_id| service_contracts["Contracts.service_contracts"]
-  properties -->|property_id| contract_debit_diffs["Contracts.contract_debit_diffs"]
-  properties -->|property_id| assets["Depreciation.assets"]
+  subgraph Accounting
+    booking_header["booking_header"]
+    booking_positions["booking_positions"]
+    accounts["accounts"]
+    budgets["budgets"]
+  end
 
-  booking_header -->|booking_header_id| booking_positions["Accounting.booking_positions"]
-  booking_positions -->|account_id| accounts["Accounting.accounts"]
+  subgraph Contracts
+    service_contracts["service_contracts"]
+    contract_debit_diffs["contract_debit_diffs"]
+    contract_debits["contract_debits"]
+    contract_ends["contract_ends"]
+    index_rent["index_rent"]
+  end
+
+  subgraph Depreciation
+    assets["assets"]
+    depreciation["depreciation"]
+  end
+
+  subgraph Operations
+    notifications["notifications"]
+    projects["projects"]
+  end
+
+  subgraph Stakeholder
+    creditor["creditor"]
+    tenants["tenants"]
+    owner["owner"]
+    employees["employees"]
+  end
+
+  properties -.->|property_id| booking_header
+  properties -.->|property_id| notifications
+  properties -.->|property_id| projects
+  properties -->|property_id| technical_objects
+  properties -->|property_id| property_creditor_services
+  properties -->|property_id| property_structure
+  properties -.->|property_id| budgets
+  properties -.->|property_id| tenants
+  properties -.->|property_id| owner
+  properties -.->|property_id| employees
+  properties -.->|property_id| service_contracts
+  properties -.->|property_id| contract_debit_diffs
+  properties -.->|property_id| assets
+
+  booking_header -->|booking_header_id| booking_positions
+  booking_positions -->|account_id| accounts
   budgets -->|account_id| accounts
-  contract_debit_diffs -->|account_id| accounts
-  notifications -->|technical_object_id| technical_objects
+  contract_debit_diffs -.->|account_id| accounts
+  notifications -.->|technical_object_id| technical_objects
   notifications -->|report_id| projects
-  technical_objects -->|service_contract_id| service_contracts
-  booking_header -->|property_id + person_id| tenants
-  booking_positions -->|property_id + person_id| tenants
-  tenants -->|floor_area_person_id| contract_debits["Contracts.contract_debits"]
-  tenants -->|floor_area_person_id| contract_ends["Contracts.contract_ends"]
-  tenants -->|floor_area_person_id| index_rent["Contracts.index_rent"]
-  tenants -->|floor_area_id| property_structure
-  booking_header -->|property_structure_account_id| property_structure
-  booking_positions -->|property_structure_account_id| property_structure
+  technical_objects -.->|service_contract_id| service_contracts
+  booking_header -.->|property_id + person_id| tenants
+  booking_positions -.->|property_id + person_id| tenants
+  tenants -.->|floor_area_person_id| contract_debits
+  tenants -.->|floor_area_person_id| contract_ends
+  tenants -.->|floor_area_person_id| index_rent
+  tenants -.->|floor_area_id| property_structure
+  booking_header -.->|property_structure_account_id| property_structure
+  booking_positions -.->|property_structure_account_id| property_structure
   technical_objects -->|property_structure_account_id| property_structure
-  assets -->|asset_id| depreciation["Depreciation.depreciation"]
+  assets -->|asset_id| depreciation
 
-  creditor -->|creditor_id| technical_objects
-  creditor -->|creditor_id| property_creditor_services
-  creditor -->|creditor_id| service_contracts
-  creditor -->|creditor_id| booking_header
-  creditor -->|creditor_id| booking_positions
+  creditor -.->|creditor_id| technical_objects
+  creditor -.->|creditor_id| property_creditor_services
+  creditor -.->|creditor_id| service_contracts
+  creditor -.->|creditor_id| booking_header
+  creditor -.->|creditor_id| booking_positions
 ```
+
+*Solid edges are joins within a domain; dashed edges cross into another domain.*
 
 ### Join keys in detail
 

@@ -11,6 +11,32 @@ The v1 Operations domain covers two tables: `notifications` and `projects`.
   the meantime, see the [full data model](/data-model/operations).
 </Note>
 
+## How Operations connects to other domains
+
+`property_id` links both tables back to `Property.properties`; `technical_object_id`
+connects `notifications` to `Property.technical_objects`.
+
+```mermaid
+graph LR
+  subgraph Operations
+    notifications["notifications"]
+    projects["projects"]
+  end
+
+  properties["Property.properties"]
+  technical_objects["Property.technical_objects"]
+
+  properties -.->|property_id| notifications
+  properties -.->|property_id| projects
+  notifications -.->|technical_object_id| technical_objects
+  notifications -->|report_id| projects
+```
+
+*Solid edges are joins within a domain; dashed edges cross into another domain.*
+
+For the full cross-domain diagram and join-key cardinalities, see the
+[v1 data model overview](/v1/data-model/overview#how-the-v1-tables-connect).
+
 ## notifications
 
 `GET /v1/operations/notifications` — maintenance reports and damage notifications.

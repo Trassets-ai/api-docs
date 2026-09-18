@@ -7,6 +7,64 @@ description: "Feldreferenz für die v1-Property-Tabellen properties, property_st
 Die v1-Property-Domäne umfasst vier Tabellen: `properties`, `property_structure`,
 `property_creditor_services` und `technical_objects`.
 
+## Wie Property mit anderen Domänen zusammenhängt
+
+`properties` ist der Hub, mit dem jede andere Domäne auf dieser Seite über `property_id`
+verknüpft ist. Durchgezogene Kanten sind die internen Property-Joins; gestrichelte Kanten
+sind ausgehende Joins in andere Domänen.
+
+```mermaid
+graph LR
+  subgraph Property
+    properties["properties"]
+    technical_objects["technical_objects"]
+    property_creditor_services["property_creditor_services"]
+    property_structure["property_structure"]
+  end
+
+  booking_header["Accounting.booking_header"]
+  booking_positions["Accounting.booking_positions"]
+  budgets["Accounting.budgets"]
+  notifications["Operations.notifications"]
+  projects["Operations.projects"]
+  service_contracts["Contracts.service_contracts"]
+  contract_debit_diffs["Contracts.contract_debit_diffs"]
+  assets["Depreciation.assets"]
+  tenants["Stakeholder.tenants"]
+  owner["Stakeholder.owner"]
+  employees["Stakeholder.employees"]
+  creditor["Stakeholder.creditor"]
+
+  properties -->|property_id| technical_objects
+  properties -->|property_id| property_creditor_services
+  properties -->|property_id| property_structure
+  technical_objects -->|property_structure_account_id| property_structure
+
+  properties -.->|property_id| booking_header
+  properties -.->|property_id| notifications
+  properties -.->|property_id| projects
+  properties -.->|property_id| budgets
+  properties -.->|property_id| tenants
+  properties -.->|property_id| owner
+  properties -.->|property_id| employees
+  properties -.->|property_id| service_contracts
+  properties -.->|property_id| contract_debit_diffs
+  properties -.->|property_id| assets
+
+  notifications -.->|technical_object_id| technical_objects
+  technical_objects -.->|service_contract_id| service_contracts
+
+  tenants -.->|floor_area_id| property_structure
+  booking_header -.->|property_structure_account_id| property_structure
+  booking_positions -.->|property_structure_account_id| property_structure
+
+  creditor -.->|creditor_id| technical_objects
+  creditor -.->|creditor_id| property_creditor_services
+```
+
+Das vollständige domänenübergreifende Diagramm und die Kardinalitäten der Join-Keys stehen
+in der [v1-Datenmodell-Übersicht](/de/v1/data-model/overview#wie-die-v1-tabellen-zusammenhängen).
+
 ## properties
 
 `GET /v1/property/properties` — eine Zeile pro Objekt.
