@@ -72,15 +72,15 @@ This example fetches the first page and then uses the cursor to continue:
 
 ```bash
 # First page
-curl -G "https://api.trassets.ai/raw/kontenmapping_ranges" \
+curl -G "https://api.trassets.ai/raw/sollart" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=5000"
 
 # Next page (use the next_cursor value from the previous response)
-curl -G "https://api.trassets.ai/raw/kontenmapping_ranges" \
+curl -G "https://api.trassets.ai/raw/sollart" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=5000" \
-  -d "cursor=eyJjb2wiOiAiT2JqZWt0YmVyZWljaCIsICJ2YWwiOiAiMS05OTk5In0="
+  -d "cursor=eyJjb2wiOiAiSERSX0lEIiwgInZhbCI6IDF9"
 ```
 
 When `next_cursor` is `null`, the export is complete.

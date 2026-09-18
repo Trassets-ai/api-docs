@@ -20,10 +20,10 @@ Export an entire source table from the Data API into your warehouse or analytics
     ```json
     [
       {
-        "table_name": "kontenmapping_ranges",
-        "primary_key": "Objektbereich",
+        "table_name": "sollart",
+        "primary_key": "HDR_ID",
         "status": "synced",
-        "row_count": 71,
+        "row_count": 47,
         "last_sync_at": "2026-04-10T08:00:00"
       }
     ]
@@ -33,7 +33,7 @@ Export an entire source table from the Data API into your warehouse or analytics
     Request the first page of the table you want. Set `limit` up to the maximum of `10000`.
 
     ```bash
-    curl -s "https://api.trassets.ai/raw/kontenmapping_ranges?limit=10000" \
+    curl -s "https://api.trassets.ai/raw/sollart?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -42,12 +42,12 @@ Export an entire source table from the Data API into your warehouse or analytics
     ```json
     {
       "data": [
-        { "Objektbereich": "1-9999", "Position": "Netto Mieteinnahmen" }
+        { "HDR_ID": 1, "BEZ": "Demo" }
       ],
       "count": 1,
-      "next_cursor": "eyJjb2wiOiAiT2JqZWt0YmVyZWljaCIsICJ2YWwiOiAiMS05OTk5In0=",
-      "table_name": "kontenmapping_ranges",
-      "total_rows": 71
+      "next_cursor": "eyJjb2wiOiAiSERSX0lEIiwgInZhbCI6IDF9",
+      "table_name": "sollart",
+      "total_rows": 47
     }
     ```
   </Step>
@@ -56,7 +56,7 @@ Export an entire source table from the Data API into your warehouse or analytics
 
     ```bash
     #!/bin/bash
-    TABLE="kontenmapping_ranges"
+    TABLE="sollart"
     CURSOR=""
     
     while true; do
@@ -81,7 +81,7 @@ Export an entire source table from the Data API into your warehouse or analytics
     Check the `X-Snapshot-At` response header on every page. All rows within a single cursor sequence are consistent as of that timestamp. If the header changes between pages, start the export over to ensure a single snapshot view.
 
     ```bash
-    curl -sI "https://api.trassets.ai/raw/kontenmapping_ranges?limit=10000" \
+    curl -sI "https://api.trassets.ai/raw/sollart?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY" | grep -i x-snapshot-at
     ```
   </Step>
@@ -134,7 +134,7 @@ Export an entire source table from the Data API into your warehouse or analytics
 
 
     if __name__ == "__main__":
-        rows, snapshot_at = export_table("kontenmapping_ranges")
+        rows, snapshot_at = export_table("sollart")
         print(f"Exported {len(rows)} rows as of snapshot {snapshot_at}")
     ```
   </Step>
