@@ -1,7 +1,7 @@
 ---
 title: "Data API v1 Reference: Endpoints Overview"
 sidebarTitle: "Introduction"
-description: "Overview of the /v1/ endpoints: base URL, authentication, response headers, errors, and the unversioned endpoints that have no /v1/ counterpart."
+description: "Overview of the /v1/ endpoints: base URL, authentication, response headers, errors, and the endpoint groups with no version prefix."
 ---
 
 The `/v1/` endpoints are the versioned interface to the same real-estate data. Base URL: `https://api.trassets.ai`. Send your API key in the `X-API-Key` header on every request. All responses are JSON.
@@ -15,7 +15,7 @@ Every `/v1/` response is a top-level JSON array — there is no wrapping envelop
 | Category endpoints | `/v1/{category}/{api_table}` | Offset-based (`limit` / `offset`) plus cursor support | Business queries, dashboards, incremental fetches |
 | Raw endpoints | `/raw/{table_name}` | Cursor-based (`cursor` from `next_cursor` in body) | Bulk sync, full exports, data warehousing |
 
-Raw endpoints are unversioned: they expose source tables below the modelled layer, so there is no `/v1/` variant.
+Raw endpoints carry no version prefix: they expose source tables below the modelled layer, so there is no `/v1/` variant.
 
 ### Response headers
 
@@ -32,7 +32,7 @@ Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versioning
 
-Tables are migrated to `/v1/` one at a time, alongside the unversioned base path — both work today, with no redirect and no confirmed sunset date for unversioned paths yet. See [Versioning](/concepts/versioning) for the current rollout state.
+Tables are migrated to `/v1/` one at a time. See [Versioning](/concepts/versioning) for the current rollout state.
 
 ## Endpoint groups
 
@@ -62,15 +62,15 @@ Tables are migrated to `/v1/` one at a time, alongside the unversioned base path
   </Card>
 </CardGroup>
 
-Not every unversioned table has a `/v1/` counterpart. `offers` and `orders` are still base-path only, and `kontenmapping_ranges` stays there permanently. [Data Model Overview](/v1/data-model/overview) lists what `/v1/` covers today.
+[Data Model Overview](/v1/data-model/overview) lists what `/v1/` covers today.
 
-## Unversioned endpoints
+## Endpoint groups without a version prefix
 
 Four endpoint groups exist once for the whole API and carry no `/v1/` prefix. They are listed in the sidebar below the categories.
 
 | Group | Endpoint | What to expect under `/v1/` |
 | --- | --- | --- |
-| Catalog | `GET /catalog` | Lists the **unversioned** categories and tables, not the `/v1/` set. Use [Data Model Overview](/v1/data-model/overview) for the `/v1/` inventory. |
-| Delta Sync | `GET /changes` | Reports sync timestamps per table; the `endpoint_url` field points at unversioned paths. Requires a `since` parameter (ISO-8601 UTC). |
+| Catalog | `GET /catalog` | Lists all categories and tables exposed by the API. Use [Data Model Overview](/v1/data-model/overview) for the `/v1/` inventory. |
+| Delta Sync | `GET /changes` | Reports sync timestamps per table. Requires a `since` parameter (ISO-8601 UTC). |
 | Meta | `GET /meta/{api_table}/values/{column}` | Lookup values for a column, where they are configured for your key. Returns `404 Not Found` with `"No lookup values configured"` otherwise. |
-| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Source tables below the modelled layer — unaffected by the `/v1/` migration. |
+| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Source tables below the modelled layer, with no version prefix of their own. |

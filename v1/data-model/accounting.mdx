@@ -9,12 +9,6 @@ The v1 Accounting domain covers four tables: `accounts`, `booking_header`,
 structure](/v1/response-shape-conventions) rules — nested `period`/`amount` objects and flat
 join keys.
 
-<Note>
-  `kontenmapping_ranges` is not getting a `/v1/` endpoint — it stays available as
-  [`Accounting.kontenmapping_ranges`](/data-model/accounting#kontenmapping_ranges) on the
-  unversioned path.
-</Note>
-
 ## How Accounting connects to other domains
 
 `property_id` links `booking_header` and `budgets` back to `Property.properties`.
