@@ -32,13 +32,6 @@ description: "The tables available under /v1/ and how they join — Accounting, 
   </Card>
 </CardGroup>
 
-<Note>
-  `Operations.offers` and `orders` have no `/v1/` endpoint yet — fetch them via the
-  unversioned path in the meantime. `Accounting.kontenmapping_ranges` is not getting one at
-  all and stays on the unversioned path permanently. All three are documented in the
-  [full data model](/data-model/overview).
-</Note>
-
 ## How the v1 tables connect
 
 `property_id` is the join key shared across every table on this page.

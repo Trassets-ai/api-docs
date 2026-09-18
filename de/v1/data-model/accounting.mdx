@@ -9,12 +9,6 @@ Die v1-Accounting-Domäne umfasst vier Tabellen: `accounts`, `booking_header`,
 [Response-Struktur](/de/v1/response-shape-conventions) — verschachtelte
 `period`-/`amount`-Objekte und flache Join-Keys.
 
-<Note>
-  `kontenmapping_ranges` bekommt keinen `/v1/`-Endpunkt — die Tabelle bleibt als
-  [`Accounting.kontenmapping_ranges`](/de/data-model/accounting#kontenmapping_ranges) auf dem
-  unversionierten Pfad verfügbar.
-</Note>
-
 ## Wie Accounting mit anderen Domänen zusammenhängt
 
 `property_id` verknüpft `booking_header` und `budgets` mit `Property.properties`.

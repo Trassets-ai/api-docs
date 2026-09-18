@@ -5,7 +5,7 @@ description: "Preview of the versioned Data API: which tables are available unde
 ---
 
 <Warning>
-  `/v1/` is live but not yet complete: tables are added one at a time. The **API Reference** tab always shows what is available right now — a table listed under the unversioned API is not automatically reachable under `/v1/`.
+  `/v1/` is live but not yet complete: tables are added one at a time. The **API Reference** tab always shows what is available right now — don't assume a table is reachable under `/v1/` just because you've used it before.
 </Warning>
 
-`/v1/` serves data under a `/v1/{category}/{api_table}` path prefix, with responses that follow the [response structure](/v1/response-shape-conventions) rules. For a table that has no `/v1/` endpoint yet, keep using the unversioned path.
+`/v1/` serves data under a `/v1/{category}/{api_table}` path prefix, with responses that follow the [response structure](/v1/response-shape-conventions) rules.
