@@ -24,9 +24,3 @@ Bedeutungen, genau deshalb lohnt sich der Blick hierher.
 | `cost_center_id` | string | Kostenstellen-Referenz. Kommt bei `notifications` und `projects` vor; es gibt noch keinen `/v1/`-Kostenstellen-Endpunkt, um sie aufzulösen. |
 | `booking_date` | date | ISO-8601-Datum der Buchhaltungsbuchung. Kommt bei `booking_header` und `booking_positions` vor. |
 | `dms_link` | string | Link zum zugehörigen Dokument im Dokumentenmanagementsystem, falls vorhanden. Kommt bei `booking_header`, `creditor`, `properties`, `property_structure` und `tenants` vor. |
-
-<Note>
-  Felder mit dem Präfix `sk_` sind interne Surrogatschlüssel. Keine der aktuell unter `/v1/`
-  dokumentierten Tabellen legt einen solchen offen, aber falls dir im Tab **API-Referenz**
-  einer begegnet: nicht als stabilen Identifikator verwenden.
-</Note>
