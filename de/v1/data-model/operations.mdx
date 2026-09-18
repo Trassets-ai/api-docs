@@ -11,6 +11,32 @@ Die v1-Operations-Domäne umfasst zwei Tabellen: `notifications` und `projects`.
   unversionierten Pfad abrufen, siehe das [vollständige Datenmodell](/de/data-model/operations).
 </Note>
 
+## Wie Operations mit anderen Domänen zusammenhängt
+
+`property_id` verknüpft beide Tabellen mit `Property.properties`; `technical_object_id`
+verbindet `notifications` mit `Property.technical_objects`.
+
+```mermaid
+graph LR
+  subgraph Operations
+    notifications["notifications"]
+    projects["projects"]
+  end
+
+  properties["Property.properties"]
+  technical_objects["Property.technical_objects"]
+
+  properties -.->|property_id| notifications
+  properties -.->|property_id| projects
+  notifications -.->|technical_object_id| technical_objects
+  notifications -->|report_id| projects
+```
+
+*Durchgezogene Kanten sind Joins innerhalb einer Domäne; gestrichelte Kanten gehen in eine andere Domäne.*
+
+Das vollständige domänenübergreifende Diagramm und die Kardinalitäten der Join-Keys stehen
+in der [v1-Datenmodell-Übersicht](/de/v1/data-model/overview#wie-die-v1-tabellen-zusammenhängen).
+
 ## notifications
 
 `GET /v1/operations/notifications` — Instandhaltungs- und Schadensmeldungen.

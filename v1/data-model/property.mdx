@@ -7,6 +7,63 @@ description: "Field-level reference for the v1 Property tables properties, prope
 The v1 Property domain covers four tables: `properties`, `property_structure`,
 `property_creditor_services`, and `technical_objects`.
 
+## How Property connects to other domains
+
+`properties` is the hub every other domain on this page joins to via `property_id`. Solid
+edges are the internal Property joins; dashed edges are outbound joins into other domains.
+
+```mermaid
+graph LR
+  subgraph Property
+    properties["properties"]
+    technical_objects["technical_objects"]
+    property_creditor_services["property_creditor_services"]
+    property_structure["property_structure"]
+  end
+
+  booking_header["Accounting.booking_header"]
+  booking_positions["Accounting.booking_positions"]
+  budgets["Accounting.budgets"]
+  notifications["Operations.notifications"]
+  projects["Operations.projects"]
+  service_contracts["Contracts.service_contracts"]
+  contract_debit_diffs["Contracts.contract_debit_diffs"]
+  assets["Depreciation.assets"]
+  tenants["Stakeholder.tenants"]
+  owner["Stakeholder.owner"]
+  employees["Stakeholder.employees"]
+  creditor["Stakeholder.creditor"]
+
+  properties -->|property_id| technical_objects
+  properties -->|property_id| property_creditor_services
+  properties -->|property_id| property_structure
+  technical_objects -->|property_structure_account_id| property_structure
+
+  properties -.->|property_id| booking_header
+  properties -.->|property_id| notifications
+  properties -.->|property_id| projects
+  properties -.->|property_id| budgets
+  properties -.->|property_id| tenants
+  properties -.->|property_id| owner
+  properties -.->|property_id| employees
+  properties -.->|property_id| service_contracts
+  properties -.->|property_id| contract_debit_diffs
+  properties -.->|property_id| assets
+
+  notifications -.->|technical_object_id| technical_objects
+  technical_objects -.->|service_contract_id| service_contracts
+
+  tenants -.->|floor_area_id| property_structure
+  booking_header -.->|property_structure_account_id| property_structure
+  booking_positions -.->|property_structure_account_id| property_structure
+
+  creditor -.->|creditor_id| technical_objects
+  creditor -.->|creditor_id| property_creditor_services
+```
+
+For the full cross-domain diagram and join-key cardinalities, see the
+[v1 data model overview](/v1/data-model/overview#how-the-v1-tables-connect).
+
 ## properties
 
 `GET /v1/property/properties` — one row per property object.

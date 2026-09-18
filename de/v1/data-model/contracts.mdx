@@ -8,6 +8,45 @@ Die v1-Contracts-Domäne umfasst fünf Tabellen: `service_contracts`, `contract_
 `contract_debit_diffs`, `contract_ends` und `index_rent`, die alle den Regeln der
 [Response-Struktur](/de/v1/response-shape-conventions) folgen.
 
+## Wie Contracts mit anderen Domänen zusammenhängt
+
+`property_id` verknüpft `service_contracts` und `contract_debit_diffs` mit
+`Property.properties`; `floor_area_person_id` verknüpft `contract_debits`, `contract_ends`
+und `index_rent` mit `Stakeholder.tenants`.
+
+```mermaid
+graph LR
+  subgraph Contracts
+    service_contracts["service_contracts"]
+    contract_debit_diffs["contract_debit_diffs"]
+    contract_debits["contract_debits"]
+    contract_ends["contract_ends"]
+    index_rent["index_rent"]
+  end
+
+  properties["Property.properties"]
+  technical_objects["Property.technical_objects"]
+  accounts["Accounting.accounts"]
+  tenants["Stakeholder.tenants"]
+  creditor["Stakeholder.creditor"]
+
+  properties -.->|property_id| service_contracts
+  properties -.->|property_id| contract_debit_diffs
+
+  technical_objects -.->|service_contract_id| service_contracts
+  contract_debit_diffs -.->|account_id| accounts
+  creditor -.->|creditor_id| service_contracts
+
+  tenants -.->|floor_area_person_id| contract_debits
+  tenants -.->|floor_area_person_id| contract_ends
+  tenants -.->|floor_area_person_id| index_rent
+```
+
+*Durchgezogene Kanten sind Joins innerhalb einer Domäne; gestrichelte Kanten gehen in eine andere Domäne. Diese Domäne hat keine direkten internen Joins — jede Tabelle hier verknüpft stattdessen in eine andere Domäne.*
+
+Das vollständige domänenübergreifende Diagramm und die Kardinalitäten der Join-Keys stehen
+in der [v1-Datenmodell-Übersicht](/de/v1/data-model/overview#wie-die-v1-tabellen-zusammenhängen).
+
 ## service_contracts
 
 `GET /v1/contracts/service_contracts` — Wartungs- und Dienstleistungsverträge.
