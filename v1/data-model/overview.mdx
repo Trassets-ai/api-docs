@@ -152,11 +152,13 @@ property_id                    1002
 ```
 
 <Warning>
-  Don't parse the `property_id` / `floor_area_id` / `floor_area_person_id` prefixes above to
-  extract their components. Segment widths aren't fixed — the same property can carry both
-  `45111` and `451110` as `floor_area_id`, so `45111` is itself a prefix of `451110` and prefix
-  matching is ambiguous. Building the key also drops separators, so a `person_id` of `"010-1"`
-  ends up as the suffix `0101` and can't be recovered. Read `property_id`, `floor_area_id`, and
-  `person_id` directly instead of slicing the composite.
+  The key is built by appending: `1002` (property) + `10001` (unit number) = `floor_area_id`
+  `100210001`; `100210001` + `100001` (tenant number) = `floor_area_person_id`
+  `100210001100001`. Still, don't parse it back apart to extract the components. Segment widths
+  aren't fixed — the same property can carry both `45111` and `451110` as `floor_area_id`, so
+  `45111` is itself a prefix of `451110` and prefix matching is ambiguous. Building the key also
+  drops separators, so a `person_id` of `"010-1"` ends up as the suffix `0101` and can't be
+  recovered. Read `property_id`, `floor_area_id`, and `person_id` directly instead of slicing
+  the composite.
 </Warning>
 
