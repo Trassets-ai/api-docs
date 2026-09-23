@@ -1,5 +1,5 @@
 ---
-title: "v1 Datenmodell"
+title: "Datenmodell"
 sidebarTitle: "Übersicht"
 description: "Die unter /v1/ verfügbaren Tabellen und wie sie sich verknüpfen — Accounting, Contracts, Depreciation, Operations, Property und Stakeholder."
 ---
@@ -35,7 +35,7 @@ Endpunkt steht in der [API-Referenz](/de/v1/api-reference/introduction).
   </Card>
 </CardGroup>
 
-## Wie die v1-Tabellen zusammenhängen
+## Wie die Tabellen zusammenhängen
 
 `property_id` ist der Join-Key, den sich alle Tabellen auf dieser Seite teilen.
 
@@ -127,35 +127,20 @@ graph LR
 |---|---|---|
 | `property_id` | Identifiziert ein Objekt. Auf jeder Tabelle dieser Seite vorhanden, außer `creditor` (eine eigenständige Entität, referenziert über `creditor_id`). | 1 Objekt → viele Zeilen in jeder Domäne |
 | `booking_header_id` | Gruppiert Buchungspositionen unter einem Buchungskopf. | 1 `booking_header` → viele `booking_positions` |
-| `account_id` | Interne Konto-ID. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
-| `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header` und `booking_positions` — bei `projects` unzuverlässig, siehe unten. | 1 Kreditor → viele Zeilen über Domänen hinweg |
-| `technical_object_id` | Verknüpft eine Meldung mit dem technischen Objekt, auf das sie sich bezieht. Referenziert `technical_objects.to_id`. | 1 technisches Objekt → viele Meldungen |
+| `account_id` | Interne Konto-ID bei `accounts`, `booking_positions` und `budgets` — darüber verknüpfbar. Bei `index_rent` und `contract_debit_diffs` bedeutet derselbe Feldname etwas anderes: den Sollart-Code (entspricht `contract_debits.debit_type.code`) — nicht mit `accounts` verknüpfen. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
+| `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header` und `booking_positions`. | 1 Kreditor → viele Zeilen über Domänen hinweg |
+| `technical_object_id` | Vorhanden auf `notifications` und `orders`, löst sich gegen `technical_objects.to_id` auf. | 1 technisches Objekt → viele Meldungen |
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
-| `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_header` ein String, bei `booking_positions` eine Zahl — vor einem Join über diese Grenze den Warnhinweis unten lesen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
+| `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_header` ein String, bei `booking_positions` eine Zahl — `booking_positions` nicht direkt über `person_id` mit einem Mieter verknüpfen, sondern über `booking_header_id` gehen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
 | `floor_area_person_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits`, `contract_ends` und `index_rent` teilen denselben Wert und denselben Typ (String) — direkt darüber verknüpfen, ohne `property_id` und ohne Cast. | 1 Mietverhältnis → viele Soll-/Ende-/Index-Zeilen |
 | `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits` und `contract_ends`. | 1 Einheit → viele Zeilen |
 | `asset_id` | Verknüpft eine Abschreibungsbuchung mit dem Anlagegut, auf das sie abschreibt. Jede `depreciation`-Zeile löst sich gegen `assets` auf. | 1 Anlagegut → viele Buchungen |
 | `property_structure_account_id` | Fremdschlüssel auf `property_structure`, vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
 
 <Note>
-  Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell, nicht
-  unabhängig verifizierte Zeilenzahlen. `projects.creditor_id` und `projects.to_hdr_id` sind
-  bewusst nicht Teil dieses Diagramms — beide sind unzuverlässig, also nicht als
-  funktionierende Verknüpfung behandeln.
+  Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell.
 </Note>
-
-<Warning>
-  `person_id` kommt bei `tenants` und `booking_header` als JSON-String zurück, bei
-  `booking_positions` dagegen als Zahl — und die String-Form ist opak: führende Nullen in
-  wechselnder Breite, manche Werte mit einem Suffix der Art `"2001-1"`. Ein Cast der Zahl auf
-  String ergibt den Wert **nicht**. `booking_positions` deshalb gar nicht über `person_id` mit
-  einem Mieter verknüpfen, sondern über `booking_header_id` gehen und die `person_id` des
-  Buchungskopfs nutzen. `floor_area_id` hat eine mildere Variante desselben Problems: überall
-  eine Zahl, außer bei `contract_debits`, wo es ein String ist — dort genügt aber ein einfacher
-  Cast. `floor_area_person_id` ist nicht betroffen — auf allen vier Tabellen, die es führen, ein
-  String.
-</Warning>
 
 ### Schlüsselaufbau: zusammengesetzt, aber nicht zerlegbar
 
@@ -168,23 +153,15 @@ property_id                    1002
    └─ floor_area_person_id     100210001100001   floor_area_id + person_id
 ```
 
-Gegen Live-Daten geprüft, gilt für jede Zeile, in der der Schlüssel befüllt ist:
-
-| Regel | Gilt auf |
-|---|---|
-| `floor_area_id` beginnt mit `property_id` | `property_structure`, `tenants`, `contract_debits`, `contract_ends` |
-| `floor_area_person_id` beginnt mit `floor_area_id` | `tenants`, `contract_debits`, `contract_ends` |
-| `property_id_person_id` beginnt mit `property_id` | `contract_debits`, `booking_positions` — dort null bei Zeilen ohne Person, aber nie abweichend |
-| `property_structure.account_id` beginnt mit `property_id` | jede Zeile außer Sammelkonten, die stattdessen wie `ALLE/5` aussehen |
-
 <Warning>
-  Die Präfixe eignen sich zum Filtern und Gruppieren nach Objekt, nicht zum Zerlegen eines
-  Schlüssels. Drei Gründe: Die Segmentbreiten sind nicht fest — sie unterscheiden sich je
-  Datenbestand und sogar innerhalb eines Objekts, in dem dasselbe Objekt sowohl `45111` als auch
-  `451110` als `floor_area_id` führt. Damit ist auch ein Präfix-Vergleich mehrdeutig, denn
-  `45111` ist selbst ein Präfix von `451110`. Und beim Bilden des Schlüssels fallen Trennzeichen
-  weg: Eine `person_id` `"010-1"` landet als Suffix `0101` und lässt sich nicht zurückgewinnen.
-
-  Jede Komponente ist ein eigenes Feld in der Antwort. Also `property_id`, `floor_area_id` und
-  `person_id` direkt lesen statt den zusammengesetzten Wert zu zerschneiden.
+  Der Schlüssel entsteht durch Anhängen: `1002` (Objekt) + `10001` (Flächennummer) =
+  `floor_area_id` `100210001`; `100210001` + `100001` (Mieter-Nummer) = `floor_area_person_id`
+  `100210001100001`. Trotzdem nicht zurückzerlegen, um die Bestandteile zu ermitteln. Die
+  Segmentbreiten sind nicht fest — dasselbe Objekt kann sowohl `45111` als auch `451110` als
+  `floor_area_id` führen, `45111` ist also selbst ein Präfix von `451110` und ein
+  Präfix-Vergleich damit mehrdeutig. Beim Bilden des Schlüssels fallen außerdem Trennzeichen weg:
+  eine `person_id` `"010-1"` landet als Suffix `0101` und lässt sich nicht zurückgewinnen.
+  `property_id`, `floor_area_id` und `person_id` direkt lesen statt den zusammengesetzten Wert
+  zu zerschneiden.
 </Warning>
+
