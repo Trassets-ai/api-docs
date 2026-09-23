@@ -151,3 +151,12 @@ property_id                    1002
    └─ floor_area_person_id     100210001100001   floor_area_id + person_id
 ```
 
+<Warning>
+  Don't parse the `property_id` / `floor_area_id` / `floor_area_person_id` prefixes above to
+  extract their components. Segment widths aren't fixed — the same property can carry both
+  `45111` and `451110` as `floor_area_id`, so `45111` is itself a prefix of `451110` and prefix
+  matching is ambiguous. Building the key also drops separators, so a `person_id` of `"010-1"`
+  ends up as the suffix `0101` and can't be recovered. Read `property_id`, `floor_area_id`, and
+  `person_id` directly instead of slicing the composite.
+</Warning>
+

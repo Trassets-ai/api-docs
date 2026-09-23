@@ -153,3 +153,13 @@ property_id                    1002
    └─ floor_area_person_id     100210001100001   floor_area_id + person_id
 ```
 
+<Warning>
+  Die Präfixe `property_id` / `floor_area_id` / `floor_area_person_id` aus dem Beispiel oben
+  nicht zerlegen, um ihre Bestandteile zu ermitteln. Die Segmentbreiten sind nicht fest —
+  dasselbe Objekt kann sowohl `45111` als auch `451110` als `floor_area_id` führen, `45111` ist
+  also selbst ein Präfix von `451110` und ein Präfix-Vergleich damit mehrdeutig. Beim Bilden des
+  Schlüssels fallen außerdem Trennzeichen weg: eine `person_id` `"010-1"` landet als Suffix
+  `0101` und lässt sich nicht zurückgewinnen. `property_id`, `floor_area_id` und `person_id`
+  direkt lesen statt den zusammengesetzten Wert zu zerschneiden.
+</Warning>
+
