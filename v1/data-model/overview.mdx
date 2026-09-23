@@ -4,31 +4,32 @@ sidebarTitle: "Overview"
 description: "The tables available under /v1/ and how they join — Accounting, Contracts, Depreciation, Operations, Property, and Stakeholder."
 ---
 
-`/v1/` covers six data domains. Each domain page holds the field reference for its tables.
+`/v1/` covers six data domains, listed by table below. Field-level detail lives in the
+[API reference](/v1/api-reference/introduction) for each endpoint.
 
 <CardGroup cols={2}>
-  <Card title="Accounting" icon="book" href="/v1/data-model/accounting">
-    `accounts`, `booking_header`, `booking_positions`, and `budgets`, with `period`, `amount`, and `amount_per_sqm` objects.
+  <Card title="Accounting" icon="book">
+    `accounts`, `booking_header`, `booking_positions`, and `budgets`.
   </Card>
 
-  <Card title="Contracts" icon="file-contract" href="/v1/data-model/contracts">
-    `service_contracts`, `contract_debits`, `contract_debit_diffs`, `contract_ends`, and `index_rent`, with the `contract_period`, `debit_period`, `debit_type`, `period`, `option_state`, `validity_period`, and `calculation_model` objects.
+  <Card title="Contracts" icon="file-contract">
+    `service_contracts`, `contract_debits`, `contract_debit_diffs`, `contract_ends`, and `index_rent`.
   </Card>
 
-  <Card title="Depreciation" icon="chart-line-down" href="/v1/data-model/depreciation">
-    `assets` and `depreciation`, with the `afa_period` object and the `asset_id`/`asset_number` pair.
+  <Card title="Depreciation" icon="chart-line-down">
+    `assets` and `depreciation`.
   </Card>
 
-  <Card title="Operations" icon="clipboard-list" href="/v1/data-model/operations">
-    `notifications` and `projects`, with `technical_object_id` and the `hierarchy` array.
+  <Card title="Operations" icon="clipboard-list">
+    `notifications` and `projects`.
   </Card>
 
-  <Card title="Property" icon="building" href="/v1/data-model/property">
-    `properties`, `property_structure`, `property_creditor_services`, and `technical_objects`, with the `entrances` array, `mandate_period` object, `levels` array, and conditional `property_structure_account_id` fallback.
+  <Card title="Property" icon="building">
+    `properties`, `property_structure`, `property_creditor_services`, and `technical_objects`.
   </Card>
 
-  <Card title="Stakeholder" icon="users" href="/v1/data-model/stakeholder">
-    `creditor`, `employees`, `owner`, and `tenants`, with a `phones` array on `creditor` and `tenants`.
+  <Card title="Stakeholder" icon="users">
+    `creditor`, `employees`, `owner`, and `tenants`.
   </Card>
 </CardGroup>
 
@@ -133,13 +134,12 @@ graph LR
 | `floor_area_person_id` | Identifies a tenancy. Shared by `tenants`, `contract_debits`, `contract_ends`, and `index_rent` as the same underlying value and the same type (string) — join across them directly, without `property_id` and without a cast. | 1 tenancy → many debit/end/index rows |
 | `floor_area_id` | Identifies a unit in `property_structure`. Also present on `technical_objects`, `tenants`, `contract_debits`, and `contract_ends`. | 1 unit → many rows |
 | `asset_id` | Links a depreciation posting to the asset it writes down. Every `depreciation` row resolves against `assets`. | 1 asset → many postings |
-| `property_structure_account_id` | Foreign key into [`Property.property_structure`](/v1/data-model/property#property_structure), present on `booking_header`, `booking_positions`, and `technical_objects`. Always populated on the two booking tables, where it's the only route from a booking down to a unit; on `technical_objects` it's the fallback for rows without a `floor_area_id`. | 1 unit → many rows |
+| `property_structure_account_id` | Foreign key into `property_structure`, present on `booking_header`, `booking_positions`, and `technical_objects`. Always populated on the two booking tables, where it's the only route from a booking down to a unit; on `technical_objects` it's the fallback for rows without a `floor_area_id`. | 1 unit → many rows |
 
 <Note>
   Cardinalities above describe the intended data model, not independently verified row
   counts. `projects.creditor_id` and `projects.to_hdr_id` are deliberately left out of this
-  diagram — both are flagged as unreliable in the [Operations field
-  reference](/v1/data-model/operations), so don't treat them as working joins.
+  diagram — both are unreliable, so don't treat them as working joins.
 </Note>
 
 <Warning>
