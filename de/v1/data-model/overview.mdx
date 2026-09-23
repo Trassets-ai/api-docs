@@ -4,39 +4,34 @@ sidebarTitle: "Übersicht"
 description: "Die unter /v1/ verfügbaren Tabellen und wie sie sich verknüpfen — Accounting, Contracts, Depreciation, Operations, Property und Stakeholder."
 ---
 
-`/v1/` umfasst sechs Datendomänen. Jede Domänenseite enthält die Feldreferenz ihrer
-Tabellen.
+`/v1/` umfasst sechs Datendomänen, unten nach Tabelle aufgeschlüsselt. Die Feldreferenz je
+Endpunkt steht in der [API-Referenz](/de/v1/api-reference/introduction).
 
 <CardGroup cols={2}>
-  <Card title="Accounting" icon="book" href="/de/v1/data-model/accounting">
-    `accounts`, `booking_header`, `booking_positions` und `budgets`, mit `period`-,
-    `amount`- und `amount_per_sqm`-Objekten.
+  <Card title="Accounting" icon="book">
+    `accounts`, `booking_header`, `booking_positions` und `budgets`.
   </Card>
 
-  <Card title="Contracts" icon="file-contract" href="/de/v1/data-model/contracts">
+  <Card title="Contracts" icon="file-contract">
     `service_contracts`, `contract_debits`, `contract_debit_diffs`, `contract_ends` und
-    `index_rent`, mit den Objekten `contract_period`, `debit_period`, `debit_type`, `period`,
-    `option_state`, `validity_period` und `calculation_model`.
+    `index_rent`.
   </Card>
 
-  <Card title="Depreciation" icon="chart-line-down" href="/de/v1/data-model/depreciation">
-    `assets` und `depreciation`, mit dem `afa_period`-Objekt und dem Paar
-    `asset_id`/`asset_number`.
+  <Card title="Depreciation" icon="chart-line-down">
+    `assets` und `depreciation`.
   </Card>
 
-  <Card title="Operations" icon="clipboard-list" href="/de/v1/data-model/operations">
-    `notifications` und `projects`, mit `technical_object_id` und dem `hierarchy`-Array.
+  <Card title="Operations" icon="clipboard-list">
+    `notifications` und `projects`.
   </Card>
 
-  <Card title="Property" icon="building" href="/de/v1/data-model/property">
+  <Card title="Property" icon="building">
     `properties`, `property_structure`, `property_creditor_services` und
-    `technical_objects`, mit dem `entrances`-Array, dem `mandate_period`-Objekt, dem
-    `levels`-Array und dem bedingten `property_structure_account_id`-Fallback.
+    `technical_objects`.
   </Card>
 
-  <Card title="Stakeholder" icon="users" href="/de/v1/data-model/stakeholder">
-    `creditor`, `employees`, `owner` und `tenants`, mit einem `phones`-Array auf `creditor`
-    und `tenants`.
+  <Card title="Stakeholder" icon="users">
+    `creditor`, `employees`, `owner` und `tenants`.
   </Card>
 </CardGroup>
 
@@ -141,13 +136,13 @@ graph LR
 | `floor_area_person_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits`, `contract_ends` und `index_rent` teilen denselben Wert und denselben Typ (String) — direkt darüber verknüpfen, ohne `property_id` und ohne Cast. | 1 Mietverhältnis → viele Soll-/Ende-/Index-Zeilen |
 | `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits` und `contract_ends`. | 1 Einheit → viele Zeilen |
 | `asset_id` | Verknüpft eine Abschreibungsbuchung mit dem Anlagegut, auf das sie abschreibt. Jede `depreciation`-Zeile löst sich gegen `assets` auf. | 1 Anlagegut → viele Buchungen |
-| `property_structure_account_id` | Fremdschlüssel auf [`Property.property_structure`](/de/v1/data-model/property#property_structure), vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
+| `property_structure_account_id` | Fremdschlüssel auf `property_structure`, vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
 
 <Note>
   Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell, nicht
   unabhängig verifizierte Zeilenzahlen. `projects.creditor_id` und `projects.to_hdr_id` sind
-  bewusst nicht Teil dieses Diagramms — beide sind in der [Operations-Feldreferenz](/de/v1/data-model/operations)
-  als unzuverlässig markiert, also nicht als funktionierende Verknüpfung behandeln.
+  bewusst nicht Teil dieses Diagramms — beide sind unzuverlässig, also nicht als
+  funktionierende Verknüpfung behandeln.
 </Note>
 
 <Warning>
