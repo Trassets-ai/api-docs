@@ -19,6 +19,7 @@ This glossary defines field names that appear across multiple endpoints in the D
 | `next_cursor` | string | Opaque cursor for Raw endpoint pagination; null when all rows are fetched |
 | `join_key` | string | Bridge key produced by `property_structure`; equals `account_id` for cost-centre nodes or `floor_area_id` for floor-area nodes. Used to join bookings and tenancy data to a specific unit or cost centre. |
 | `floor_area_person_id` | integer | Composite key identifying a specific tenant in a specific unit. Appears in `Contracts.contract_debits` and `Contracts.contract_ends`. |
+| `contract_end_id` | string | Internal hash identifying a specific lease-end/option record in `Contracts.contract_ends`. Not stable long-term — changes if the option deadline or contract end date is shifted. |
 | `property_id_person_id` | integer | Composite key identifying a specific tenant at property level, without unit granularity. Appears in `Contracts.contract_debits` and `Contracts.contract_debit_diffs`. |
 | `account_id` | string | Ledger account reference. Links `Contracts` debit records to `Accounting`. |
 | `contract_id` | integer | Contract identifier. Appears in `Contracts.service_contracts` and related contract records. |

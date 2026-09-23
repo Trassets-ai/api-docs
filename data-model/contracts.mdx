@@ -201,6 +201,12 @@ status.
   Composite key identifying the tenancy this record applies to.
 </ResponseField>
 
+<ResponseField name="contract_end_id" type="string">
+  Internal hash identifying this specific lease-end/option record. Not stable long-term —
+  it changes if the underlying option deadline or contract end date is shifted. Not
+  intended as a persistent external reference.
+</ResponseField>
+
 <ResponseField name="start_date" type="date">
   Start of the lease.
 </ResponseField>

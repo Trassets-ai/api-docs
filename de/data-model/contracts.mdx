@@ -205,6 +205,12 @@ Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
   Datensatz bezieht.
 </ResponseField>
 
+<ResponseField name="contract_end_id" type="string">
+  Interner Hash, der diesen konkreten Vertragsende-/Options-Datensatz identifiziert. Nicht
+  langfristig stabil — ändert sich, wenn die zugrunde liegende Optionsfrist oder das
+  Vertragsende verschoben wird. Nicht als dauerhafte externe Referenz gedacht.
+</ResponseField>
+
 <ResponseField name="start_date" type="date">
   Beginn des Mietverhältnisses.
 </ResponseField>

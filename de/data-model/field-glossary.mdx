@@ -19,6 +19,7 @@ Datenmodelle abbildest oder Verknüpfungen über Domänen hinweg gestaltest.
 | `creditor_id` | string | Identifiziert einen Kreditor (Lieferant oder Dienstleister) |
 | `booking_date` | date | ISO-8601-Datum der Buchhaltungsbuchung |
 | `next_cursor` | string | Undurchsichtiger Cursor für die Pagination des Raw-Endpunkts; null, wenn alle Zeilen abgerufen wurden |
+| `contract_end_id` | string | Interner Hash, der einen konkreten Vertragsende-/Options-Datensatz in `Contracts.contract_ends` identifiziert. Nicht langfristig stabil — ändert sich, wenn die Optionsfrist oder das Vertragsende verschoben wird. |
 
 <Note>
   Felder mit dem Präfix `sk_` sind interne Surrogatschlüssel. Sie sind keine stabilen
