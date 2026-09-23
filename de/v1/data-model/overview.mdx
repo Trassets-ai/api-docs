@@ -139,8 +139,7 @@ graph LR
 | `property_structure_account_id` | Fremdschlüssel auf `property_structure`, vorhanden auf `booking_header`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
 
 <Note>
-  Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell, nicht
-  unabhängig verifizierte Zeilenzahlen.
+  Die oben genannten Kardinalitäten beschreiben das beabsichtigte Datenmodell.
 </Note>
 
 <Warning>
@@ -166,23 +165,3 @@ property_id                    1002
    └─ floor_area_person_id     100210001100001   floor_area_id + person_id
 ```
 
-Gegen Live-Daten geprüft, gilt für jede Zeile, in der der Schlüssel befüllt ist:
-
-| Regel | Gilt auf |
-|---|---|
-| `floor_area_id` beginnt mit `property_id` | `property_structure`, `tenants`, `contract_debits`, `contract_ends` |
-| `floor_area_person_id` beginnt mit `floor_area_id` | `tenants`, `contract_debits`, `contract_ends` |
-| `property_id_person_id` beginnt mit `property_id` | `contract_debits`, `booking_positions` — dort null bei Zeilen ohne Person, aber nie abweichend |
-| `property_structure.account_id` beginnt mit `property_id` | jede Zeile außer Sammelkonten, die stattdessen wie `ALLE/5` aussehen |
-
-<Warning>
-  Die Präfixe eignen sich zum Filtern und Gruppieren nach Objekt, nicht zum Zerlegen eines
-  Schlüssels. Drei Gründe: Die Segmentbreiten sind nicht fest — sie unterscheiden sich je
-  Datenbestand und sogar innerhalb eines Objekts, in dem dasselbe Objekt sowohl `45111` als auch
-  `451110` als `floor_area_id` führt. Damit ist auch ein Präfix-Vergleich mehrdeutig, denn
-  `45111` ist selbst ein Präfix von `451110`. Und beim Bilden des Schlüssels fallen Trennzeichen
-  weg: Eine `person_id` `"010-1"` landet als Suffix `0101` und lässt sich nicht zurückgewinnen.
-
-  Jede Komponente ist ein eigenes Feld in der Antwort. Also `property_id`, `floor_area_id` und
-  `person_id` direkt lesen statt den zusammengesetzten Wert zu zerschneiden.
-</Warning>

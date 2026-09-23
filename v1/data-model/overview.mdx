@@ -137,8 +137,7 @@ graph LR
 | `property_structure_account_id` | Foreign key into `property_structure`, present on `booking_header`, `booking_positions`, and `technical_objects`. Always populated on the two booking tables, where it's the only route from a booking down to a unit; on `technical_objects` it's the fallback for rows without a `floor_area_id`. | 1 unit → many rows |
 
 <Note>
-  Cardinalities above describe the intended data model, not independently verified row
-  counts.
+  Cardinalities above describe the intended data model.
 </Note>
 
 <Warning>
@@ -163,23 +162,3 @@ property_id                    1002
    └─ floor_area_person_id     100210001100001   floor_area_id + person_id
 ```
 
-Verified against live data, holding for every row where the key is populated:
-
-| Rule | Holds on |
-|---|---|
-| `floor_area_id` starts with `property_id` | `property_structure`, `tenants`, `contract_debits`, `contract_ends` |
-| `floor_area_person_id` starts with `floor_area_id` | `tenants`, `contract_debits`, `contract_ends` |
-| `property_id_person_id` starts with `property_id` | `contract_debits`, `booking_positions` — null there on rows with no person, never mismatched |
-| `property_structure.account_id` starts with `property_id` | every row except pooled accounts, which look like `ALLE/5` instead |
-
-<Warning>
-  Use the prefixes to filter or group by property, never to parse a key apart. Three reasons:
-  segment widths are not fixed — they differ per dataset and even within a single property,
-  where the same property carries both `45111` and `451110` as `floor_area_id`; prefix matching
-  is therefore ambiguous, since `45111` is itself a prefix of `451110`; and building the key
-  drops separators, so a `person_id` of `"010-1"` ends up as the suffix `0101` and cannot be
-  split back out.
-
-  Every component is its own field in the response. Read `property_id`, `floor_area_id`, and
-  `person_id` directly instead of slicing the composite.
-</Warning>
