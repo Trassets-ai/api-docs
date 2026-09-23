@@ -126,7 +126,7 @@ graph LR
 | `property_id` | Identifies a property. Present on every table on this page except `creditor` (a standalone entity, referenced via `creditor_id` instead). | 1 property → many rows in each domain |
 | `booking_header_id` | Groups booking line items under one header. | 1 `booking_header` → many `booking_positions` |
 | `account_id` | Internal account identifier. | 1 `accounts` row → many `booking_positions`/`budgets` rows |
-| `creditor_id` | Identifies a creditor. Referenced by `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header`, and `booking_positions` — unreliable on `projects`, see below. | 1 creditor → many rows across domains |
+| `creditor_id` | Identifies a creditor. Referenced by `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header`, and `booking_positions`. | 1 creditor → many rows across domains |
 | `technical_object_id` | Links a notification to the technical object it concerns. References `technical_objects.to_id`. | 1 technical object → many notifications |
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
 | `service_contract_id` | Links a technical object to the service contract covering it. References `service_contracts.contract_id`. | 1 contract → many technical objects |
