@@ -70,14 +70,10 @@ configuration applied to each asset.
 </ResponseField>
 
 <ResponseField name="afa_validity" type="string">
-  Validity date of the depreciation-rate configuration applied to this asset.
+  Validity date of the depreciation-rate configuration applied to this asset. In practice,
+  always identical to `afa_period.start` — an ETL duplicate, not an independent signal.
+  Scheduled for removal in a future API version.
 </ResponseField>
-
-<Note>
-  `afa_validity` is not the same as `afa_period.start`. `afa_period.start` is when this
-  asset's own depreciation schedule begins; `afa_validity` is when the depreciation-rate
-  configuration it uses became valid. The two can differ.
-</Note>
 
 <ResponseField name="afa_method" type="string">
   Depreciation method applied, as a label (e.g. straight-line).
