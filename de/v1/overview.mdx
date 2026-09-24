@@ -1,11 +1,37 @@
 ---
 title: "Data API v1 (Preview)"
 sidebarTitle: "Übersicht"
-description: "Vorschau auf die versionierte Data API: welche Tabellen unter /v1/ verfügbar sind und wie ihre Responses aufgebaut sind."
+description: "Was die Trassets Data API ist und wo der Einstieg in den versionierten /v1/-Pfad liegt."
 ---
 
-<Warning>
-  `/v1/` ist live, aber noch nicht vollständig: Tabellen kommen einzeln hinzu. Der Tab **API-Referenz** zeigt immer den aktuellen Stand — nicht davon ausgehen, dass eine Tabelle unter `/v1/` erreichbar ist, nur weil sie schon mal genutzt wurde.
-</Warning>
+Die Trassets Data API ist eine Read-only-REST-Schnittstelle über Immobiliendaten — Objekte, Verträge, Buchhaltung und mehr — gebaut für Softwarepartner und Integratoren, die an Trassets-verwaltete Portfolios andocken. Jede Anfrage wird per `X-API-Key`-Header authentifiziert, jede Antwort ist JSON.
 
-`/v1/` liefert Daten unter dem Pfad-Präfix `/v1/{category}/{api_table}`, mit Responses nach den Regeln der [Response-Struktur](/de/v1/response-shape-conventions).
+Dieser Bereich behandelt `/v1/`, die versionierte Pfad-Familie der API (`/v1/{category}/{api_table}`), mit einer Response-Struktur, die pro Endpunkt stabil bleibt, sobald sie veröffentlicht ist.
+
+## Für wen ist die API gedacht?
+
+- **Softwarepartner & Integratoren**, die Tools auf Basis von Trassets-verwalteten Portfolios bauen.
+- **IT-Teams der Immobilienverwalter selbst**, die interne Systeme oder Reporting an Live-Portfoliodaten anbinden.
+- **Data- & BI-Teams**, die Data Warehouses, Dashboards oder Analyse-Pipelines speisen.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/de/v1/quickstart">
+    API-Key holen und den ersten `/v1/`-Call machen.
+  </Card>
+
+  <Card title="Authentication" icon="key" href="/de/v1/authentication">
+    Key-Management und Zugriffsstufen.
+  </Card>
+
+  <Card title="Response-Struktur" icon="brackets-curly" href="/de/v1/response-shape-conventions">
+    Die strukturellen Regeln, denen jede `/v1/`-Response folgt.
+  </Card>
+
+  <Card title="Datenmodell" icon="diagram-project" href="/de/v1/data-model/overview">
+    Die unter `/v1/` verfügbaren Tabellen und wie sie zusammenhängen.
+  </Card>
+
+  <Card title="API-Referenz" icon="book-open" href="/de/v1/api-reference/introduction">
+    Jeder Endpunkt, der aktuell unter `/v1/` live ist.
+  </Card>
+</CardGroup>
