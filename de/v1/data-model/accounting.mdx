@@ -49,7 +49,7 @@ andere Domäne.*
 Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
 `account_type_name`.
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
 </ResponseField>
 
@@ -85,8 +85,9 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
 </ResponseField>
 
 <Note>
-  `category`, `group` und `nr` sind `null` bei Konten, die noch auf der älteren
-  Kontenbereichs-Klassifizierung laufen — diese liefert diese drei Felder nicht.
+  `nr` ist `null` bei Konten, die noch auf der älteren Kontenbereichs-Klassifizierung
+  laufen — diese liefert dieses Feld nicht. `category` und `group` sind in dem Fall
+  trotzdem befüllt, nur anders hergeleitet.
 </Note>
 
 <ResponseField name="account_group" type="string">
@@ -108,7 +109,7 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
       Bilanzseiten-Code: `1` oder `2`; `0` wenn nicht klassifiziert.
     </ResponseField>
     <ResponseField name="label" type="string">
-      Lesbare Bezeichnung zum Code (z. B. "Aufwandskonto", "Ertragskonto").
+      Lesbare Bezeichnung zum Code.
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -130,7 +131,7 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
 `GET /v1/accounting/booking_header` — Hauptbuch-Buchungsköpfe. Jeder Kopf gruppiert
 zusammengehörige Positionen.
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
 </ResponseField>
 
@@ -139,11 +140,11 @@ zusammengehörige Positionen.
   `booking_header_id`.
 </ResponseField>
 
-<ResponseField name="booking_nr" type="string">
+<ResponseField name="booking_nr" type="integer">
   Laufende Nummer der Buchung im Journal (Primanota) — dem chronologischen Buchungsprotokoll.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
+<ResponseField name="creditor_id" type="string">
   Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
 </ResponseField>
 
@@ -208,7 +209,7 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
   Konto, auf das die Position gebucht wird. Verknüpft sich mit `accounts.account_id`.
 </ResponseField>
 
-<ResponseField name="contra_account_id" type="string">
+<ResponseField name="contra_account_id" type="integer">
   Gegenkonto für die Buchung, als Kontonummer — nicht derselbe Wertebereich wie
   `accounts.account_id`.
 </ResponseField>
@@ -227,7 +228,7 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
   Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
 </ResponseField>
 
-<ResponseField name="person_id" type="string">
+<ResponseField name="person_id" type="integer">
   Mit der Buchung verknüpfter Mieter oder Ansprechpartner.
 </ResponseField>
 

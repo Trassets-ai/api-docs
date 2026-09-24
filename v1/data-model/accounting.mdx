@@ -48,7 +48,7 @@ graph LR
 tenant accounts, creditor accounts, project accounts, cost centres, and asset accounts —
 see `account_type_name`.
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Unique property identifier.
 </ResponseField>
 
@@ -84,8 +84,9 @@ see `account_type_name`.
 </ResponseField>
 
 <Note>
-  `category`, `group`, and `nr` are `null` for accounts still on the older account-range
-  classification — that classification doesn't produce these three fields.
+  `nr` is `null` for accounts still on the older account-range classification — that
+  classification doesn't produce this field. `category` and `group` are still populated in
+  that case, derived differently under the hood.
 </Note>
 
 <ResponseField name="account_group" type="string">
@@ -107,7 +108,7 @@ see `account_type_name`.
       Balance-side code: `1` or `2`; `0` when not classified.
     </ResponseField>
     <ResponseField name="label" type="string">
-      Human-readable label for the code (e.g. "Aufwandskonto", "Ertragskonto").
+      Human-readable label for the code.
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -129,7 +130,7 @@ see `account_type_name`.
 `GET /v1/accounting/booking_header` — general ledger booking headers. Each header groups
 related line items.
 
-<ResponseField name="property_id" type="integer" required>
+<ResponseField name="property_id" type="string" required>
   Unique property identifier.
 </ResponseField>
 
@@ -138,11 +139,11 @@ related line items.
   `booking_header_id`.
 </ResponseField>
 
-<ResponseField name="booking_nr" type="string">
+<ResponseField name="booking_nr" type="integer">
   Sequential number of the booking within the journal (Primanota) — the chronological log of all bookings.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
+<ResponseField name="creditor_id" type="string">
   Creditor linked to the booking. References `Stakeholder.creditor`.
 </ResponseField>
 
@@ -205,7 +206,7 @@ belongs to exactly one booking header via `booking_header_id`.
   Account the line item is posted to. Joins to `accounts.account_id`.
 </ResponseField>
 
-<ResponseField name="contra_account_id" type="string">
+<ResponseField name="contra_account_id" type="integer">
   Contra account for the posting, as an account number — not the same identifier space as
   `accounts.account_id`.
 </ResponseField>
@@ -223,7 +224,7 @@ belongs to exactly one booking header via `booking_header_id`.
   Creditor linked to the posting. References `Stakeholder.creditor`.
 </ResponseField>
 
-<ResponseField name="person_id" type="string">
+<ResponseField name="person_id" type="integer">
   Tenant or contact person linked to the posting.
 </ResponseField>
 
