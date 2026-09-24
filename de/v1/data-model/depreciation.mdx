@@ -72,15 +72,10 @@ andere Domäne.*
 </ResponseField>
 
 <ResponseField name="afa_validity" type="string">
-  Gültigkeitsdatum der AfA-Konfiguration, die für diese Anlage angewendet wird.
+  Gültigkeitsdatum der AfA-Konfiguration, die für diese Anlage angewendet wird. In der
+  Praxis immer identisch mit `afa_period.start` — ein ETL-Duplikat, kein eigenständiges
+  Signal. Für eine künftige API-Version zur Entfernung vorgesehen.
 </ResponseField>
-
-<Note>
-  `afa_validity` ist nicht dasselbe wie `afa_period.start`. `afa_period.start` ist der
-  Beginn des Abschreibungszeitraums dieser konkreten Anlage; `afa_validity` ist der
-  Zeitpunkt, ab dem die verwendete AfA-Konfiguration gültig wurde. Beide können voneinander
-  abweichen.
-</Note>
 
 <ResponseField name="afa_method" type="string">
   Angewendete Abschreibungsmethode, als Bezeichnung (z. B. linear).
