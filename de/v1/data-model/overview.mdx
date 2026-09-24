@@ -45,10 +45,11 @@ werden — Sachkonto, Personenkonto, Kreditorkonto, Projektkonto oder Kostenstel
 `accounts.account_type_name`. Da ein Vorgang meist höchstens einen Kreditor, einen Mieter
 oder eine Kostenstelle betrifft, führt `booking_header` `creditor_id`, `person_id` und
 `property_structure_account_id` bereits direkt, ohne den Umweg über `booking_positions`. Zu
-jedem Konto kann es ein `budget` für einen bestimmten Monat geben. Ein Kostenstellen-Konto
-teilt seinen Bezeichner mit `property_structure.account_id` — in `accounts.account_number`,
-nicht in `accounts.account_id`. `contract_debits` referenziert das Sachkonto, auf das es
-bucht, über `ledger_id` — ebenfalls gegen `accounts.account_number`. `contract_debit_diffs.
+jedem Konto kann es ein `budget` für einen bestimmten Monat geben. Bei einer Kostenstelle
+entspricht `property_structure.account_id` dem `accounts.account_number` der zugehörigen
+Konto-Zeile — nicht deren `accounts.account_id`. `contract_debits` referenziert das
+Sachkonto, auf das es bucht, über `ledger_id` — ebenfalls gegen `accounts.account_number`.
+`contract_debit_diffs.
 account_number` ist etwas anderes, ein Sollart-Code, kein Kontenbezug (siehe die
 `account_id`-Zeile weiter unten).
 
