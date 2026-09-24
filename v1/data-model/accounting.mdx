@@ -72,11 +72,11 @@ see `account_type_name`.
 </ResponseField>
 
 <ResponseField name="category" type="string">
-  Reporting category from the account-range mapping (e.g. income, expenses, depreciation).
+  Reporting category the account belongs to (e.g. income, expenses, depreciation).
 </ResponseField>
 
 <ResponseField name="group" type="string">
-  Income-affecting vs. balance-neutral classification from the account-range mapping.
+  Whether the account is income-affecting or balance-neutral.
 </ResponseField>
 
 <ResponseField name="nr" type="integer">
@@ -84,13 +84,12 @@ see `account_type_name`.
 </ResponseField>
 
 <Note>
-  `nr` is `null` for accounts still on the older account-range classification — that
-  classification doesn't produce this field. `category` and `group` are still populated in
-  that case, derived differently under the hood.
+  `nr` is `null` for some accounts, depending on how the account was classified. `category`
+  and `group` are still populated in that case.
 </Note>
 
 <ResponseField name="account_group" type="string">
-  Account group assigned by the account-range mapping.
+  Account group the account is classified under.
 </ResponseField>
 
 <ResponseField name="account_tax_code" type="integer">
@@ -320,7 +319,7 @@ belongs to exactly one booking header via `booking_header_id`.
   Account the budget applies to. Joins to `accounts.account_id`.
 </ResponseField>
 
-<ResponseField name="account_number" type="integer">
+<ResponseField name="account_number" type="string">
   Account number.
 </ResponseField>
 
