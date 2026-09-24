@@ -37,6 +37,17 @@ description: "The tables available under /v1/ and how they join — Accounting, 
 
 `property_id` is the join key shared across every table on this page.
 
+A booking transaction produces one `booking_header` row, which groups every line item it
+posts (`booking_positions`). Line items post to accounts of different types — general
+ledger, tenant, creditor, project, or cost centre, see `accounts.account_type_name`. Since a
+transaction usually posts to at most one creditor, tenant, or cost centre, `booking_header`
+already carries `creditor_id`, `person_id`, and `property_structure_account_id` directly,
+without going through `booking_positions`. Each account can have a `budget` for a given
+month. A cost-centre account shares its identifier with `property_structure.account_id` — in
+`accounts.account_number`, not `accounts.account_id`. Debit schedules (`contract_debits`,
+`contract_debit_diffs`) reference the general ledger account they post to via `ledger_id`,
+again matching `accounts.account_number`.
+
 ```mermaid
 graph LR
   subgraph Property
@@ -96,6 +107,9 @@ graph LR
   booking_positions -->|account_id| accounts
   budgets -->|account_id| accounts
   contract_debit_diffs -.->|account_id| accounts
+  contract_debits -.->|ledger_id = account_number| accounts
+  property_structure -.->|account_id = account_number| accounts
+  properties -.->|property_id| accounts
   notifications -.->|technical_object_id| technical_objects
   notifications -->|report_id| projects
   technical_objects -.->|service_contract_id| service_contracts
@@ -125,12 +139,13 @@ graph LR
 |---|---|---|
 | `property_id` | Identifies a property. Present on every table on this page except `creditor` (a standalone entity, referenced via `creditor_id` instead). | 1 property → many rows in each domain |
 | `booking_header_id` | Groups booking line items under one header. | 1 `booking_header` → many `booking_positions` |
-| `account_id` | Internal account identifier on `accounts`, `booking_positions`, and `budgets` — joins across those three. On `index_rent` and `contract_debit_diffs`, the same field name means something unrelated: a debit-type code (matches `contract_debits.debit_type.code`) — don't join those to `accounts`. | 1 `accounts` row → many `booking_positions`/`budgets` rows |
+| `account_id` | Internal account identifier on `accounts`, `booking_positions`, and `budgets` — joins across those three. On `index_rent` and `contract_debit_diffs`, the same field name means something unrelated: a debit-type code (matches `contract_debits.debit_type.code`) — don't join those to `accounts`. On `property_structure`, it means something else again: a cost-centre business code, matching `accounts.account_number` for the corresponding cost-centre row, not `accounts.account_id`. | 1 `accounts` row → many `booking_positions`/`budgets` rows |
+| `ledger_id` | General ledger account a debit line posts to, on `contract_debits`. Matches `accounts.account_number`, not `accounts.account_id`. | 1 `accounts` row → many `contract_debits` rows |
 | `creditor_id` | Identifies a creditor. Referenced by `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header`, and `booking_positions`. | 1 creditor → many rows across domains |
 | `technical_object_id` | Present on `notifications` and `orders`, resolves against `technical_objects.to_id`. | 1 technical object → many notifications |
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
 | `service_contract_id` | Links a technical object to the service contract covering it. References `service_contracts.contract_id`. | 1 contract → many technical objects |
-| `person_id` | Links a booking to the tenant it applies to. Only valid combined with `property_id`, since the numbering restarts per property. A string on `tenants`/`booking_header`, a number on `booking_positions` — don't join `booking_positions` to a tenant on `person_id` directly, go through `booking_header_id` instead. | 1 person → 1..N tenancies per property |
+| `person_id` | Links a booking to the tenant it applies to. Only valid combined with `property_id`, since the numbering restarts per property. A string on `tenants`/`booking_header`, a number on `booking_positions` — don't join `booking_positions` to a tenant on `person_id` directly, go through `booking_header_id` instead. Bookings link to a tenant only at the property level, not down to the individual unit — if the same tenant holds multiple units in one property, their bookings can't be separated by unit. | 1 person → 1..N tenancies per property |
 | `floor_area_person_id` | Identifies a tenancy. Shared by `tenants`, `contract_debits`, `contract_ends`, and `index_rent` as the same underlying value and the same type (string) — join across them directly, without `property_id` and without a cast. | 1 tenancy → many debit/end/index rows |
 | `floor_area_id` | Identifies a unit in `property_structure`. Also present on `technical_objects`, `tenants`, `contract_debits`, and `contract_ends`. | 1 unit → many rows |
 | `asset_id` | Links a depreciation posting to the asset it writes down. Every `depreciation` row resolves against `assets`. | 1 asset → many postings |
