@@ -31,7 +31,7 @@ graph LR
   properties -.->|property_id| contract_debits
   properties -.->|property_id| contract_ends
   properties -.->|property_id| index_rent
-  contract_debits -.->|ledger_id = account_number| accounts
+  contract_debits -.->|account_number| accounts
   contract_debit_diffs -.->|account_number| accounts
   creditor -.->|creditor_id| service_contracts
   tenants -.->|floor_area_person_id| contract_debits
@@ -174,7 +174,7 @@ Datensatz repräsentiert eine geplante Sollstellung mit einem Gültigkeitsinterv
   Zusammengesetzter Schlüssel, der den Mieter auf Objektebene identifiziert.
 </ResponseField>
 
-<ResponseField name="ledger_id" type="string">
+<ResponseField name="account_number" type="string">
   Konto, auf das die Sollstellung gebucht wird. Entspricht
   `Accounting.accounts.account_number`, nicht `account_id`.
 </ResponseField>
@@ -200,8 +200,8 @@ Datensatz repräsentiert eine geplante Sollstellung mit einem Gültigkeitsinterv
   Art der Sollstellung als Code+Label-Paar (z. B. Miete oder Nebenkosten).
   <Expandable title="properties">
     <ResponseField name="code" type="integer">
-      Sollart-Code. Kein Kontenbezug, und trotz ähnlichen Namens nicht dasselbe wie
-      `contract_debit_diffs.account_number` — siehe dessen Beschreibung.
+      Sollart-Code. Kein Kontenbezug — nicht zu verwechseln mit dem `account_number`-Feld
+      dieser selben Tabelle oder mit `contract_debit_diffs.account_number`.
     </ResponseField>
     <ResponseField name="label" type="string">
       Lesbares Label, z. B. "Nettokaltmiete Wohnung".

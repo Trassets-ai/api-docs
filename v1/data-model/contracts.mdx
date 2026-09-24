@@ -31,7 +31,7 @@ graph LR
   properties -.->|property_id| contract_debits
   properties -.->|property_id| contract_ends
   properties -.->|property_id| index_rent
-  contract_debits -.->|ledger_id = account_number| accounts
+  contract_debits -.->|account_number| accounts
   contract_debit_diffs -.->|account_number| accounts
   creditor -.->|creditor_id| service_contracts
   tenants -.->|floor_area_person_id| contract_debits
@@ -173,7 +173,7 @@ represents a scheduled debit with a validity interval.
   Composite key identifying the tenant at property level.
 </ResponseField>
 
-<ResponseField name="ledger_id" type="string">
+<ResponseField name="account_number" type="string">
   General ledger account the debit posts to. Matches
   `Accounting.accounts.account_number`, not `account_id`.
 </ResponseField>
@@ -198,9 +198,8 @@ represents a scheduled debit with a validity interval.
   The type of debit, as a code + label pair (e.g. rent or ancillary charges).
   <Expandable title="properties">
     <ResponseField name="code" type="integer">
-      Debit-type code. Not a ledger account reference, and not the same as
-      `contract_debit_diffs.account_number` despite the similar naming — see that field's
-      description.
+      Debit-type code. Not a ledger account reference — don't confuse this with this same
+      table's own `account_number` field, or with `contract_debit_diffs.account_number`.
     </ResponseField>
     <ResponseField name="label" type="string">
       Human-readable label, e.g. "Nettokaltmiete Wohnung".
