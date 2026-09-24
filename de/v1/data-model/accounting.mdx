@@ -73,11 +73,11 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
 </ResponseField>
 
 <ResponseField name="category" type="string">
-  Reporting-Kategorie aus dem Kontenmapping (z. B. Einnahmen, Ausgaben, Abschreibungen).
+  Reporting-Kategorie des Kontos (z. B. Einnahmen, Ausgaben, Abschreibungen).
 </ResponseField>
 
 <ResponseField name="group" type="string">
-  Klassifizierung ergebniswirksam vs. bilanzneutral aus dem Kontenmapping.
+  Ob das Konto ergebniswirksam oder bilanzneutral ist.
 </ResponseField>
 
 <ResponseField name="nr" type="integer">
@@ -85,13 +85,12 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
 </ResponseField>
 
 <Note>
-  `nr` ist `null` bei Konten, die noch auf der älteren Kontenbereichs-Klassifizierung
-  laufen — diese liefert dieses Feld nicht. `category` und `group` sind in dem Fall
-  trotzdem befüllt, nur anders hergeleitet.
+  `nr` ist bei manchen Konten `null`, je nachdem wie das Konto klassifiziert wurde.
+  `category` und `group` sind in dem Fall trotzdem befüllt.
 </Note>
 
 <ResponseField name="account_group" type="string">
-  Kontengruppe aus dem Kontenmapping.
+  Kontengruppe, der das Konto zugeordnet ist.
 </ResponseField>
 
 <ResponseField name="account_tax_code" type="integer">
@@ -325,7 +324,7 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
   Konto, auf das sich das Budget bezieht. Verknüpft sich mit `accounts.account_id`.
 </ResponseField>
 
-<ResponseField name="account_number" type="integer">
+<ResponseField name="account_number" type="string">
   Kontonummer.
 </ResponseField>
 
