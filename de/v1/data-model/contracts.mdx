@@ -23,7 +23,6 @@ graph LR
   tenants["Stakeholder.tenants"]
   creditor["Stakeholder.creditor"]
 
-  contract_debit_diffs -->|account_number = debit_type.code| contract_debits
   contract_debits -->|floor_area_person_id| contract_ends
   contract_debits -->|floor_area_person_id| index_rent
 
@@ -33,6 +32,7 @@ graph LR
   properties -.->|property_id| contract_ends
   properties -.->|property_id| index_rent
   contract_debits -.->|ledger_id = account_number| accounts
+  contract_debit_diffs -.->|account_number| accounts
   creditor -.->|creditor_id| service_contracts
   tenants -.->|floor_area_person_id| contract_debits
   tenants -.->|floor_area_person_id| contract_ends
@@ -132,9 +132,9 @@ Sollstellungen mit dem realisierten Zahlungsfluss abzugleichen.
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  Sollart-Code, auf den sich die Abweichung bezieht. Trotz des Feldnamens kein
-  Kontenbezug — entspricht `contract_debits.debit_type.code`, nicht
-  `Accounting.accounts`.
+  Sachkonto, auf das sich die Abweichung bezieht. Entspricht
+  `Accounting.accounts.account_number` — trotz ähnlich klingendem Namen nicht dasselbe wie
+  `contract_debits.debit_type.code`.
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
@@ -200,8 +200,8 @@ Datensatz repräsentiert eine geplante Sollstellung mit einem Gültigkeitsinterv
   Art der Sollstellung als Code+Label-Paar (z. B. Miete oder Nebenkosten).
   <Expandable title="properties">
     <ResponseField name="code" type="integer">
-      Sollart-Code. Entspricht `contract_debit_diffs.account_number` — trotz ähnlichen
-      Namens kein Konto.
+      Sollart-Code. Kein Kontenbezug, und trotz ähnlichen Namens nicht dasselbe wie
+      `contract_debit_diffs.account_number` — siehe dessen Beschreibung.
     </ResponseField>
     <ResponseField name="label" type="string">
       Lesbares Label, z. B. "Nettokaltmiete Wohnung".
@@ -482,9 +482,3 @@ Basis eines Verbraucherpreisindex (VPI).
   Ende des Mietverhältnisses, wie auf diesem Datensatz geführt.
 </ResponseField>
 
-<Warning>
-  `min_date`/`max_date` und `begin_contract`/`end_contract` sind zwei weitere
-  Zeitraum-Paare neben `validity_period`, bewusst getrennt gehalten. Ihre genaue Beziehung
-  zu `validity_period` und zueinander ist nicht gegen das Quellsystem bestätigt — geh
-  nicht davon aus, dass die drei Paare austauschbar sind.
-</Warning>

@@ -23,7 +23,6 @@ graph LR
   tenants["Stakeholder.tenants"]
   creditor["Stakeholder.creditor"]
 
-  contract_debit_diffs -->|account_number = debit_type.code| contract_debits
   contract_debits -->|floor_area_person_id| contract_ends
   contract_debits -->|floor_area_person_id| index_rent
 
@@ -33,6 +32,7 @@ graph LR
   properties -.->|property_id| contract_ends
   properties -.->|property_id| index_rent
   contract_debits -.->|ledger_id = account_number| accounts
+  contract_debit_diffs -.->|account_number| accounts
   creditor -.->|creditor_id| service_contracts
   tenants -.->|floor_area_person_id| contract_debits
   tenants -.->|floor_area_person_id| contract_ends
@@ -131,9 +131,9 @@ flow.
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  Debit-type code the deviation applies to. Despite the field name, this is not a ledger
-  account reference — it matches `contract_debits.debit_type.code`, not
-  `Accounting.accounts`.
+  General ledger account the deviation applies to. Matches
+  `Accounting.accounts.account_number` — not the same thing as
+  `contract_debits.debit_type.code`, despite the similar-sounding names.
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
@@ -198,8 +198,9 @@ represents a scheduled debit with a validity interval.
   The type of debit, as a code + label pair (e.g. rent or ancillary charges).
   <Expandable title="properties">
     <ResponseField name="code" type="integer">
-      Debit-type code. Matches `contract_debit_diffs.account_number` — not a ledger account
-      despite the similar naming.
+      Debit-type code. Not a ledger account reference, and not the same as
+      `contract_debit_diffs.account_number` despite the similar naming — see that field's
+      description.
     </ResponseField>
     <ResponseField name="label" type="string">
       Human-readable label, e.g. "Nettokaltmiete Wohnung".
@@ -475,9 +476,3 @@ a consumer price index (VPI).
   Tenancy end date, as carried on this record.
 </ResponseField>
 
-<Warning>
-  `min_date`/`max_date` and `begin_contract`/`end_contract` are two more date-range pairs
-  alongside `validity_period`, kept separate deliberately. Their exact relationship to
-  `validity_period` and to each other has not been confirmed against the source system —
-  don't assume any of the three pairs are interchangeable.
-</Warning>
