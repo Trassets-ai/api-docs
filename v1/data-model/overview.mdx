@@ -45,10 +45,10 @@ already carries `creditor_id`, `person_id`, and `property_structure_account_id` 
 without going through `booking_positions`. Each account can have a `budget` for a given
 month. For a cost centre, `property_structure.account_id` matches the
 `accounts.account_number` of the corresponding accounts row — not its `accounts.account_id`.
-`contract_debits` references the
-general ledger account it posts to via `ledger_id`, again matching `accounts.account_number`
-— `contract_debit_diffs.account_number` is a different thing, a debit-type code, not a
-ledger reference (see the `account_id` row below).
+`contract_debits` and `contract_debit_diffs` both reference the general ledger account they
+post to, via `account_number` on each — matching `accounts.account_number`.
+`contract_debits.debit_type.code` is a different thing, a debit-type code, not a ledger
+reference (see the `account_id` row below).
 
 ```mermaid
 graph LR
@@ -108,8 +108,8 @@ graph LR
   booking_header -->|booking_header_id| booking_positions
   booking_positions -->|account_id| accounts
   budgets -->|account_id| accounts
-  contract_debit_diffs -->|account_number = debit_type.code| contract_debits
-  contract_debits -.->|ledger_id = account_number| accounts
+  contract_debits -.->|account_number| accounts
+  contract_debit_diffs -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   properties -.->|property_id| accounts
   notifications -.->|technical_object_id| technical_objects
@@ -141,8 +141,8 @@ graph LR
 |---|---|---|
 | `property_id` | Identifies a property. Present on every table on this page except `creditor` (a standalone entity, referenced via `creditor_id` instead). | 1 property → many rows in each domain |
 | `booking_header_id` | Groups booking line items under one header. | 1 `booking_header` → many `booking_positions` |
-| `account_id` | Internal account identifier on `accounts`, `booking_positions`, and `budgets` — joins across those three. `index_rent.account_id` and `contract_debits.debit_type.code` mean something unrelated: a debit-type code — don't join those to `accounts`. `contract_debit_diffs.account_number` matches the same debit-type code under a different field name. On `property_structure`, it means something else again: a cost-centre business code, matching `accounts.account_number` for the corresponding cost-centre row, not `accounts.account_id`. | 1 `accounts` row → many `booking_positions`/`budgets` rows |
-| `ledger_id` | General ledger account a debit line posts to, on `contract_debits`. Matches `accounts.account_number`, not `accounts.account_id`. | 1 `accounts` row → many `contract_debits` rows |
+| `account_id` | Internal account identifier on `accounts`, `booking_positions`, and `budgets` — joins across those three. `index_rent.account_id` and `contract_debits.debit_type.code` mean something unrelated: a debit-type code — don't join those to `accounts`. On `property_structure`, it means something else again: a cost-centre business code, matching `accounts.account_number` for the corresponding cost-centre row, not `accounts.account_id`. | 1 `accounts` row → many `booking_positions`/`budgets` rows |
+| `account_number` (on `contract_debits`/`contract_debit_diffs`) | General ledger account a debit line posts to — on both `contract_debits` and `contract_debit_diffs`. Matches `accounts.account_number`, not `accounts.account_id`. | 1 `accounts` row → many `contract_debits`/`contract_debit_diffs` rows |
 | `creditor_id` | Identifies a creditor. Referenced by `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header`, and `booking_positions`. | 1 creditor → many rows across domains |
 | `technical_object_id` | Present on `notifications` and `orders`, resolves against `technical_objects.to_id`. | 1 technical object → many notifications |
 | `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
