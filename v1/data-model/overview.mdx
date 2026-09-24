@@ -44,9 +44,10 @@ transaction usually posts to at most one creditor, tenant, or cost centre, `book
 already carries `creditor_id`, `person_id`, and `property_structure_account_id` directly,
 without going through `booking_positions`. Each account can have a `budget` for a given
 month. A cost-centre account shares its identifier with `property_structure.account_id` — in
-`accounts.account_number`, not `accounts.account_id`. Debit schedules (`contract_debits`,
-`contract_debit_diffs`) reference the general ledger account they post to via `ledger_id`,
-again matching `accounts.account_number`.
+`accounts.account_number`, not `accounts.account_id`. `contract_debits` references the
+general ledger account it posts to via `ledger_id`, again matching `accounts.account_number`
+— `contract_debit_diffs.account_number` is a different thing, a debit-type code, not a
+ledger reference (see the `account_id` row below).
 
 ```mermaid
 graph LR

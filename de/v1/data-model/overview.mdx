@@ -47,9 +47,10 @@ oder eine Kostenstelle betrifft, führt `booking_header` `creditor_id`, `person_
 `property_structure_account_id` bereits direkt, ohne den Umweg über `booking_positions`. Zu
 jedem Konto kann es ein `budget` für einen bestimmten Monat geben. Ein Kostenstellen-Konto
 teilt seinen Bezeichner mit `property_structure.account_id` — in `accounts.account_number`,
-nicht in `accounts.account_id`. Sollstellungen (`contract_debits`, `contract_debit_diffs`)
-referenzieren das Sachkonto, auf das sie buchen, über `ledger_id` — ebenfalls gegen
-`accounts.account_number`.
+nicht in `accounts.account_id`. `contract_debits` referenziert das Sachkonto, auf das es
+bucht, über `ledger_id` — ebenfalls gegen `accounts.account_number`. `contract_debit_diffs.
+account_number` ist etwas anderes, ein Sollart-Code, kein Kontenbezug (siehe die
+`account_id`-Zeile weiter unten).
 
 ```mermaid
 graph LR
