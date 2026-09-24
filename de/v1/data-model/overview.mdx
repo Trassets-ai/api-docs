@@ -39,6 +39,20 @@ Endpunkt steht in der [API-Referenz](/de/v1/api-reference/introduction).
 
 `property_id` ist der Join-Key, den sich alle Tabellen auf dieser Seite teilen.
 
+Ein Buchungsvorgang erzeugt einen `booking_header`, der alle dabei ausgelösten Buchungen
+(`booking_positions`) vereint. Buchungen können auf Konten unterschiedlicher Art gebucht
+werden — Sachkonto, Personenkonto, Kreditorkonto, Projektkonto oder Kostenstelle, siehe
+`accounts.account_type_name`. Da ein Vorgang meist höchstens einen Kreditor, einen Mieter
+oder eine Kostenstelle betrifft, führt `booking_header` `creditor_id`, `person_id` und
+`property_structure_account_id` bereits direkt, ohne den Umweg über `booking_positions`. Zu
+jedem Konto kann es ein `budget` für einen bestimmten Monat geben. Bei einer Kostenstelle
+entspricht `property_structure.account_id` dem `accounts.account_number` der zugehörigen
+Konto-Zeile — nicht deren `accounts.account_id`. `contract_debits` referenziert das
+Sachkonto, auf das es bucht, über `ledger_id` — ebenfalls gegen `accounts.account_number`.
+`contract_debit_diffs.
+account_number` ist etwas anderes, ein Sollart-Code, kein Kontenbezug (siehe die
+`account_id`-Zeile weiter unten).
+
 ```mermaid
 graph LR
   subgraph Property
@@ -98,6 +112,9 @@ graph LR
   booking_positions -->|account_id| accounts
   budgets -->|account_id| accounts
   contract_debit_diffs -.->|account_id| accounts
+  contract_debits -.->|ledger_id = account_number| accounts
+  property_structure -.->|account_id = account_number| accounts
+  properties -.->|property_id| accounts
   notifications -.->|technical_object_id| technical_objects
   notifications -->|report_id| projects
   technical_objects -.->|service_contract_id| service_contracts
@@ -127,12 +144,13 @@ graph LR
 |---|---|---|
 | `property_id` | Identifiziert ein Objekt. Auf jeder Tabelle dieser Seite vorhanden, außer `creditor` (eine eigenständige Entität, referenziert über `creditor_id`). | 1 Objekt → viele Zeilen in jeder Domäne |
 | `booking_header_id` | Gruppiert Buchungspositionen unter einem Buchungskopf. | 1 `booking_header` → viele `booking_positions` |
-| `account_id` | Interne Konto-ID bei `accounts`, `booking_positions` und `budgets` — darüber verknüpfbar. Bei `index_rent` und `contract_debit_diffs` bedeutet derselbe Feldname etwas anderes: den Sollart-Code (entspricht `contract_debits.debit_type.code`) — nicht mit `accounts` verknüpfen. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
+| `account_id` | Interne Konto-ID bei `accounts`, `booking_positions` und `budgets` — darüber verknüpfbar. Bei `index_rent` und `contract_debit_diffs` bedeutet derselbe Feldname etwas anderes: den Sollart-Code (entspricht `contract_debits.debit_type.code`) — nicht mit `accounts` verknüpfen. Bei `property_structure` bedeutet es wieder etwas anderes: einen Kostenstellen-Geschäftscode, der `accounts.account_number` der zugehörigen Kostenstellen-Zeile entspricht, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
+| `ledger_id` | Sachkonto, auf das eine Sollstellungszeile bucht, bei `contract_debits`. Entspricht `accounts.account_number`, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `contract_debits`-Zeilen |
 | `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header` und `booking_positions`. | 1 Kreditor → viele Zeilen über Domänen hinweg |
 | `technical_object_id` | Vorhanden auf `notifications` und `orders`, löst sich gegen `technical_objects.to_id` auf. | 1 technisches Objekt → viele Meldungen |
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
-| `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_header` ein String, bei `booking_positions` eine Zahl — `booking_positions` nicht direkt über `person_id` mit einem Mieter verknüpfen, sondern über `booking_header_id` gehen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
+| `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_header` ein String, bei `booking_positions` eine Zahl — `booking_positions` nicht direkt über `person_id` mit einem Mieter verknüpfen, sondern über `booking_header_id` gehen. Buchungen sind einem Mieter nur auf Objektebene zuordenbar, nicht bis zur einzelnen Fläche — hält derselbe Mieter mehrere Flächen im selben Objekt, lassen sich seine Buchungen nicht nach Fläche trennen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
 | `floor_area_person_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits`, `contract_ends` und `index_rent` teilen denselben Wert und denselben Typ (String) — direkt darüber verknüpfen, ohne `property_id` und ohne Cast. | 1 Mietverhältnis → viele Soll-/Ende-/Index-Zeilen |
 | `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits` und `contract_ends`. | 1 Einheit → viele Zeilen |
 | `asset_id` | Verknüpft eine Abschreibungsbuchung mit dem Anlagegut, auf das sie abschreibt. Jede `depreciation`-Zeile löst sich gegen `assets` auf. | 1 Anlagegut → viele Buchungen |
