@@ -30,7 +30,7 @@ graph LR
   properties -.->|property_id| booking_header
   properties -.->|property_id| budgets
   properties -.->|property_id| accounts
-  contract_debits -.->|ledger_id = account_number| accounts
+  contract_debits -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   booking_header -.->|property_id + person_id| tenants
   booking_positions -.->|property_id + person_id| tenants
