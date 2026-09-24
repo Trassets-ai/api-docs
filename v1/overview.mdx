@@ -1,11 +1,31 @@
 ---
 title: "Data API v1 (Preview)"
 sidebarTitle: "Overview"
-description: "Preview of the versioned Data API: which tables are available under /v1/ and how its responses are structured."
+description: "What the Trassets Data API is and where to start with its versioned /v1/ path."
 ---
 
-<Warning>
-  `/v1/` already covers six data domains — Accounting, Contracts, Depreciation, Operations, Property, and Stakeholder — and keeps growing. The **API Reference** tab always shows what is available right now — don't assume a table is reachable under `/v1/` just because you've used it before.
-</Warning>
+The Trassets Data API is a read-only REST interface over real-estate data — properties, contracts, accounting, and more — built for software partners and integrators connecting to Trassets-managed portfolios. Every request is authenticated with an `X-API-Key` header; every response is JSON.
 
-`/v1/` serves data under a `/v1/{category}/{api_table}` path prefix, with responses that follow the [response structure](/v1/response-shape-conventions) rules.
+This section covers `/v1/`, the API's versioned path family (`/v1/{category}/{api_table}`), with a response shape that's stable per endpoint once published.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/v1/quickstart">
+    Get an API key and make your first `/v1/` call.
+  </Card>
+
+  <Card title="Authentication" icon="key" href="/v1/authentication">
+    Key management and access tiers.
+  </Card>
+
+  <Card title="Response Structure" icon="brackets-curly" href="/v1/response-shape-conventions">
+    The structural rules every `/v1/` response follows.
+  </Card>
+
+  <Card title="Data Model" icon="diagram-project" href="/v1/data-model/overview">
+    The tables available under `/v1/` and how they join.
+  </Card>
+
+  <Card title="API Reference" icon="book-open" href="/v1/api-reference/introduction">
+    Every endpoint currently live under `/v1/`.
+  </Card>
+</CardGroup>
