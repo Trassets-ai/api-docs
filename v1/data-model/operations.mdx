@@ -167,7 +167,9 @@ graph LR
 
 
 <ResponseField name="hierarchy" type="string[]">
-  The project's position in a cost-breakdown hierarchy, as an ordered list of levels. Empty
+  Where the project sits in the accounting chart of accounts, as an ordered list from
+  coarse to fine (e.g. `["4", "4.2", "4.2.1"]` — top-level cost category, subcategory,
+  specific account). Like a folder path, just numeric instead of named. Empty, deeper
   levels are omitted.
 </ResponseField>
 
