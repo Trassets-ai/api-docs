@@ -13,7 +13,11 @@ seine Erklärung auf der jeweiligen Domain-Seite.
 
 <ResponseField name="account_name / account_group" type="string">
   Denormalisierte Kopien der gleichnamigen Spalte auf `Accounting.accounts`, aufgelöst über
-  das Kontenbereichs-Mapping — aber kein Paar, und nicht auf jeder Tabelle. `account_name`
+  das Kontenbereichs-Mapping — eine Lookup-Tabelle, die Kontennummern-Bereiche je
+  Objektbereich einer Reporting-Position zuordnet. Hat noch keinen eigenen `/v1/`-Endpunkt;
+  die tatsächlichen Felder stehen unter
+  [`kontenmapping_ranges`](/de/data-model/accounting#kontenmapping_ranges) auf der
+  unversionierten Accounting-Seite. Kein Paar, und nicht auf jeder Tabelle. `account_name`
   (ohne `account_group`) steht auf `property_structure` (Kostenstellen-Name), `projects`
   und `assets`. `account_group` (ohne `account_name`) steht auf `booking_positions` und
   `contract_debits`. Keines der beiden Felder gibt es auf `technical_objects` — dort steht
