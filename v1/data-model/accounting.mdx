@@ -58,13 +58,6 @@ given month. A cost centre is always tied to part of the property structure
 always reference a tenant account listed in `accounts`, via `account_number`.
 
 <Note>
-  `accounts` rows with `account_type_name` `"Kreditorkonto"` represent a creditor posting
-  target, but their `account_id` does not match `Stakeholder.creditor.creditor_id` — there
-  is no direct join between the two. The creditor for a transaction is exposed directly on
-  `booking_header.creditor_id` / `booking_positions.creditor_id` instead.
-</Note>
-
-<Note>
   Bookings on a tenant account (Personenkonto) are only linkable to a tenant at the
   property level (`property_id` + `person_id`), not down to a specific unit. If a tenant
   occupies multiple units in the same property, their bookings can't be split between them.
@@ -111,10 +104,6 @@ see `account_type_name`.
   Sort order of the reporting position within its category.
 </ResponseField>
 
-<Note>
-  `nr` is `null` for some accounts, depending on how the account was classified. `category`
-  and `group` are still populated in that case.
-</Note>
 
 <ResponseField name="account_group" type="string">
   Account group the account is classified under.

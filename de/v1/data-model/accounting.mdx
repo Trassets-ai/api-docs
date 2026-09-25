@@ -60,14 +60,6 @@ der Objektstruktur (`property_structure`) verbunden. Sollstellungen
 `accounts` gelistetes Personenkonto, über `account_number`.
 
 <Note>
-  `accounts`-Zeilen mit `account_type_name` `"Kreditorkonto"` stehen für ein
-  Kreditor-Buchungsziel, aber ihre `account_id` entspricht nicht
-  `Stakeholder.creditor.creditor_id` — dafür gibt es keine direkte Verknüpfung. Der
-  Kreditor eines Vorgangs steht stattdessen direkt auf `booking_header.creditor_id` /
-  `booking_positions.creditor_id`.
-</Note>
-
-<Note>
   Buchungen auf einem Personenkonto (Mieter) sind nur auf Objektebene mit einem Mieter
   verknüpfbar (`property_id` + `person_id`), nicht bis auf eine bestimmte Einheit herunter.
   Bewohnt ein Mieter mehrere Einheiten desselben Objekts, lassen sich seine Buchungen nicht
@@ -115,10 +107,6 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
   Sortiernummer der Position innerhalb ihrer Kategorie.
 </ResponseField>
 
-<Note>
-  `nr` ist bei manchen Konten `null`, je nachdem wie das Konto klassifiziert wurde.
-  `category` und `group` sind in dem Fall trotzdem befüllt.
-</Note>
 
 <ResponseField name="account_group" type="string">
   Kontengruppe, der das Konto zugeordnet ist.
