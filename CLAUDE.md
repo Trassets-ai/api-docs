@@ -22,7 +22,7 @@ No build, lint, or test step. Changes deploy automatically on push to the defaul
 - English content lives at repo root (`quickstart.mdx`, `concepts/*.mdx`, `data-model/*.mdx`, `guides/*.mdx`, `api-reference/introduction.mdx`).
 - German content is a parallel tree under `de/`, mirroring the English paths 1:1 (`de/quickstart.mdx`, `de/concepts/*.mdx`, etc.). Keep both trees in sync — a new/changed English page usually needs the same treatment in `de/`.
 - `api-reference/introduction.mdx` (and its `de/` counterpart) is hand-written; the actual endpoint pages are generated from the live OpenAPI spec at `https://api.trassets.ai/openapi.json`, referenced via an `"openapi"` key in a `docs.json` nav group rather than as MDX files. The generated endpoint pages themselves are not translated — the spec has one language.
-- `.agents/skills/` — vendored Mintlify skills (`mintlify`, `mintlify-docs`, `mintlify-api`); consult these for component syntax and MDX conventions instead of guessing.
+- `.agents/skills/` — vendored Mintlify skills (`mintlify`, `mintlify-api`); consult these for component syntax and MDX conventions instead of guessing.
 - `v1/data-model/AUTHORING.md` — framework/checklist for writing or editing pages under `v1/data-model/`, distilled from a documentation review. Read before creating or substantially editing a page there.
 
 ## Content conventions
