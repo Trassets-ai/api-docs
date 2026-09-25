@@ -1,0 +1,47 @@
+---
+title: "Feldglossar"
+sidebarTitle: "Feldglossar"
+description: "Referenz für Feldnamen, die über mehrere v1-Datenmodell-Tabellen hinweg mit derselber Bedeutung wiederkehren, aber keine Verknüpfungsschlüssel oder strukturellen Konventionen sind."
+---
+
+Dieses Glossar deckt Felder ab, die über mehrere `/v1/`-Tabellen hinweg mit konsistenter
+Bedeutung wiederkehren, aber nicht auf die [Datenmodell-Übersicht](/de/v1/data-model/overview)
+(Verknüpfungsschlüssel mit Kardinalität/Fallstricken) oder in die
+[Response-Struktur-Konventionen](/de/v1/response-shape-conventions) (strukturelle Muster wie
+`period`-, `amount`- und `code`+`label`-Objekte) gehören. Steht ein Feld hier nicht, liegt
+seine Erklärung auf der jeweiligen Domain-Seite.
+
+<ResponseField name="account_name / account_group" type="string">
+  Denormalisierte Kopien der gleichnamigen Spalte auf `Accounting.accounts`, aufgelöst über
+  das Kontenbereichs-Mapping. `account_name` und `account_group` stehen auf `accounts` selbst
+  (der Quelle) und erneut auf `booking_positions`, `contract_debits`, `technical_objects`,
+  `projects` und `assets` — beschreiben dort aber immer *das eigene* Konto der jeweiligen
+  Zeile, nicht ein Join-Ziel. Welches Konto sie beschreiben, unterscheidet sich je Tabelle
+  (eine Kostenstelle bei `technical_objects`/`property_structure`, ein Projektkonto bei
+  `projects`, ein Abschreibungskonto bei `assets`). Nur lesend; kein alternativer
+  Join-Pfad zu `accounts` — dafür `account_number` nutzen (siehe Verknüpfungsschlüssel-Tabelle
+  auf der Übersichtsseite).
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link zu einem im Dokumentenmanagementsystem (DMS) hinterlegten Dokument. Kommt vor auf
+  `booking_positions`, `projects`, `properties` und `property_structure`. `null`, wenn kein
+  Dokument hinterlegt ist — nicht jede Zeile hat eines.
+</ResponseField>
+
+<ResponseField name="comment / *_comment" type="string">
+  Freitext-Ergänzung zu einem begleitenden Code-Feld (z. B. `vacancy_reason` /
+  `vacancy_reason_comment`, `contract_reasoning` / `contract_reasoning_comment`), oder eine
+  eigenständige Freitext-Notiz (`notifications.comment`, `contract_ends.comment`).
+  Unstrukturiert — nicht auf Werte parsen, die eigentlich aus dem Code-Feld stammen sollten.
+</ResponseField>
+
+<ResponseField name="property_id_person_id vs. floor_area_person_id" type="string">
+  Beide sind zusammengesetzte Mieter-Identifikatoren und leicht zu verwechseln.
+  `property_id_person_id` (integer) identifiziert einen Mieter auf Objektebene, ohne
+  Flächenbezug — auf `booking_positions` und `contract_debits`. `floor_area_person_id`
+  (string) identifiziert ein konkretes Mietverhältnis (Mieter *in* einer bestimmten Fläche)
+  und ist der Cross-Endpoint-Verknüpfungsschlüssel zwischen `tenants`, `contract_debits`,
+  `contract_ends` und `index_rent` — Details dazu in der Verknüpfungsschlüssel-Tabelle der
+  Übersichtsseite. Beide sind nicht austauschbar und nicht voneinander ableitbar.
+</ResponseField>

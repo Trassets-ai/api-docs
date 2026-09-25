@@ -1,0 +1,47 @@
+---
+title: "Field Glossary"
+sidebarTitle: "Field Glossary"
+description: "Reference for field names that recur across multiple v1 data-model tables with the same meaning, but aren't join keys or structural conventions covered elsewhere."
+---
+
+This glossary covers fields that repeat across several `/v1/` tables with a consistent
+meaning, but don't belong on the [Data Model Overview](/v1/data-model/overview) (join
+keys and their cardinality/pitfalls) or in
+[Response Shape Conventions](/v1/response-shape-conventions) (structural patterns like
+`period`, `amount`, and `code`+`label` objects). If a field isn't listed here, its
+explanation lives on the domain page where it appears.
+
+<ResponseField name="account_name / account_group" type="string">
+  Denormalized copies of the matching column on `Accounting.accounts`, resolved via the
+  account-range mapping. `account_name` and `account_group` appear on `accounts` itself
+  (the source) and again on `booking_positions`, `contract_debits`, `technical_objects`,
+  `projects`, and `assets` — but they always describe *that row's own* account, not a
+  join target. Which account they describe differs per table (a cost centre on
+  `technical_objects`/`property_structure`, a project account on `projects`, a
+  depreciation account on `assets`). Read-only; don't treat them as an alternative join
+  path to `accounts` — use `account_number` for that (see the join-key table on the
+  overview page).
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link to a document attached in the document management system (DMS). Appears on
+  `booking_positions`, `projects`, `properties`, and `property_structure`. `null` when no
+  document is attached — not every row has one.
+</ResponseField>
+
+<ResponseField name="comment / *_comment" type="string">
+  Free-text elaboration on a companion code field (e.g. `vacancy_reason` /
+  `vacancy_reason_comment`, `contract_reasoning` / `contract_reasoning_comment`), or a
+  standalone free-text note (`notifications.comment`, `contract_ends.comment`). Unstructured
+  — don't parse it for values that should come from the code field instead.
+</ResponseField>
+
+<ResponseField name="property_id_person_id vs. floor_area_person_id" type="string">
+  Both are composite tenant identifiers and easy to confuse. `property_id_person_id`
+  (integer) identifies a tenant at property level, without unit granularity — used on
+  `booking_positions` and `contract_debits`. `floor_area_person_id` (string) identifies a
+  specific tenancy (tenant *in* a specific unit) and is the cross-endpoint bridge key
+  between `tenants`, `contract_debits`, `contract_ends`, and `index_rent` — see the
+  overview page's join-key table for the join details. They are not interchangeable and
+  not derivable from each other.
+</ResponseField>
