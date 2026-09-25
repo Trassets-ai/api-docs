@@ -63,6 +63,15 @@ always reference a tenant account listed in `accounts`, via `account_number`.
   occupies multiple units in the same property, their bookings can't be split between them.
 </Note>
 
+<Note>
+  `person_id` isn't type-consistent across endpoints: `booking_header.person_id` and
+  `Stakeholder.tenants.person_id` are strings (e.g. `"2001-1"`), but
+  `booking_positions.person_id` is an integer with the hyphen stripped — casting it back to
+  a string doesn't reproduce the original value. Don't join `booking_positions` to `tenants`
+  directly on `person_id`; go via `booking_positions.booking_header_id` →
+  `booking_header.person_id` instead.
+</Note>
+
 ## accounts
 
 `GET /v1/accounting/accounts` — the chart of accounts. Covers general ledger accounts,
