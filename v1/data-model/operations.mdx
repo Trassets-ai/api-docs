@@ -48,16 +48,13 @@ graph LR
   `Stakeholder.tenants.person_id` — don't treat the two as the same entity.
 </ResponseField>
 
-<ResponseField name="cost_center" type="object">
-  Cost centre the report is booked against, as a structured object.
-  <Expandable title="properties">
-    <ResponseField name="code" type="string">
-      Cost-centre code.
-    </ResponseField>
-    <ResponseField name="label" type="string">
-      Cost-centre name.
-    </ResponseField>
-  </Expandable>
+<ResponseField name="cost_center_id" type="string">
+  Cost centre the report is booked against.
+</ResponseField>
+
+<ResponseField name="cost_center_id_name" type="string">
+  Cost-centre ID and name, pre-combined into one display string for convenience (e.g. in
+  Power BI). Not a join key.
 </ResponseField>
 
 <ResponseField name="to_do_period" type="object">
@@ -112,8 +109,9 @@ graph LR
   Priority level.
 </ResponseField>
 
-<ResponseField name="status" type="string">
-  Current status of the report.
+<ResponseField name="Status" type="string">
+  Current status of the report. Capitalized in the response — not a typo in this
+  documentation, that's the live field name.
 </ResponseField>
 
 <ResponseField name="status_date" type="date">
@@ -228,18 +226,20 @@ graph LR
   Current project status.
 </ResponseField>
 
-<ResponseField name="comments" type="object[]">
-  Comments and notes, as a list of objects. Combines what were four separate fields —
-  `comment` (a status comment) and `comment_1`/`comment_2`/`comment_3` (notes) — into one
-  array; empty entries are omitted. Each entry keeps its origin via `type`.
-  <Expandable title="properties">
-    <ResponseField name="type" type="string">
-      Where the entry came from: `status`, `hint_1`, `hint_2`, or `hint_3`.
-    </ResponseField>
-    <ResponseField name="text" type="string">
-      The comment or note text.
-    </ResponseField>
-  </Expandable>
+<ResponseField name="comment" type="string">
+  Status comment on the project.
+</ResponseField>
+
+<ResponseField name="comment_1" type="string">
+  Free-text note. Not merged with `comment`/`comment_2`/`comment_3` — four separate fields.
+</ResponseField>
+
+<ResponseField name="comment_2" type="string">
+  Free-text note, see `comment_1`.
+</ResponseField>
+
+<ResponseField name="comment_3" type="string">
+  Free-text note, see `comment_1`.
 </ResponseField>
 
 <ResponseField name="percentage_completed" type="number">
