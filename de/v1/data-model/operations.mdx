@@ -169,8 +169,10 @@ andere Domäne.*
 
 
 <ResponseField name="hierarchy" type="string[]">
-  Position des Projekts in einer Kostenaufschlüsselungs-Hierarchie, als geordnete Liste von
-  Ebenen. Leere Ebenen werden weggelassen.
+  Wo das Projekt im Kontenbaum der Buchhaltung "aufgehängt" ist, als geordnete Liste von
+  grob nach fein (z. B. `["4", "4.2", "4.2.1"]` — oberste Kostenkategorie, Unterkategorie,
+  konkretes Konto). Wie ein Ordnerpfad, nur numerisch statt benannt. Leere, tiefere
+  Ebenen werden weggelassen.
 </ResponseField>
 
 <ResponseField name="cost_center" type="object">
