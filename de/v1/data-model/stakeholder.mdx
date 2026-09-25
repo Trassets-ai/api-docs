@@ -139,6 +139,10 @@ bedienen kann, referenziert über `creditor_id` aus `Property.technical_objects`
   Link zum verknüpften Dokument im DMS.
 </ResponseField>
 
+<ResponseField name="okdn" type="string">
+  Bedeutung mit dem Quellsystem noch nicht geklärt — keine Bedeutung aus dem Namen ableiten.
+</ResponseField>
+
 ## employees
 
 `GET /v1/stakeholder/employees` — das für ein Objekt zuständige Verwaltungsteam.
@@ -243,6 +247,10 @@ Miteigentum.
   `Accounting.accounts.account_number`, das ein Sachkonto identifiziert.
 </ResponseField>
 
+<ResponseField name="partner" type="string">
+  Bedeutung mit dem Quellsystem noch nicht geklärt — keine Bedeutung aus dem Namen ableiten.
+</ResponseField>
+
 ## tenants
 
 `GET /v1/stakeholder/tenants` — Mieter-Stammdaten und aktuelle Mietvertragskonditionen.
@@ -329,4 +337,8 @@ Miteigentum.
 
 <ResponseField name="dms_link" type="string">
   Link zum verknüpften Dokument im DMS.
+</ResponseField>
+
+<ResponseField name="option_valid_until" type="date">
+  Bedeutung mit dem Quellsystem noch nicht geklärt — keine Bedeutung aus dem Namen ableiten.
 </ResponseField>
