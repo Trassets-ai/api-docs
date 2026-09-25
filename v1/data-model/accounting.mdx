@@ -33,7 +33,6 @@ graph LR
   contract_debits -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   booking_header -.->|property_id + person_id| tenants
-  booking_positions -.->|property_id + person_id| tenants
   booking_header -.->|property_structure_account_id| property_structure
   booking_positions -.->|property_structure_account_id| property_structure
   creditor -.->|creditor_id| booking_header
@@ -51,6 +50,11 @@ account, a creditor account, a project account, or a cost centre — see
 creditor, tenant, or cost-centre account, so those are already exposed directly on
 `booking_header` (`creditor_id`, `person_id`, `property_structure_account_id`) rather than
 requiring a join through `accounts`.
+
+`booking_positions` also carries a `person_id`, but as `integer` rather than the `string`
+used by `booking_header.person_id` and `tenants.person_id` — it doesn't join directly to
+`tenants`. To link a posting to a tenant, go through `booking_positions.booking_header_id`
+to `booking_header.person_id` instead.
 
 Every transaction belongs to one property. An account can have a budget (`budgets`) for a
 given month. A cost centre is always tied to part of the property structure

@@ -33,7 +33,6 @@ graph LR
   contract_debits -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   booking_header -.->|property_id + person_id| tenants
-  booking_positions -.->|property_id + person_id| tenants
   booking_header -.->|property_structure_account_id| property_structure
   booking_positions -.->|property_structure_account_id| property_structure
   creditor -.->|creditor_id| booking_header
@@ -52,6 +51,12 @@ Kreditorkonto, ein Projektkonto oder eine Kostenstelle betreffen — siehe
 Kreditor-, Personen- oder Kostenstellenkonto gibt, stehen diese bereits direkt auf
 `booking_header` (`creditor_id`, `person_id`, `property_structure_account_id`) — eine
 Verknüpfung über `accounts` ist dafür nicht nötig.
+
+`booking_positions` führt ebenfalls ein `person_id`-Feld, aber als `integer` statt als
+`string` wie bei `booking_header.person_id` und `tenants.person_id` — eine direkte
+Verknüpfung zu `tenants` funktioniert damit nicht. Um eine Position einem Mieter
+zuzuordnen, geht der Weg über `booking_positions.booking_header_id` zu
+`booking_header.person_id`.
 
 Jeder Buchungsvorgang gehört zu genau einem Objekt. Zu einem Konto kann es ein Budget
 (`budgets`) für einen bestimmten Monat geben. Eine Kostenstelle ist immer mit einem Teil
