@@ -201,7 +201,8 @@
                       "v1/data-model/overview",
                       "v1/data-model/accounting",
                       "v1/data-model/contracts",
-                      "v1/data-model/depreciation"
+                      "v1/data-model/depreciation",
+                      "v1/data-model/operations"
                     ]
                   }
                 ]
@@ -284,7 +285,8 @@
                       "de/v1/data-model/overview",
                       "de/v1/data-model/accounting",
                       "de/v1/data-model/contracts",
-                      "de/v1/data-model/depreciation"
+                      "de/v1/data-model/depreciation",
+                      "de/v1/data-model/operations"
                     ]
                   }
                 ]

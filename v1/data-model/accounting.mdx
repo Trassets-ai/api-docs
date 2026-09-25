@@ -42,6 +42,34 @@ graph LR
 
 *Solid edges are joins within Accounting; dashed edges cross into another domain.*
 
+### How the booking model fits together
+
+A booking transaction has one `booking_header`, which groups every individual posting
+(`booking_positions`) it triggers. A posting can hit a general ledger account, a tenant
+account, a creditor account, a project account, or a cost centre — see
+`accounts.account_type_name`. A transaction usually has at most one posting against a
+creditor, tenant, or cost-centre account, so those are already exposed directly on
+`booking_header` (`creditor_id`, `person_id`, `property_structure_account_id`) rather than
+requiring a join through `accounts`.
+
+Every transaction belongs to one property. An account can have a budget (`budgets`) for a
+given month. A cost centre is always tied to part of the property structure
+(`property_structure`). Debits (`Contracts.contract_debits`, `Contracts.contract_debit_diffs`)
+always reference a tenant account listed in `accounts`, via `account_number`.
+
+<Note>
+  `accounts` rows with `account_type_name` `"Kreditorkonto"` represent a creditor posting
+  target, but their `account_id` does not match `Stakeholder.creditor.creditor_id` — there
+  is no direct join between the two. The creditor for a transaction is exposed directly on
+  `booking_header.creditor_id` / `booking_positions.creditor_id` instead.
+</Note>
+
+<Note>
+  Bookings on a tenant account (Personenkonto) are only linkable to a tenant at the
+  property level (`property_id` + `person_id`), not down to a specific unit. If a tenant
+  occupies multiple units in the same property, their bookings can't be split between them.
+</Note>
+
 ## accounts
 
 `GET /v1/accounting/accounts` — the chart of accounts. Covers general ledger accounts,

@@ -43,6 +43,37 @@ graph LR
 *Durchgezogene Kanten sind Joins innerhalb von Accounting; gestrichelte Kanten gehen in eine
 andere Domäne.*
 
+### So hängt das Buchungsmodell zusammen
+
+Ein Buchungsvorgang hat einen `booking_header`, der alle dabei ausgelösten Buchungen
+(`booking_positions`) vereint. Eine Buchung kann ein Sachkonto, ein Personenkonto, ein
+Kreditorkonto, ein Projektkonto oder eine Kostenstelle betreffen — siehe
+`accounts.account_type_name`. Da es je Vorgang in der Regel nur eine Buchung auf ein
+Kreditor-, Personen- oder Kostenstellenkonto gibt, stehen diese bereits direkt auf
+`booking_header` (`creditor_id`, `person_id`, `property_structure_account_id`) — eine
+Verknüpfung über `accounts` ist dafür nicht nötig.
+
+Jeder Buchungsvorgang gehört zu genau einem Objekt. Zu einem Konto kann es ein Budget
+(`budgets`) für einen bestimmten Monat geben. Eine Kostenstelle ist immer mit einem Teil
+der Objektstruktur (`property_structure`) verbunden. Sollstellungen
+(`Contracts.contract_debits`, `Contracts.contract_debit_diffs`) referenzieren immer ein in
+`accounts` gelistetes Personenkonto, über `account_number`.
+
+<Note>
+  `accounts`-Zeilen mit `account_type_name` `"Kreditorkonto"` stehen für ein
+  Kreditor-Buchungsziel, aber ihre `account_id` entspricht nicht
+  `Stakeholder.creditor.creditor_id` — dafür gibt es keine direkte Verknüpfung. Der
+  Kreditor eines Vorgangs steht stattdessen direkt auf `booking_header.creditor_id` /
+  `booking_positions.creditor_id`.
+</Note>
+
+<Note>
+  Buchungen auf einem Personenkonto (Mieter) sind nur auf Objektebene mit einem Mieter
+  verknüpfbar (`property_id` + `person_id`), nicht bis auf eine bestimmte Einheit herunter.
+  Bewohnt ein Mieter mehrere Einheiten desselben Objekts, lassen sich seine Buchungen nicht
+  zwischen ihnen aufteilen.
+</Note>
+
 ## accounts
 
 `GET /v1/accounting/accounts` — der Kontenplan. Umfasst Sachkonten, Personenkonten,
