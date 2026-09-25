@@ -50,13 +50,16 @@ andere Domäne.*
   `Stakeholder.tenants.person_id` — nicht als dieselbe Entität behandeln.
 </ResponseField>
 
-<ResponseField name="cost_center_id" type="string">
-  Kostenstelle, gegen die die Meldung gebucht wird.
-</ResponseField>
-
-<ResponseField name="cost_center_id_name" type="string">
-  Kostenstellen-ID und -Name, vorab zu einem Anzeige-String kombiniert (z. B. für Power BI).
-  Kein Verknüpfungsschlüssel.
+<ResponseField name="cost_center" type="object">
+  Kostenstelle, gegen die die Meldung gebucht wird, als strukturiertes Objekt.
+  <Expandable title="properties">
+    <ResponseField name="code" type="string">
+      Kostenstellen-Code.
+    </ResponseField>
+    <ResponseField name="label" type="string">
+      Kostenstellen-Bezeichnung.
+    </ResponseField>
+  </Expandable>
 </ResponseField>
 
 <ResponseField name="to_do_period" type="object">
@@ -111,9 +114,8 @@ andere Domäne.*
   Prioritätsstufe.
 </ResponseField>
 
-<ResponseField name="Status" type="string">
-  Aktueller Status der Meldung. Im Response großgeschrieben — kein Tippfehler in dieser
-  Doku, das ist der live geltende Feldname.
+<ResponseField name="status" type="string">
+  Aktueller Status der Meldung.
 </ResponseField>
 
 <ResponseField name="status_date" type="date">
@@ -228,21 +230,19 @@ andere Domäne.*
   Aktueller Projektstatus.
 </ResponseField>
 
-<ResponseField name="comment" type="string">
-  Statuskommentar zum Projekt.
-</ResponseField>
-
-<ResponseField name="comment_1" type="string">
-  Freitext-Hinweis. Nicht zusammengeführt mit `comment`/`comment_2`/`comment_3` — vier
-  getrennte Felder.
-</ResponseField>
-
-<ResponseField name="comment_2" type="string">
-  Freitext-Hinweis, siehe `comment_1`.
-</ResponseField>
-
-<ResponseField name="comment_3" type="string">
-  Freitext-Hinweis, siehe `comment_1`.
+<ResponseField name="comments" type="object[]">
+  Kommentare und Hinweise als Liste von Objekten. Fasst vier vormals getrennte Felder
+  zusammen — `comment` (ein Statuskommentar) und `comment_1`/`comment_2`/`comment_3`
+  (Hinweise) — leere Einträge werden weggelassen. Jeder Eintrag behält seine Herkunft über
+  `type`.
+  <Expandable title="properties">
+    <ResponseField name="type" type="string">
+      Herkunft des Eintrags: `status`, `hint_1`, `hint_2` oder `hint_3`.
+    </ResponseField>
+    <ResponseField name="text" type="string">
+      Der Kommentar- bzw. Hinweistext.
+    </ResponseField>
+  </Expandable>
 </ResponseField>
 
 <ResponseField name="percentage_completed" type="number">
