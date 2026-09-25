@@ -116,7 +116,6 @@ graph LR
   notifications -->|report_id| projects
   technical_objects -.->|service_contract_id| service_contracts
   booking_header -.->|property_id + person_id| tenants
-  booking_positions -.->|property_id + person_id| tenants
   tenants -.->|floor_area_person_id| contract_debits
   tenants -.->|floor_area_person_id| contract_ends
   tenants -.->|floor_area_person_id| index_rent
