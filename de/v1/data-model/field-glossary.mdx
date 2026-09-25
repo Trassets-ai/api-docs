@@ -13,26 +13,26 @@ seine Erklärung auf der jeweiligen Domain-Seite.
 
 <ResponseField name="account_name / account_group" type="string">
   Denormalisierte Kopien der gleichnamigen Spalte auf `Accounting.accounts`, aufgelöst über
-  das Kontenbereichs-Mapping. `account_name` und `account_group` stehen auf `accounts` selbst
-  (der Quelle) und erneut auf `booking_positions`, `contract_debits`, `technical_objects`,
-  `projects` und `assets` — beschreiben dort aber immer *das eigene* Konto der jeweiligen
-  Zeile, nicht ein Join-Ziel. Welches Konto sie beschreiben, unterscheidet sich je Tabelle
-  (eine Kostenstelle bei `technical_objects`/`property_structure`, ein Projektkonto bei
-  `projects`, ein Abschreibungskonto bei `assets`). Nur lesend; kein alternativer
-  Join-Pfad zu `accounts` — dafür `account_number` nutzen (siehe Verknüpfungsschlüssel-Tabelle
-  auf der Übersichtsseite).
+  das Kontenbereichs-Mapping — aber kein Paar, und nicht auf jeder Tabelle. `account_name`
+  (ohne `account_group`) steht auf `property_structure` (Kostenstellen-Name), `projects`
+  und `assets`. `account_group` (ohne `account_name`) steht auf `booking_positions` und
+  `contract_debits`. Keines der beiden Felder gibt es auf `technical_objects` — dort steht
+  stattdessen `property_structure_account_id` (ein Fremdschlüssel). Welches Konto jeweils
+  gemeint ist, unterscheidet sich je Tabelle. Nur lesend; kein alternativer Join-Pfad zu
+  `accounts` — dafür `account_number` nutzen (siehe Verknüpfungsschlüssel-Tabelle auf der
+  Übersichtsseite).
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">
   Link zu einem im Dokumentenmanagementsystem (DMS) hinterlegten Dokument. Kommt vor auf
-  `booking_positions`, `projects`, `properties` und `property_structure`. `null`, wenn kein
+  `booking_header`, `projects`, `properties` und `property_structure`. `null`, wenn kein
   Dokument hinterlegt ist — nicht jede Zeile hat eines.
 </ResponseField>
 
 <ResponseField name="comment / *_comment" type="string">
   Freitext-Ergänzung zu einem begleitenden Code-Feld (z. B. `vacancy_reason` /
   `vacancy_reason_comment`, `contract_reasoning` / `contract_reasoning_comment`), oder eine
-  eigenständige Freitext-Notiz (`notifications.comment`, `contract_ends.comment`).
+  eigenständige Freitext-Notiz (`notifications.comment`, `index_rent.comment`).
   Unstrukturiert — nicht auf Werte parsen, die eigentlich aus dem Code-Feld stammen sollten.
 </ResponseField>
 

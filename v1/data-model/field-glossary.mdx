@@ -13,26 +13,26 @@ explanation lives on the domain page where it appears.
 
 <ResponseField name="account_name / account_group" type="string">
   Denormalized copies of the matching column on `Accounting.accounts`, resolved via the
-  account-range mapping. `account_name` and `account_group` appear on `accounts` itself
-  (the source) and again on `booking_positions`, `contract_debits`, `technical_objects`,
-  `projects`, and `assets` — but they always describe *that row's own* account, not a
-  join target. Which account they describe differs per table (a cost centre on
-  `technical_objects`/`property_structure`, a project account on `projects`, a
-  depreciation account on `assets`). Read-only; don't treat them as an alternative join
+  account-range mapping — but not as a pair, and not on every table. `account_name`
+  (without `account_group`) appears on `property_structure` (cost-centre name),
+  `projects`, and `assets`. `account_group` (without `account_name`) appears on
+  `booking_positions` and `contract_debits`. Neither field is on `technical_objects`,
+  which carries `property_structure_account_id` (a foreign key) instead. Which account
+  each describes differs per table. Read-only; don't treat them as an alternative join
   path to `accounts` — use `account_number` for that (see the join-key table on the
   overview page).
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">
   Link to a document attached in the document management system (DMS). Appears on
-  `booking_positions`, `projects`, `properties`, and `property_structure`. `null` when no
+  `booking_header`, `projects`, `properties`, and `property_structure`. `null` when no
   document is attached — not every row has one.
 </ResponseField>
 
 <ResponseField name="comment / *_comment" type="string">
   Free-text elaboration on a companion code field (e.g. `vacancy_reason` /
   `vacancy_reason_comment`, `contract_reasoning` / `contract_reasoning_comment`), or a
-  standalone free-text note (`notifications.comment`, `contract_ends.comment`). Unstructured
+  standalone free-text note (`notifications.comment`, `index_rent.comment`). Unstructured
   — don't parse it for values that should come from the code field instead.
 </ResponseField>
 
