@@ -13,7 +13,8 @@ explanation lives on the domain page where it appears.
 
 <ResponseField name="account_name / account_group" type="string">
   Denormalized copies of the matching column on `Accounting.accounts`, resolved via the
-  account-range mapping — but not as a pair, and not on every table. `account_name`
+  account-range mapping — a lookup table that groups ranges of account numbers under a
+  reporting position, per property range. `account_name`
   (without `account_group`) appears on `property_structure` (cost-centre name),
   `projects`, and `assets`. `account_group` (without `account_name`) appears on
   `booking_positions` and `contract_debits`. Neither field is on `technical_objects`,
