@@ -33,7 +33,6 @@ graph LR
   contract_debits -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   booking_header -.->|property_id + person_id| tenants
-  booking_positions -.->|property_id + person_id| tenants
   booking_header -.->|property_structure_account_id| property_structure
   booking_positions -.->|property_structure_account_id| property_structure
   creditor -.->|creditor_id| booking_header
@@ -68,6 +67,15 @@ always reference a tenant account listed in `accounts`, via `account_number`.
   Bookings on a tenant account (Personenkonto) are only linkable to a tenant at the
   property level (`property_id` + `person_id`), not down to a specific unit. If a tenant
   occupies multiple units in the same property, their bookings can't be split between them.
+</Note>
+
+<Note>
+  `person_id` isn't type-consistent across endpoints: `booking_header.person_id` and
+  `Stakeholder.tenants.person_id` are strings (e.g. `"2001-1"`), but
+  `booking_positions.person_id` is an integer with the hyphen stripped — casting it back to
+  a string doesn't reproduce the original value. Don't join `booking_positions` to `tenants`
+  directly on `person_id`; go via `booking_positions.booking_header_id` →
+  `booking_header.person_id` instead.
 </Note>
 
 ## accounts

@@ -33,7 +33,6 @@ graph LR
   contract_debits -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   booking_header -.->|property_id + person_id| tenants
-  booking_positions -.->|property_id + person_id| tenants
   booking_header -.->|property_structure_account_id| property_structure
   booking_positions -.->|property_structure_account_id| property_structure
   creditor -.->|creditor_id| booking_header
@@ -72,6 +71,15 @@ der Objektstruktur (`property_structure`) verbunden. Sollstellungen
   verknüpfbar (`property_id` + `person_id`), nicht bis auf eine bestimmte Einheit herunter.
   Bewohnt ein Mieter mehrere Einheiten desselben Objekts, lassen sich seine Buchungen nicht
   zwischen ihnen aufteilen.
+</Note>
+
+<Note>
+  `person_id` ist nicht über alle Endpunkte hinweg typkonsistent: `booking_header.person_id`
+  und `Stakeholder.tenants.person_id` sind Strings (z. B. `"2001-1"`), `booking_positions.person_id`
+  dagegen ein Integer, bei dem der Bindestrich beim Cast entfernt wurde — ein Rück-Cast auf
+  String liefert nicht den ursprünglichen Wert. `booking_positions` deshalb nicht direkt über
+  `person_id` mit `tenants` verknüpfen, sondern über `booking_positions.booking_header_id` →
+  `booking_header.person_id`.
 </Note>
 
 ## accounts

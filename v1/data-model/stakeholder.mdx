@@ -38,7 +38,6 @@ graph LR
   tenants -.->|floor_area_person_id| contract_ends
   tenants -.->|floor_area_person_id| index_rent
   booking_header -.->|property_id + person_id| tenants
-  booking_positions -.->|property_id + person_id| tenants
   creditor -.->|creditor_id| technical_objects
   creditor -.->|creditor_id| property_creditor_services
   creditor -.->|creditor_id| service_contracts
@@ -48,6 +47,15 @@ graph LR
 
 *Every edge here crosses into another domain — none of the four Stakeholder tables join each
 other directly.*
+
+<Note>
+  `person_id` isn't type-consistent across the endpoints that carry it: `tenants.person_id`
+  and `Accounting.booking_header.person_id` are strings (e.g. `"2001-1"`), but
+  `Accounting.booking_positions.person_id` is an integer with the hyphen stripped — casting
+  it back to a string doesn't reproduce the original value. Don't join `booking_positions`
+  to `tenants` directly on `person_id`; go via `booking_positions.booking_header_id` →
+  `booking_header.person_id` instead.
+</Note>
 
 ## creditor
 
