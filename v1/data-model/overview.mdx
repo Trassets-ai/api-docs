@@ -39,10 +39,10 @@ description: "The tables available under /v1/ and how they join — Accounting, 
 
 A booking transaction produces one `booking_header` row, which groups every line item it
 posts (`booking_positions`). Line items post to accounts of different types — general
-ledger, tenant, creditor, project, or cost centre, see `accounts.account_type_name`. Since a
-transaction usually posts to at most one creditor, tenant, or cost centre, `booking_header`
-already carries `creditor_id`, `person_id`, and `property_structure_account_id` directly,
-without going through `booking_positions`. Each account can have a `budget` for a given
+ledger, tenant, creditor, project, or cost centre, see `accounts.account_type_name`. A
+transaction usually involves one creditor, tenant, or cost centre, so `booking_header`
+already contains `creditor_id`, `person_id`, and `property_structure_account_id` itself —
+no join through `booking_positions` needed. Each account can have a `budget` for a given
 month. For a cost centre, `property_structure.account_id` matches the
 `accounts.account_number` of the corresponding accounts row — not its `accounts.account_id`.
 `contract_debits` and `contract_debit_diffs` both reference the general ledger account they
