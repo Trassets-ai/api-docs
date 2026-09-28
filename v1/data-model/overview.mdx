@@ -37,18 +37,7 @@ description: "The tables available under /v1/ and how they join — Accounting, 
 
 `property_id` is the join key shared across every table on this page.
 
-A booking transaction produces one `booking_header` row, which groups every line item it
-posts (`booking_positions`). Line items post to accounts of different types — general
-ledger, tenant, creditor, project, or cost centre, see `accounts.account_type_name`. A
-transaction usually involves one creditor, tenant, or cost centre, so `booking_header`
-already contains `creditor_id`, `person_id`, and `property_structure_account_id` itself —
-no join through `booking_positions` needed. Each account can have a `budget` for a given
-month. For a cost centre, `property_structure.account_id` matches the
-`accounts.account_number` of the corresponding accounts row — not its `accounts.account_id`.
-`contract_debits` and `contract_debit_diffs` both reference the general ledger account they
-post to, via `account_number` on each — matching `accounts.account_number`.
-`contract_debits.debit_type.code` is a different thing, a debit-type code, not a ledger
-reference (see the `account_id` row below).
+A booking transaction produces one `booking_header` row, which groups every line item it posts (`booking_positions`). Line items post to accounts of different types — general ledger, tenant, creditor, project, or cost centre, see `accounts.account_type_name`. A transaction usually involves one creditor, tenant, or cost centre, so `booking_header` already contains `creditor_id`, `person_id`, and `property_structure_account_id` itself — no join through `booking_positions` needed. <br />Each account can have a `budget` for a given month. For a cost centre, `property_structure.account_id` matches the `accounts.account_number` of the corresponding accounts row — not its `accounts.account_id`. `contract_debits` and `contract_debit_diffs` both reference the general ledger account they post to, via `account_number` on each — matching `accounts.account_number`. `contract_debits.debit_type.code` is a different thing, a debit-type code, not a ledger reference (see the `account_id` row below).
 
 ```mermaid
 graph LR
@@ -178,4 +167,3 @@ property_id                    1002
   recovered. Read `property_id`, `floor_area_id`, and `person_id` directly instead of slicing
   the composite.
 </Warning>
-

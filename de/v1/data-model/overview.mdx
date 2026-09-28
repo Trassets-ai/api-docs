@@ -1,7 +1,7 @@
 ---
 title: "Datenmodell"
 sidebarTitle: "Übersicht"
-description: "Die unter /v1/ verfügbaren Tabellen und wie sie sich verknüpfen — Accounting, Contracts, Depreciation, Operations, Property und Stakeholder."
+description: "Die unter /v1/ verfügbaren Tabellen und wie sie verknüpft werden."
 ---
 
 `/v1/` umfasst sechs Datendomänen, unten nach Tabelle aufgeschlüsselt. Die Feldreferenz je
@@ -39,19 +39,7 @@ Endpunkt steht in der [API-Referenz](/de/v1/api-reference/introduction).
 
 `property_id` ist der Join-Key, den sich alle Tabellen auf dieser Seite teilen.
 
-Ein Buchungsvorgang erzeugt einen `booking_header`, der alle dabei ausgelösten Buchungen
-(`booking_positions`) vereint. Buchungen können auf Konten unterschiedlicher Art gebucht
-werden — Sachkonto, Personenkonto, Kreditorkonto, Projektkonto oder Kostenstelle, siehe
-`accounts.account_type_name`. Da ein Buchungsvorgang in der Regel einen Kreditor, einen Mieter oder eine Kostenstelle
-betrifft, enthält `booking_header` `creditor_id`, `person_id` und
-`property_structure_account_id` bereits selbst — der Join über `booking_positions` entfällt. Zu
-jedem Konto kann es ein `budget` für einen bestimmten Monat geben. Bei einer Kostenstelle
-entspricht `property_structure.account_id` dem `accounts.account_number` der zugehörigen
-Konto-Zeile — nicht deren `accounts.account_id`. `contract_debits` und
-`contract_debit_diffs` referenzieren beide das Sachkonto, auf das sie buchen, jeweils über
-`account_number` — gegen `accounts.account_number`. `contract_debits.debit_type.code` ist
-etwas anderes, ein Sollart-Code, kein Kontenbezug (siehe die `account_id`-Zeile weiter
-unten).
+Ein Buchungsvorgang erzeugt einen `booking_header`, der alle dabei ausgelösten Buchungen (`booking_positions`) vereint. Buchungen können auf Konten unterschiedlicher Art gebucht werden — Sachkonto, Personenkonto, Kreditorkonto, Projektkonto oder Kostenstelle, siehe `accounts.account_type_name`. Da ein Buchungsvorgang in der Regel einen Kreditor, einen Mieter oder eine Kostenstelle betrifft, enthält `booking_header` `creditor_id`, `person_id` und `property_structure_account_id` bereits selbst — der Join über `booking_positions` entfällt. <br />Zu jedem Konto kann es ein `budget` für einen bestimmten Monat geben. Bei einer Kostenstelle entspricht `property_structure.account_id` dem `accounts.account_number` der zugehörigen Konto-Zeile — nicht deren `accounts.account_id`. `contract_debits` und `contract_debit_diffs` referenzieren beide das Sachkonto, auf das sie buchen, jeweils über `account_number` — gegen `accounts.account_number`. `contract_debits.debit_type.code` ist etwas anderes, ein Sollart-Code, kein Kontenbezug (siehe die `account_id`-Zeile weiter unten).
 
 ```mermaid
 graph LR
@@ -182,4 +170,3 @@ property_id                    1002
   `property_id`, `floor_area_id` und `person_id` direkt lesen statt den zusammengesetzten Wert
   zu zerschneiden.
 </Warning>
-
