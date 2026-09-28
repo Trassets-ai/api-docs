@@ -39,7 +39,6 @@ graph LR
   tenants -.->|floor_area_person_id| contract_ends
   tenants -.->|floor_area_person_id| index_rent
   booking_header -.->|property_id + person_id| tenants
-  booking_positions -.->|property_id + person_id| tenants
   creditor -.->|creditor_id| technical_objects
   creditor -.->|creditor_id| property_creditor_services
   creditor -.->|creditor_id| service_contracts
@@ -49,6 +48,16 @@ graph LR
 
 *Jede Kante hier wechselt in eine andere Domäne — keine der vier Stakeholder-Tabellen
 verknüpft sich direkt mit einer anderen.*
+
+<Note>
+  `person_id` ist nicht über alle Endpunkte hinweg typkonsistent, die es führen:
+  `tenants.person_id` und `Accounting.booking_header.person_id` sind Strings (z. B.
+  `"2001-1"`), `Accounting.booking_positions.person_id` dagegen ein Integer, bei dem der
+  Bindestrich beim Cast entfernt wurde — ein Rück-Cast auf String liefert nicht den
+  ursprünglichen Wert. `booking_positions` deshalb nicht direkt über `person_id` mit
+  `tenants` verknüpfen, sondern über `booking_positions.booking_header_id` →
+  `booking_header.person_id`.
+</Note>
 
 ## creditor
 
