@@ -62,8 +62,8 @@ verknüpft sich direkt mit einer anderen.*
 ## creditor
 
 `GET /v1/stakeholder/creditor` — Kreditoren-Stammdaten. Der einzige Stakeholder-Endpunkt ohne
-`property_id`-Spalte — ein Kreditor ist eine eigenständige Entität, die mehrere Objekte
-bedienen kann, referenziert über `creditor_id` aus `Property.technical_objects`,
+`property_id`-Spalte — ein Kreditor ist eine eigenständige Entität, die für mehrere Objekte
+tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objects`,
 `Property.property_creditor_services`, `Contracts.service_contracts` und
 `Accounting.booking_header`/`booking_positions`.
 
@@ -120,7 +120,7 @@ bedienen kann, referenziert über `creditor_id` aus `Property.technical_objects`
 </ResponseField>
 
 <ResponseField name="swift" type="string">
-  SWIFT/BIC-Code der Bank des Kreditors — dasselbe, was `owner` `bic` nennt.
+  SWIFT/BIC-Code der Bank des Kreditors — entspricht `bic` bei `owner`.
 </ResponseField>
 
 <ResponseField name="tax_id" type="string">
@@ -241,7 +241,7 @@ Miteigentum.
 </ResponseField>
 
 <ResponseField name="bic" type="string">
-  BIC-Code der Bank des Eigentümers — dasselbe, was `creditor` `swift` nennt.
+  BIC-Code der Bank des Eigentümers — entspricht `swift` bei `creditor`.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
@@ -250,7 +250,7 @@ Miteigentum.
 
 <ResponseField name="account_number" type="string">
   Eigene Kontonummer des Eigentümers, zusammen mit `iban`. Nicht zu verwechseln mit
-  `Accounting.accounts.account_number`, das ein Sachkonto identifiziert.
+  `Accounting.accounts.account_number`, das ein Konto in der Kontenübersicht identifiziert.
 </ResponseField>
 
 

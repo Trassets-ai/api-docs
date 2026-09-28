@@ -47,16 +47,14 @@ graph LR
   `Stakeholder.tenants.person_id` — nicht als dieselbe Entität behandeln.
 </ResponseField>
 
-<ResponseField name="cost_center" type="object">
-  Kostenstelle, gegen die die Meldung gebucht wird, als strukturiertes Objekt.
-  <Expandable title="properties">
-    <ResponseField name="code" type="string">
-      Kostenstellen-Code.
-    </ResponseField>
-    <ResponseField name="label" type="string">
-      Kostenstellen-Bezeichnung.
-    </ResponseField>
-  </Expandable>
+<ResponseField name="cost_center_id" type="string">
+  Kostenstelle, gegen die die Meldung gebucht wird. Vorerst zwei flache Felder — ein
+  ausstehender Sync konsolidiert sie zu einem verschachtelten `cost_center`-Objekt, analog
+  zu `projects.cost_center`.
+</ResponseField>
+
+<ResponseField name="cost_center_id_name" type="string">
+  Kostenstellen-Bezeichnung zu `cost_center_id`.
 </ResponseField>
 
 <ResponseField name="to_do_period" type="object">
@@ -111,8 +109,9 @@ graph LR
   Prioritätsstufe.
 </ResponseField>
 
-<ResponseField name="status" type="string">
-  Aktueller Status der Meldung.
+<ResponseField name="Status" type="string">
+  Aktueller Status der Meldung. In der Live-Antwort großgeschrieben (`Status`, nicht
+  `status`) — ein ausstehender Sync schreibt es künftig klein, passend zum Rest des Schemas.
 </ResponseField>
 
 <ResponseField name="status_date" type="date">
@@ -167,9 +166,9 @@ graph LR
 
 <ResponseField name="hierarchy" type="string[]">
   Wo das Projekt im Kontenbaum der Buchhaltung "aufgehängt" ist, als geordnete Liste von
-  grob nach fein (z. B. `["4", "4.2", "4.2.1"]` — oberste Kostenkategorie, Unterkategorie,
-  konkretes Konto). Wie ein Ordnerpfad, nur numerisch statt benannt. Leere, tiefere
-  Ebenen werden weggelassen.
+  grob nach fein (z. B. `["1000/10/20/01", "1000/10/20/01.1", "1000/10/20/01.1.5"]`). Die
+  Segmente sind auf den oberen Ebenen durch `/` getrennt, auf den feineren durch `.` —
+  nicht rein numerisch mit Punkt-Trennung. Leere, tiefere Ebenen werden weggelassen.
 </ResponseField>
 
 <ResponseField name="cost_center" type="object">
@@ -213,12 +212,14 @@ graph LR
 </ResponseField>
 
 <ResponseField name="ledger_account" type="string">
-  Sachkontonummer für das Projekt.
+  Kommagetrennte Liste von Sachkontonummern für das Projekt — meist mehrere, nicht nur
+  eine.
 </ResponseField>
 
 <ResponseField name="ledger_account_nr" type="string">
-  Interne ID des Sachkontos — trotz des Namens nicht die Kontonummer. Dafür `ledger_account`
-  verwenden.
+  Trotz des Namens keine sachkontobezogene ID — identischer Wert wie `cost_center_id`, nur
+  unter anderem Feldnamen (beide stammen aus derselben Rohspalte). Für die
+  tatsächliche(n) Sachkontonummer(n) `ledger_account` verwenden.
 </ResponseField>
 
 <ResponseField name="project_type" type="string">

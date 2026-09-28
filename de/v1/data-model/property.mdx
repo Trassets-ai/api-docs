@@ -436,9 +436,10 @@ Wartungs- und Prüfinformationen.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Fremdschlüssel auf `property_structure`. Nur gesetzt für Zeilen ohne `floor_area_id`
-  (rund ein Viertel der Zeilen) — wo `floor_area_id` gesetzt ist, ist das bereits der
-  Verknüpfungspfad zur Fläche und dieses Feld bleibt leer.
+  Fremdschlüssel auf `property_structure`. Nur gesetzt für Zeilen ohne `floor_area_id` — wo
+  `floor_area_id` gesetzt ist, ist das bereits der Verknüpfungspfad zur Fläche und dieses Feld
+  bleibt leer. Der Anteil der Zeilen ohne `floor_area_id` schwankt je nach Kunden-Katalog stark
+  (in der Praxis zwischen etwa 7 % und 94 % gesehen) — nicht als feste Quote behandeln.
 </ResponseField>
 
 <ResponseField name="warranty_period" type="object">

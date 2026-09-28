@@ -106,7 +106,8 @@ graph LR
 ## contract_debit_diffs
 
 `GET /v1/contracts/contract_debit_diffs` — monatliche Abweichungen zwischen dem
-Sollstellungsziel und den tatsächlichen Kontobewegungen. Verwendbar, um geplante Sollstellungen mit dem realisierten Zahlungsfluss abzugleichen.
+Sollstellungsziel und den tatsächlichen Kontobewegungen. Damit lassen sich geplante
+Sollstellungen mit dem tatsächlichen Zahlungsfluss abgleichen.
 
 <ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
@@ -128,9 +129,10 @@ Sollstellungsziel und den tatsächlichen Kontobewegungen. Verwendbar, um geplant
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  Sachkonto, auf das sich die Abweichung bezieht. Entspricht
+  Personenkonto, auf das sich die Abweichung bezieht. Entspricht
   `Accounting.accounts.account_number` — trotz ähnlich klingendem Namen nicht dasselbe wie
-  `contract_debits.debit_type.code`.
+  `contract_debits.debit_type.code`, und eine andere Kontoart als
+  `contract_debits.account_number` (Sachkonto).
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
@@ -171,7 +173,7 @@ Datensatz repräsentiert eine geplante Sollstellung mit einem Gültigkeitsinterv
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  Konto, auf das die Sollstellung gebucht wird. Entspricht
+  Sachkonto, auf das die Sollstellung gebucht wird. Entspricht
   `Accounting.accounts.account_number`, nicht `account_id`.
 </ResponseField>
 

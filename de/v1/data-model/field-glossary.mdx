@@ -12,9 +12,11 @@ Bedeutung wiederkehren, aber nicht auf die [Datenmodell-Übersicht](/de/v1/data-
 seine Erklärung auf der jeweiligen Domain-Seite.
 
 <ResponseField name="account_name / account_group" type="string">
-  Beide Felder sind denormalisiert aus der gleichnamigen Spalte auf `Accounting.accounts`
-  übernommen, aufgelöst über das Kontenbereichs-Mapping — eine Zuordnungstabelle, die
-  Kontennummern-Bereiche je Objekt einer Reporting-Position zuordnet. `account_name` (ohne
+  Beide Felder sind denormalisierte Kopien der gleichnamigen Spalte auf
+  `Accounting.accounts`, aufgelöst über das Kontenbereichs-Mapping — eine Zuordnungstabelle, die
+  Kontennummern-Bereiche je Objekt einer Reporting-Position zuordnet. Ausnahme: bei `assets`
+  ist `account_name` ein direkter Fremdschlüssel-Join auf das Konto, kein Bereichs-Lookup.
+  `account_name` (ohne
   `account_group`) findet sich auf `property_structure` (dort der Kostenstellen-Name), auf
   `projects` und auf `assets`; `account_group` (ohne `account_name`) dagegen auf
   `booking_positions` und `contract_debits`. Auf `technical_objects` fehlen beide Felder —
@@ -26,24 +28,25 @@ seine Erklärung auf der jeweiligen Domain-Seite.
 
 <ResponseField name="dms_link" type="string">
   Link zu einem im Dokumentenmanagementsystem (DMS) hinterlegten Dokument. Kommt vor auf
-  `booking_header`, `projects`, `properties`, `property_structure`, `creditor` und
-  `tenants`. `null`, wenn kein Dokument hinterlegt ist — nicht jede Zeile hat eines.
+  `booking_header`, `projects`, `properties`, `property_structure`, `creditor`, `orders`
+  und `tenants`. `null`, wenn kein Dokument hinterlegt ist — nicht jede Zeile hat eines.
 </ResponseField>
 
 <ResponseField name="comment / *_comment" type="string">
   Manche Tabellen kombinieren ein Code-Feld mit einem passenden Kommentarfeld:
   `vacancy_reason` mit `vacancy_reason_comment`, `contract_reasoning` mit
   `contract_reasoning_comment` — der Kommentar liefert den Freitext zum Code. Bei
-  `notifications.comment` und `index_rent.comment` gibt es kein solches Code-Feld, das sind
-  eigenständige Freitext-Notizen. In beiden Fällen unstrukturiert — nicht versuchen, daraus
-  Werte herauszulesen, die eigentlich im zugehörigen Code-Feld stehen sollten.
+  `notifications.comment`, `index_rent.comment`, `offers.comment` und
+  `technical_objects.comment` gibt es kein solches Code-Feld, das sind eigenständige
+  Freitext-Notizen. In beiden Fällen unstrukturiert — nicht versuchen, daraus Werte
+  herauszulesen, die eigentlich im zugehörigen Code-Feld stehen sollten.
 </ResponseField>
 
 <ResponseField name="property_id_person_id vs. floor_area_person_id" type="string">
-  Beide sind zusammengesetzte Mieter-Identifikatoren und leicht zu verwechseln.
-  `property_id_person_id` identifiziert einen Mieter auf Objektebene, ohne
+  Beide sind zusammengesetzte Mieter-Identifikatoren, leicht zu verwechseln.
+  `property_id_person_id` (Zahl) identifiziert einen Mieter auf Objektebene, ohne
   Flächenbezug — auf `booking_positions` und `contract_debits`. `floor_area_person_id`
-  identifiziert ein konkretes Mietverhältnis (Mieter *in* einer bestimmten Fläche)
+  (String) identifiziert ein konkretes Mietverhältnis (Mieter *in* einer bestimmten Fläche)
   und ist der Cross-Endpoint-Verknüpfungsschlüssel zwischen `tenants`, `contract_debits`,
   `contract_ends` und `index_rent` — Details dazu in der Verknüpfungsschlüssel-Tabelle der
   Übersichtsseite. Beide sind nicht austauschbar und nicht voneinander ableitbar.

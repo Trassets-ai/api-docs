@@ -14,7 +14,8 @@ explanation lives on the domain page where it appears.
 <ResponseField name="account_name / account_group" type="string">
   Denormalized copies of the matching column on `Accounting.accounts`, resolved via the
   account-range mapping — a lookup table that groups ranges of account numbers under a
-  reporting position, per property range. `account_name`
+  reporting position, per property range. Exception: on `assets`, `account_name` is a
+  direct foreign-key join to the account instead, not a range lookup. `account_name`
   (without `account_group`) appears on `property_structure` (cost-centre name),
   `projects`, and `assets`. `account_group` (without `account_name`) appears on
   `booking_positions` and `contract_debits`. Neither field is on `technical_objects`,
@@ -26,19 +27,20 @@ explanation lives on the domain page where it appears.
 
 <ResponseField name="dms_link" type="string">
   Link to a document attached in the document management system (DMS). Appears on
-  `booking_header`, `projects`, `properties`, `property_structure`, `creditor`, and
-  `tenants`. `null` when no document is attached — not every row has one.
+  `booking_header`, `projects`, `properties`, `property_structure`, `creditor`, `orders`,
+  and `tenants`. `null` when no document is attached — not every row has one.
 </ResponseField>
 
 <ResponseField name="comment / *_comment" type="string">
   Free-text elaboration on a companion code field (e.g. `vacancy_reason` /
   `vacancy_reason_comment`, `contract_reasoning` / `contract_reasoning_comment`), or a
-  standalone free-text note (`notifications.comment`, `index_rent.comment`). Unstructured
-  — don't parse it for values that should come from the code field instead.
+  standalone free-text note (`notifications.comment`, `index_rent.comment`,
+  `offers.comment`, `technical_objects.comment`). Unstructured — don't parse it for values
+  that should come from the code field instead.
 </ResponseField>
 
 <ResponseField name="property_id_person_id vs. floor_area_person_id" type="string">
-  Both are composite tenant identifiers and easy to confuse. `property_id_person_id`
+  Both are composite tenant identifiers, easy to confuse. `property_id_person_id`
   (integer) identifies a tenant at property level, without unit granularity — used on
   `booking_positions` and `contract_debits`. `floor_area_person_id` (string) identifies a
   specific tenancy (tenant *in* a specific unit) and is the cross-endpoint bridge key

@@ -54,8 +54,10 @@ requiring a join through `accounts`.
 
 Every transaction belongs to one property. An account can have a budget (`budgets`) for a
 given month. A cost centre is always tied to part of the property structure
-(`property_structure`). Debits (`Contracts.contract_debits`, `Contracts.contract_debit_diffs`)
-always reference a tenant account listed in `accounts`, via `account_number`.
+(`property_structure`). Debits (`Contracts.contract_debits`) always reference a general
+ledger account listed in `accounts`, via `account_number`. `Contracts.contract_debit_diffs`
+uses the same field name but resolves to a tenant account instead — see the
+[overview page](/v1/data-model/overview) join-key table.
 
 <Note>
   Bookings on a tenant account (Personenkonto) are only linkable to a tenant at the
@@ -79,8 +81,8 @@ see `account_type_name`.
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  Account number. `null` for account types that aren't numbered (e.g. tenant and creditor
-  accounts).
+  Account number. `null` for creditor accounts, which aren't numbered. Populated for most
+  other account types, including the large majority of tenant accounts.
 </ResponseField>
 
 <ResponseField name="account_name" type="string">

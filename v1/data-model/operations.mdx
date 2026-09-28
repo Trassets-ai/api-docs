@@ -46,16 +46,13 @@ graph LR
   `Stakeholder.tenants.person_id` — don't treat the two as the same entity.
 </ResponseField>
 
-<ResponseField name="cost_center" type="object">
-  Cost centre the report is booked against, as a structured object.
-  <Expandable title="properties">
-    <ResponseField name="code" type="string">
-      Cost-centre code.
-    </ResponseField>
-    <ResponseField name="label" type="string">
-      Cost-centre name.
-    </ResponseField>
-  </Expandable>
+<ResponseField name="cost_center_id" type="string">
+  Cost centre the report is booked against. Two flat fields for now — a pending sync will
+  consolidate them into a nested `cost_center` object, matching `projects.cost_center`.
+</ResponseField>
+
+<ResponseField name="cost_center_id_name" type="string">
+  Cost-centre name for `cost_center_id`.
 </ResponseField>
 
 <ResponseField name="to_do_period" type="object">
@@ -110,8 +107,9 @@ graph LR
   Priority level.
 </ResponseField>
 
-<ResponseField name="status" type="string">
-  Current status of the report.
+<ResponseField name="Status" type="string">
+  Current status of the report. Capitalized in the live response (`Status`, not
+  `status`) — a pending sync will lowercase it to match the rest of the schema.
 </ResponseField>
 
 <ResponseField name="status_date" type="date">
@@ -166,9 +164,9 @@ graph LR
 
 <ResponseField name="hierarchy" type="string[]">
   Where the project sits in the accounting chart of accounts, as an ordered list from
-  coarse to fine (e.g. `["4", "4.2", "4.2.1"]` — top-level cost category, subcategory,
-  specific account). Like a folder path, just numeric instead of named. Empty, deeper
-  levels are omitted.
+  coarse to fine (e.g. `["1000/10/20/01", "1000/10/20/01.1", "1000/10/20/01.1.5"]`).
+  Segments are separated by `/` at the higher levels and `.` for finer subdivisions — not
+  a purely dot-separated numeric form. Empty, deeper levels are omitted.
 </ResponseField>
 
 <ResponseField name="cost_center" type="object">
@@ -212,12 +210,14 @@ graph LR
 </ResponseField>
 
 <ResponseField name="ledger_account" type="string">
-  General ledger account number for the project.
+  Comma-separated list of general ledger account numbers for the project — usually
+  several, not a single value.
 </ResponseField>
 
 <ResponseField name="ledger_account_nr" type="string">
-  Internal identifier of the general ledger account — despite the name, this is not the
-  account number. Use `ledger_account` for that.
+  Despite the name, not a ledger-account identifier — the same value as `cost_center_id`
+  under a different field name (both derive from the same source column). Use
+  `ledger_account` for the actual general ledger account number(s).
 </ResponseField>
 
 <ResponseField name="project_type" type="string">

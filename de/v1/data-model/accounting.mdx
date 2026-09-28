@@ -41,7 +41,7 @@ graph LR
 
 ### So hängt das Buchungsmodell zusammen
 
-Ein Buchungsvorgang hat einen `booking_header`, der alle dabei ausgelösten Buchungen
+Ein Buchungsvorgang hat einen `booking_header`, der alle dabei ausgelösten Positionen
 (`booking_positions`) vereint. Eine Buchung kann ein Sachkonto, ein Personenkonto, ein
 Kreditorkonto, ein Projektkonto oder eine Kostenstelle betreffen — siehe
 `accounts.account_type_name`. Da ein Vorgang in der Regel nur eine Buchung auf ein
@@ -56,11 +56,13 @@ zuzuordnen, führt der Weg über `booking_positions.booking_header_id` zu
 Jeder Buchungsvorgang gehört zu genau einem Objekt. Zu einem Konto kann es ein Budget
 (`budgets`) für einen bestimmten Monat geben. Eine Kostenstelle ist immer mit einem Teil
 der Objektstruktur (`property_structure`) verbunden. Sollstellungen
-(`Contracts.contract_debits`, `Contracts.contract_debit_diffs`) referenzieren immer ein in
-`accounts` gelistetes Personenkonto, über `account_number`.
+(`Contracts.contract_debits`) referenzieren immer ein in `accounts` gelistetes Sachkonto,
+über `account_number`. `Contracts.contract_debit_diffs` nutzt denselben Feldnamen, löst aber
+gegen ein Personenkonto auf — siehe die Verknüpfungsschlüssel-Tabelle auf der
+[Übersichtsseite](/de/v1/data-model/overview).
 
 <Note>
-  Buchungen auf einem Personenkonto (Mieter) sind nur auf Objektebene mit einem Mieter
+  Buchungen auf einem Personenkonto sind nur auf Objektebene mit einem Mieter
   verknüpfbar (`property_id` + `person_id`), nicht bis auf eine bestimmte Einheit herunter.
   Bewohnt ein Mieter mehrere Einheiten desselben Objekts, lassen sich seine Buchungen nicht
   zwischen ihnen aufteilen.
@@ -82,8 +84,8 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  Kontonummer. `null` bei Kontoarten, die keine Nummer führen (z. B. Personen- und
-  Kreditorkonten).
+  Kontonummer. `null` bei Kreditorkonten, die keine Nummer führen. Bei den meisten anderen
+  Kontoarten belegt, auch bei der großen Mehrheit der Personenkonten.
 </ResponseField>
 
 <ResponseField name="account_name" type="string">
@@ -117,7 +119,7 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
 </ResponseField>
 
 <ResponseField name="account_tax_appliance" type="integer">
-  MwSt-Behandlungsmethode.
+  MwSt-Behandlungsmethode des Kontos.
 </ResponseField>
 
 <ResponseField name="account_balance_type" type="object">
@@ -228,7 +230,7 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
 </ResponseField>
 
 <ResponseField name="contra_account_id" type="integer">
-  Gegenkonto für die Buchung, als Kontonummer — nicht derselbe Wertebereich wie
+  Gegenkonto für die Buchung, als Kontonummer — nicht derselbe Nummernkreis wie
   `accounts.account_id`.
 </ResponseField>
 
