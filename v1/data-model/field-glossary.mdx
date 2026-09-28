@@ -12,33 +12,37 @@ keys and their cardinality/pitfalls) or in
 explanation lives on the domain page where it appears.
 
 <ResponseField name="account_name / account_group" type="string">
-  Denormalized copies of the matching column on `Accounting.accounts`, resolved via the
-  account-range mapping — a lookup table that groups ranges of account numbers under a
-  reporting position, per property range. `account_name`
-  (without `account_group`) appears on `property_structure` (cost-centre name),
-  `projects`, and `assets`. `account_group` (without `account_name`) appears on
-  `booking_positions` and `contract_debits`. Neither field is on `technical_objects`,
-  which carries `property_structure_account_id` (a foreign key) instead. Which account
-  each describes differs per table. Read-only; don't treat them as an alternative join
-  path to `accounts` — use `account_number` for that (see the join-key table on the
-  overview page).
+  Denormalized copies of the matching column on `Accounting.accounts`, but resolved two
+  different ways. `account_group` (on `booking_positions`/`contract_debits`) goes through
+  the account-range mapping — a lookup table that groups ranges of account numbers under
+  a reporting position, per property range. `account_name` never goes through that
+  mapping: on `assets` and `projects` it's a direct foreign-key join to the account
+  instead; on `property_structure` it isn't derived from `Accounting.accounts` at all —
+  it's the structure row's own descriptive name (the cost-centre or floor-area name).
+  `account_name` (without `account_group`) appears on `property_structure`, `projects`,
+  and `assets`. `account_group` (without `account_name`) appears on `booking_positions`
+  and `contract_debits`. Neither field is on `technical_objects`, which carries
+  `property_structure_account_id` (a foreign key) instead. Which account each describes
+  differs per table. Both fields are read-only — the actual join key back to `accounts`,
+  where one exists, varies per table (see the join-key table on the overview page).
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">
   Link to a document attached in the document management system (DMS). Appears on
-  `booking_header`, `projects`, `properties`, `property_structure`, `creditor`, and
-  `tenants`. `null` when no document is attached — not every row has one.
+  `booking_header`, `projects`, `properties`, `property_structure`, `creditor`, `orders`,
+  and `tenants`. `null` when no document is attached — not every row has one.
 </ResponseField>
 
 <ResponseField name="comment / *_comment" type="string">
   Free-text elaboration on a companion code field (e.g. `vacancy_reason` /
   `vacancy_reason_comment`, `contract_reasoning` / `contract_reasoning_comment`), or a
-  standalone free-text note (`notifications.comment`, `index_rent.comment`). Unstructured
-  — don't parse it for values that should come from the code field instead.
+  standalone free-text note (`notifications.comment`, `index_rent.comment`,
+  `offers.comment`, `technical_objects.comment`). Unstructured — don't parse it for values
+  that should come from the code field instead.
 </ResponseField>
 
 <ResponseField name="property_id_person_id vs. floor_area_person_id" type="string">
-  Both are composite tenant identifiers and easy to confuse. `property_id_person_id`
+  Both are composite tenant identifiers, easy to confuse. `property_id_person_id`
   (integer) identifies a tenant at property level, without unit granularity — used on
   `booking_positions` and `contract_debits`. `floor_area_person_id` (string) identifies a
   specific tenancy (tenant *in* a specific unit) and is the cross-endpoint bridge key

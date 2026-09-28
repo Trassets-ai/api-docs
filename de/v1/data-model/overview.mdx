@@ -39,7 +39,7 @@ Endpunkt steht in der [API-Referenz](/de/v1/api-reference/introduction).
 
 `property_id` ist der Join-Key, den sich alle Tabellen auf dieser Seite teilen.
 
-Ein Buchungsvorgang erzeugt einen `booking_header`, der alle dabei ausgelösten Buchungen (`booking_positions`) vereint. Buchungen können auf Konten unterschiedlicher Art gebucht werden — Sachkonto, Personenkonto, Kreditorkonto, Projektkonto oder Kostenstelle, siehe `accounts.account_type_name`. Da ein Buchungsvorgang in der Regel einen Kreditor, einen Mieter oder eine Kostenstelle betrifft, enthält `booking_header` `creditor_id`, `person_id` und `property_structure_account_id` bereits selbst — der Join über `booking_positions` entfällt. <br />Zu jedem Konto kann es ein `budget` für einen bestimmten Monat geben. Bei einer Kostenstelle entspricht `property_structure.account_id` dem `accounts.account_number` der zugehörigen Konto-Zeile — nicht deren `accounts.account_id`. `contract_debits` und `contract_debit_diffs` referenzieren beide das Sachkonto, auf das sie buchen, jeweils über `account_number` — gegen `accounts.account_number`. `contract_debits.debit_type.code` ist etwas anderes, ein Sollart-Code, kein Kontenbezug (siehe die `account_id`-Zeile weiter unten).
+Ein Buchungsvorgang erzeugt einen `booking_header`, der alle dabei ausgelösten Buchungen (`booking_positions`) vereint. Buchungen können auf Konten unterschiedlicher Art gebucht werden — Sachkonto, Personenkonto, Kreditorkonto, Projektkonto oder Kostenstelle, siehe `accounts.account_type_name`. Da ein Buchungsvorgang in der Regel einen Kreditor, einen Mieter oder eine Kostenstelle betrifft, enthält `booking_header` `creditor_id`, `person_id` und `property_structure_account_id` bereits selbst — der Join über `booking_positions` entfällt. <br />Zu jedem Konto kann es ein `budget` für einen bestimmten Monat geben. Bei einer Kostenstelle entspricht `property_structure.account_id` dem `accounts.account_number` der zugehörigen Konto-Zeile — nicht deren `accounts.account_id`. `contract_debits` referenziert über `account_number` das Sachkonto, auf das gebucht wird — gegen `accounts.account_number`. `contract_debit_diffs` nutzt denselben Feldnamen `account_number`, löst aber gegen ein Personenkonto auf — gleicher Spaltenname, andere Kontoart je Tabelle. `contract_debits.debit_type.code` ist etwas anderes, ein Sollart-Code, kein Kontenbezug (siehe die `account_id`-Zeile weiter unten).
 
 ```mermaid
 graph LR
@@ -94,7 +94,11 @@ graph LR
   properties -.->|property_id| employees
   properties -.->|property_id| service_contracts
   properties -.->|property_id| contract_debit_diffs
+  properties -.->|property_id| contract_debits
+  properties -.->|property_id| contract_ends
+  properties -.->|property_id| index_rent
   properties -.->|property_id| assets
+  properties -.->|property_id| depreciation
 
   booking_header -->|booking_header_id| booking_positions
   booking_positions -->|account_id| accounts
@@ -130,7 +134,7 @@ graph LR
 | `property_id` | Identifiziert ein Objekt. Auf jeder Tabelle dieser Seite vorhanden, außer `creditor` (eine eigenständige Entität, referenziert über `creditor_id`). | 1 Objekt → viele Zeilen in jeder Domäne |
 | `booking_header_id` | Gruppiert Buchungspositionen unter einem Buchungskopf. | 1 `booking_header` → viele `booking_positions` |
 | `account_id` | Interne Konto-ID bei `accounts`, `booking_positions` und `budgets` — darüber verknüpfbar. `index_rent.account_id` und `contract_debits.debit_type.code` bedeuten etwas anderes: den Sollart-Code — nicht mit `accounts` verknüpfen. Bei `property_structure` bedeutet es wieder etwas anderes: einen Kostenstellen-Geschäftscode, der `accounts.account_number` der zugehörigen Kostenstellen-Zeile entspricht, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
-| `account_number` (bei `contract_debits`/`contract_debit_diffs`) | Sachkonto, auf das eine Sollstellungszeile bucht — bei `contract_debits` und `contract_debit_diffs`. Entspricht `accounts.account_number`, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `contract_debits`/`contract_debit_diffs`-Zeilen |
+| `account_number` (bei `contract_debits`/`contract_debit_diffs`) | Das Konto, auf das eine Zeile bucht. Bei `contract_debits` ein Sachkonto, bei `contract_debit_diffs` dagegen ein Personenkonto — gleicher Spaltenname, andere Kontoart. Entspricht `accounts.account_number`, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `contract_debits`/`contract_debit_diffs`-Zeilen |
 | `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_header` und `booking_positions`. | 1 Kreditor → viele Zeilen über Domänen hinweg |
 | `technical_object_id` | Vorhanden auf `notifications`, löst sich gegen `technical_objects.to_id` auf. | 1 technisches Objekt → viele Meldungen |
 | `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |

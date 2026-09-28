@@ -436,9 +436,8 @@ maintenance, and inspection details.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
-  Foreign key into `property_structure`. Only set for rows without a `floor_area_id` (roughly
-  a quarter of rows) — where `floor_area_id` is set, that's already the join path to the unit
-  and this field stays empty.
+  Foreign key into `property_structure`. Only set for rows without a `floor_area_id` — where
+  `floor_area_id` is set, that's already the join path to the unit and this field stays empty.
 </ResponseField>
 
 <ResponseField name="warranty_period" type="object">

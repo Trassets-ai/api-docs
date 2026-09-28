@@ -129,9 +129,10 @@ flow.
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
-  General ledger account the deviation applies to. Matches
-  `Accounting.accounts.account_number` — not the same thing as
-  `contract_debits.debit_type.code`, despite the similar-sounding names.
+  Tenant account the deviation applies to. Matches `Accounting.accounts.account_number` —
+  not the same thing as `contract_debits.debit_type.code`, despite the similar-sounding
+  names, and not the same account type as `contract_debits.account_number` (general
+  ledger).
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
