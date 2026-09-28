@@ -13,11 +13,11 @@ seine Erklärung auf der jeweiligen Domain-Seite.
 
 <ResponseField name="account_name / account_group" type="string">
   Beide Felder sind denormalisierte Kopien der gleichnamigen Spalte auf
-  `Accounting.accounts`, aufgelöst über das Kontenbereichs-Mapping — eine Zuordnungstabelle, die
-  Kontennummern-Bereiche je Objekt einer Reporting-Position zuordnet. Ausnahme: bei `assets`
-  ist `account_name` ein direkter Fremdschlüssel-Join auf das Konto, kein Bereichs-Lookup.
-  `account_name` (ohne
-  `account_group`) findet sich auf `property_structure` (dort der Kostenstellen-Name), auf
+  `Accounting.accounts`, aufgelöst über das Kontenbereichs-Mapping — eine Zuordnungstabelle,
+  die Kontennummern-Bereiche je Objekt einer Reporting-Position zuordnet. Ausnahme: bei
+  `assets` ist `account_name` ein direkter Fremdschlüssel-Join auf das Konto, kein
+  Bereichs-Lookup. `account_name` (ohne `account_group`) findet sich auf `property_structure`
+  (dort der Kostenstellen-Name), auf
   `projects` und auf `assets`; `account_group` (ohne `account_name`) dagegen auf
   `booking_positions` und `contract_debits`. Auf `technical_objects` fehlen beide Felder —
   hier verweist stattdessen der Fremdschlüssel `property_structure_account_id` auf das
