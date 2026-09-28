@@ -39,9 +39,6 @@ graph LR
   tenants -.->|floor_area_person_id| index_rent
 ```
 
-*Durchgezogene Kanten sind Joins innerhalb von Contracts; gestrichelte Kanten gehen in eine
-andere Domäne.*
-
 ## service_contracts
 
 `GET /v1/contracts/service_contracts` — Wartungs- und Dienstleistungsverträge.
@@ -109,8 +106,7 @@ andere Domäne.*
 ## contract_debit_diffs
 
 `GET /v1/contracts/contract_debit_diffs` — monatliche Abweichungen zwischen dem
-Sollstellungsziel und den tatsächlichen Kontobewegungen. Nutze dies, um geplante
-Sollstellungen mit dem realisierten Zahlungsfluss abzugleichen.
+Sollstellungsziel und den tatsächlichen Kontobewegungen. Verwendbar, um geplante Sollstellungen mit dem realisierten Zahlungsfluss abzugleichen.
 
 <ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
@@ -242,7 +238,7 @@ Datensatz repräsentiert eine geplante Sollstellung mit einem Gültigkeitsinterv
 ## contract_ends
 
 `GET /v1/contracts/contract_ends` — Mietvertragsenden und die Handhabung von
-Verlängerungen/Optionen. Nutze dies, um anstehende Vertragsabläufe, Fristen für die
+Verlängerungen/Optionen. Hilfreich, um anstehende Vertragsabläufe, Fristen für die
 Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
 
 <Note>
@@ -349,8 +345,8 @@ Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
 
 <Warning>
   `floor_area_person_id` allein identifiziert eine Zeile nicht eindeutig, da ein
-  Mietverhältnis mehrere Options-/Verlängerungseinträge haben kann. Behandle Zeilen als
-  Menge pro `floor_area_person_id`, nicht als einzeln adressierbare Datensätze.
+  Mietverhältnis mehrere Options-/Verlängerungseinträge haben kann. Zeilen werden als
+  Menge pro `floor_area_person_id` behandelt, nicht als einzeln adressierbare Datensätze.
 </Warning>
 
 ## index_rent

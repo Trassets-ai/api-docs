@@ -39,8 +39,6 @@ graph LR
   tenants -.->|floor_area_person_id| index_rent
 ```
 
-*Solid edges are joins within Contracts; dashed edges cross into another domain.*
-
 ## service_contracts
 
 `GET /v1/contracts/service_contracts` — maintenance and service contracts.
@@ -108,7 +106,7 @@ graph LR
 ## contract_debit_diffs
 
 `GET /v1/contracts/contract_debit_diffs` — monthly deviations between the debit target and
-the actual account movements. Use this to reconcile planned debits against realised cash
+the actual account movements. Usable to reconcile planned debits against realised cash
 flow.
 
 <ResponseField name="property_id" type="string" required>
@@ -238,7 +236,7 @@ represents a scheduled debit with a validity interval.
 
 ## contract_ends
 
-`GET /v1/contracts/contract_ends` — lease end dates and extension/option handling. Use this
+`GET /v1/contracts/contract_ends` — lease end dates and extension/option handling. Useful
 to track upcoming expiries, deadlines for exercising options, and the current exercise
 status.
 
