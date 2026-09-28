@@ -51,10 +51,8 @@ creditor, tenant, or cost-centre account, so those are already exposed directly 
 `booking_header` (`creditor_id`, `person_id`, `property_structure_account_id`) rather than
 requiring a join through `accounts`.
 
-`booking_positions` also carries a `person_id`, but as `integer` rather than the `string`
-used by `booking_header.person_id` and `tenants.person_id` — it doesn't join directly to
-`tenants`. To link a posting to a tenant, go through `booking_positions.booking_header_id`
-to `booking_header.person_id` instead.
+`booking_positions` also carries a `person_id`. To link a posting to a tenant, go through
+`booking_positions.booking_header_id` to `booking_header.person_id` instead.
 
 Every transaction belongs to one property. An account can have a budget (`budgets`) for a
 given month. A cost centre is always tied to part of the property structure
