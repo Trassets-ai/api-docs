@@ -20,6 +20,7 @@ graph LR
   properties["Property.properties"]
   property_structure["Property.property_structure"]
   contract_debits["Contracts.contract_debits"]
+  contract_debit_diffs["Contracts.contract_debit_diffs"]
   tenants["Stakeholder.tenants"]
   creditor["Stakeholder.creditor"]
 
@@ -31,6 +32,7 @@ graph LR
   properties -.->|property_id| budgets
   properties -.->|property_id| accounts
   contract_debits -.->|account_number| accounts
+  contract_debit_diffs -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   booking_header -.->|property_id + person_id| tenants
   booking_header -.->|property_structure_account_id| property_structure

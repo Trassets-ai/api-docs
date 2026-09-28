@@ -438,8 +438,6 @@ maintenance, and inspection details.
 <ResponseField name="property_structure_account_id" type="string">
   Foreign key into `property_structure`. Only set for rows without a `floor_area_id` — where
   `floor_area_id` is set, that's already the join path to the unit and this field stays empty.
-  The share of rows without a `floor_area_id` varies widely by customer catalog (roughly 7% to
-  94% seen in practice), so don't treat this as a fixed ratio.
 </ResponseField>
 
 <ResponseField name="warranty_period" type="object">

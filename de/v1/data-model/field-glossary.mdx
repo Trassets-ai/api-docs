@@ -12,18 +12,22 @@ Bedeutung wiederkehren, aber nicht auf die [Datenmodell-Übersicht](/de/v1/data-
 seine Erklärung auf der jeweiligen Domain-Seite.
 
 <ResponseField name="account_name / account_group" type="string">
-  Beide Felder sind denormalisierte Kopien der gleichnamigen Spalte auf
-  `Accounting.accounts`, aufgelöst über das Kontenbereichs-Mapping — eine Zuordnungstabelle,
-  die Kontennummern-Bereiche je Objekt einer Reporting-Position zuordnet. Ausnahme: bei
-  `assets` ist `account_name` ein direkter Fremdschlüssel-Join auf das Konto, kein
-  Bereichs-Lookup. `account_name` (ohne `account_group`) findet sich auf `property_structure`
-  (dort der Kostenstellen-Name), auf
-  `projects` und auf `assets`; `account_group` (ohne `account_name`) dagegen auf
-  `booking_positions` und `contract_debits`. Auf `technical_objects` fehlen beide Felder —
-  hier verweist stattdessen der Fremdschlüssel `property_structure_account_id` auf das
-  Konto. Welches Konto konkret gemeint ist, hängt von der jeweiligen Tabelle ab. Die Felder
-  sind reine Lesekopien; einen Join zurück zu `accounts` gibt es dafür nicht — dafür dient
-  `account_number` (siehe Verknüpfungsschlüssel-Tabelle auf der Übersichtsseite).
+  Denormalisierte Kopien der gleichnamigen Spalte auf `Accounting.accounts` — aber auf
+  zwei unterschiedliche Arten aufgelöst. `account_group` (bei
+  `booking_positions`/`contract_debits`) läuft über das Kontenbereichs-Mapping — eine
+  Zuordnungstabelle, die Kontennummern-Bereiche je Objekt einer Reporting-Position
+  zuordnet. `account_name` läuft nie über dieses Mapping: bei `assets` und `projects` ist
+  es ein direkter Fremdschlüssel-Join auf das Konto; bei `property_structure` hat es mit
+  `Accounting.accounts` gar nichts zu tun — dort ist es einfach die eigene Bezeichnung der
+  Struktur-Zeile (der Kostenstellen- bzw. Flächenname). `account_name` (ohne
+  `account_group`) findet sich auf `property_structure`, `projects` und `assets`;
+  `account_group` (ohne `account_name`) dagegen auf `booking_positions` und
+  `contract_debits`. Auf `technical_objects` fehlen beide Felder — hier verweist
+  stattdessen der Fremdschlüssel `property_structure_account_id` auf das Konto. Welches
+  Konto konkret gemeint ist, hängt von der jeweiligen Tabelle ab. Beide Felder sind reine
+  Lesekopien — welcher Join-Schlüssel zurück zu `accounts` tatsächlich greift (sofern es
+  einen gibt), variiert je Tabelle (siehe Verknüpfungsschlüssel-Tabelle auf der
+  Übersichtsseite).
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">

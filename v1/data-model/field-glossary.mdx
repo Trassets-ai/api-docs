@@ -12,17 +12,19 @@ keys and their cardinality/pitfalls) or in
 explanation lives on the domain page where it appears.
 
 <ResponseField name="account_name / account_group" type="string">
-  Denormalized copies of the matching column on `Accounting.accounts`, resolved via the
-  account-range mapping — a lookup table that groups ranges of account numbers under a
-  reporting position, per property range. Exception: on `assets`, `account_name` is a
-  direct foreign-key join to the account instead, not a range lookup. `account_name`
-  (without `account_group`) appears on `property_structure` (cost-centre name),
-  `projects`, and `assets`. `account_group` (without `account_name`) appears on
-  `booking_positions` and `contract_debits`. Neither field is on `technical_objects`,
-  which carries `property_structure_account_id` (a foreign key) instead. Which account
-  each describes differs per table. Read-only; don't treat them as an alternative join
-  path to `accounts` — use `account_number` for that (see the join-key table on the
-  overview page).
+  Denormalized copies of the matching column on `Accounting.accounts`, but resolved two
+  different ways. `account_group` (on `booking_positions`/`contract_debits`) goes through
+  the account-range mapping — a lookup table that groups ranges of account numbers under
+  a reporting position, per property range. `account_name` never goes through that
+  mapping: on `assets` and `projects` it's a direct foreign-key join to the account
+  instead; on `property_structure` it isn't derived from `Accounting.accounts` at all —
+  it's the structure row's own descriptive name (the cost-centre or floor-area name).
+  `account_name` (without `account_group`) appears on `property_structure`, `projects`,
+  and `assets`. `account_group` (without `account_name`) appears on `booking_positions`
+  and `contract_debits`. Neither field is on `technical_objects`, which carries
+  `property_structure_account_id` (a foreign key) instead. Which account each describes
+  differs per table. Both fields are read-only — the actual join key back to `accounts`,
+  where one exists, varies per table (see the join-key table on the overview page).
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">

@@ -94,7 +94,11 @@ graph LR
   properties -.->|property_id| employees
   properties -.->|property_id| service_contracts
   properties -.->|property_id| contract_debit_diffs
+  properties -.->|property_id| contract_debits
+  properties -.->|property_id| contract_ends
+  properties -.->|property_id| index_rent
   properties -.->|property_id| assets
+  properties -.->|property_id| depreciation
 
   booking_header -->|booking_header_id| booking_positions
   booking_positions -->|account_id| accounts
