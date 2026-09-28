@@ -36,9 +36,7 @@
                   "concepts/errors",
                   "concepts/rate-limits",
                   "concepts/filtering",
-                  "concepts/pagination",
-                  "concepts/sync-cycle",
-                  "concepts/versioning"
+                  "concepts/pagination"
                 ]
               },
               {
@@ -101,21 +99,16 @@
               {
                 "group": "Kernkonzepte",
                 "pages": [
-                  "de/concepts/endpoint-types",
-                  "de/concepts/errors",
                   "de/concepts/rate-limits",
                   "de/concepts/filtering",
                   "de/concepts/pagination",
-                  "de/concepts/sync-cycle",
-                  "de/concepts/versioning"
+                  "de/concepts/sync-cycle"
                 ]
               },
               {
                 "group": "Anleitungen",
                 "pages": [
-                  "de/guides/bulk-export",
-                  "de/guides/delta-sync",
-                  "de/guides/incremental-sync"
+                  "de/guides/bulk-export"
                 ]
               },
               {
@@ -180,9 +173,6 @@
                       "v1/response-shape-conventions",
                       "concepts/endpoint-types",
                       "concepts/errors",
-                      "concepts/rate-limits",
-                      "concepts/filtering",
-                      "concepts/pagination",
                       "concepts/sync-cycle",
                       "concepts/versioning"
                     ]
@@ -191,8 +181,7 @@
                     "group": "Guides",
                     "pages": [
                       "guides/bulk-export",
-                      "guides/delta-sync",
-                      "guides/incremental-sync"
+                      "guides/delta-sync"
                     ]
                   },
                   {
@@ -241,7 +230,7 @@
                   },
                   {
                     "group": "Raw Data",
-                    "pages": ["v1/api-reference/unversioned/raw-tables", "v1/api-reference/unversioned/raw-table"]
+                    "pages": []
                   }
                 ]
               }
@@ -268,9 +257,6 @@
                       "de/concepts/endpoint-types",
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
-                      "de/concepts/filtering",
-                      "de/concepts/pagination",
-                      "de/concepts/sync-cycle",
                       "de/concepts/versioning"
                     ]
                   },
@@ -316,7 +302,7 @@
                   },
                   {
                     "group": "Catalog",
-                    "pages": ["v1/api-reference/unversioned/catalog"]
+                    "pages": []
                   },
                   {
                     "group": "Delta Sync",
@@ -324,7 +310,7 @@
                   },
                   {
                     "group": "Meta",
-                    "pages": ["v1/api-reference/unversioned/meta-values"]
+                    "pages": []
                   },
                   {
                     "group": "Raw Data",
