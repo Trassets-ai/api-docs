@@ -47,15 +47,13 @@ andere Domäne.*
 Ein Buchungsvorgang hat einen `booking_header`, der alle dabei ausgelösten Buchungen
 (`booking_positions`) vereint. Eine Buchung kann ein Sachkonto, ein Personenkonto, ein
 Kreditorkonto, ein Projektkonto oder eine Kostenstelle betreffen — siehe
-`accounts.account_type_name`. Da es je Vorgang in der Regel nur eine Buchung auf ein
-Kreditor-, Personen- oder Kostenstellenkonto gibt, stehen diese bereits direkt auf
-`booking_header` (`creditor_id`, `person_id`, `property_structure_account_id`) — eine
+`accounts.account_type_name`. Da ein Vorgang in der Regel nur eine Buchung auf ein
+Kreditor-, Personen- oder Kostenstellenkonto enthält, hat `booking_header` `creditor_id`,
+`person_id` und `property_structure_account_id` bereits als eigene Felder — eine
 Verknüpfung über `accounts` ist dafür nicht nötig.
 
-`booking_positions` führt ebenfalls ein `person_id`-Feld, aber als `integer` statt als
-`string` wie bei `booking_header.person_id` und `tenants.person_id` — eine direkte
-Verknüpfung zu `tenants` funktioniert damit nicht. Um eine Position einem Mieter
-zuzuordnen, geht der Weg über `booking_positions.booking_header_id` zu
+Auch `booking_positions` führt ein `person_id`-Feld. Um eine Position einem Mieter
+zuzuordnen, führt der Weg über `booking_positions.booking_header_id` zu
 `booking_header.person_id`.
 
 Jeder Buchungsvorgang gehört zu genau einem Objekt. Zu einem Konto kann es ein Budget
