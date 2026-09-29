@@ -13,9 +13,9 @@ Every `/v1/` response is a top-level JSON array — there is no wrapping envelop
 | Type | Path pattern | Pagination | Use case |
 | --- | --- | --- | --- |
 | Category endpoints | `/v1/{category}/{api_table}` | Offset-based (`limit` / `offset`) plus cursor support | Business queries, dashboards, incremental fetches |
-| Raw endpoints | `/raw/{table_name}` | Cursor-based (`cursor` from `next_cursor` in body) | Bulk sync, full exports, data warehousing |
+| Raw endpoints | `/raw/{table_name}` or `/v1/raw/{table_name}` | Cursor-based (`cursor` from `next_cursor` in body) | Bulk sync, full exports, data warehousing |
 
-Raw endpoints carry no version prefix: they expose source tables below the modelled layer, so there is no `/v1/` variant.
+Raw endpoints are generic per customer (no per-table content review), so both the unversioned and `/v1/` path always expose the same tables — pick either.
 
 ### Response headers
 
@@ -73,4 +73,4 @@ Four endpoint groups exist once for the whole API and carry no `/v1/` prefix. Th
 | Catalog | `GET /catalog` | Lists all categories and tables exposed by the API. Use [Data Model Overview](/v1/data-model/overview) for the `/v1/` inventory. |
 | Delta Sync | `GET /changes` | Reports sync timestamps per table. Requires a `since` parameter (ISO-8601 UTC). |
 | Meta | `GET /meta/{api_table}/values/{column}` | Lookup values for a column, where they are configured for your key. Returns `404 Not Found` with `"No lookup values configured"` otherwise. |
-| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Source tables below the modelled layer, with no version prefix of their own. |
+| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Source tables below the modelled layer. Also available under `/v1/raw/tables` / `/v1/raw/{table_name}` — same data either way. |
