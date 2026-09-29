@@ -52,10 +52,10 @@ synced since your last poll (see [Delta Sync](/guides/delta-sync) for the full p
 pattern).
 
 <Warning>
-  `since` must not be older than 30 days — older values are rejected with a 400 error. This
+  `since` must not be older than 120 days — older values are rejected with a 400 error. This
   limit is documented in the endpoint's OpenAPI parameter description (see the **API
-  Reference** tab), but no rationale for the specific figure is given anywhere; treat it as
-  a fixed operational constraint rather than a tunable setting.
+  Reference** tab). It's a request-hygiene guardrail, not a data-retention limit — treat it
+  as a fixed operational constraint rather than a tunable setting.
 </Warning>
 
 ## Practical implications for your integration
