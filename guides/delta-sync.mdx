@@ -12,7 +12,7 @@ Discover which tables have been updated since your last sync without fetching ev
 
 <Steps>
   <Step title="Poll for changed tables">
-    Send a `GET` request to `/changes` with an ISO-8601 UTC `since` timestamp. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL.
+    Send a `GET` request to `/changes` with an ISO-8601 UTC `since` timestamp. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL. Add an optional `category` parameter (e.g. `category=property`) to only return tables belonging to that category.
 
     ```bash
     curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \

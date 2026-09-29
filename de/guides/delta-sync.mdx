@@ -12,7 +12,7 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
 
 <Steps>
   <Step title="Geänderte Tabellen abfragen">
-    Sende einen `GET`-Request an `/changes` mit einem ISO-8601-UTC-Zeitstempel `since`. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL.
+    Sende einen `GET`-Request an `/changes` mit einem ISO-8601-UTC-Zeitstempel `since`. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL. Mit dem optionalen Parameter `category` (z. B. `category=property`) werden nur Tabellen dieser Kategorie zurückgegeben.
 
     ```bash
     curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
