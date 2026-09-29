@@ -75,7 +75,7 @@
                 "group": "Endpoints",
                 "openapi": {
                   "source": "https://api.trassets.ai/openapi.json",
-                  "overlays": ["overlays/add-servers.yaml"]
+                  "overlays": ["overlays/add-servers.yaml", "overlays/require-changes-since.yaml"]
                 }
               }
             ]
@@ -139,7 +139,7 @@
                 "group": "Endpunkte",
                 "openapi": {
                   "source": "https://api.trassets.ai/openapi.json",
-                  "overlays": ["overlays/add-servers.yaml"]
+                  "overlays": ["overlays/add-servers.yaml", "overlays/require-changes-since.yaml"]
                 }
               }
             ]
