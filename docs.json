@@ -226,7 +226,10 @@
                   },
                   {
                     "group": "Raw Data",
-                    "pages": []
+                    "pages": [
+                      "v1/api-reference/unversioned/raw-tables",
+                      "v1/api-reference/unversioned/raw-table"
+                    ]
                   }
                 ]
               }
