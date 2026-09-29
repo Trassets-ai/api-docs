@@ -225,10 +225,6 @@
                     "pages": ["v1/api-reference/unversioned/changes"]
                   },
                   {
-                    "group": "Meta",
-                    "pages": ["v1/api-reference/unversioned/meta-values"]
-                  },
-                  {
                     "group": "Raw Data",
                     "pages": []
                   }
@@ -307,10 +303,6 @@
                   {
                     "group": "Delta Sync",
                     "pages": ["v1/api-reference/unversioned/changes"]
-                  },
-                  {
-                    "group": "Meta",
-                    "pages": []
                   },
                   {
                     "group": "Raw Data",
