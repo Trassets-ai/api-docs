@@ -13,9 +13,9 @@ Jede `/v1/`-Response ist ein JSON-Array auf oberster Ebene — es gibt keinen um
 | Typ | Pfad-Muster | Pagination | Anwendungsfall |
 | --- | --- | --- | --- |
 | Category-Endpunkte | `/v1/{category}/{api_table}` | Offset-basiert (`limit` / `offset`) plus Cursor-Unterstützung | Business-Abfragen, Dashboards, inkrementelle Abrufe |
-| Raw-Endpunkte | `/raw/{table_name}` | Cursor-basiert (`cursor` aus `next_cursor` im Body) | Bulk-Sync, vollständige Exporte, Data Warehousing |
+| Raw-Endpunkte | `/raw/{table_name}` oder `/v1/raw/{table_name}` | Cursor-basiert (`cursor` aus `next_cursor` im Body) | Bulk-Sync, vollständige Exporte, Data Warehousing |
 
-Raw-Endpunkte tragen kein Versions-Präfix: Sie legen Quelltabellen unterhalb der Modellschicht offen, deshalb gibt es keine `/v1/`-Variante.
+Raw-Endpunkte sind generisch pro Kunde (keine tabellenweise Inhaltsprüfung), deshalb liefern der unversionierte und der `/v1/`-Pfad immer dieselben Tabellen — beide funktionieren gleichwertig.
 
 ### Response-Header
 
@@ -66,10 +66,10 @@ Die [Datenmodell-Übersicht](/de/v1/data-model/overview) listet, was `/v1/` heut
 
 ## Endpunkt-Gruppen ohne Versions-Präfix
 
-Vier Endpunkt-Gruppen existieren einmal für die gesamte API und tragen kein `/v1/`-Präfix. Sie stehen in der Seitenleiste unterhalb der Kategorien.
+Drei Endpunkt-Gruppen existieren einmal für die gesamte API und tragen kein `/v1/`-Präfix. Sie stehen in der Seitenleiste unterhalb der Kategorien.
 
 | Gruppe | Endpunkt | Was unter `/v1/` zu erwarten ist |
 | --- | --- | --- |
 | Catalog | `GET /catalog` | Listet alle Kategorien und Tabellen, die die API bereitstellt. Für das `/v1/`-Inventar die [Datenmodell-Übersicht](/de/v1/data-model/overview) nutzen. |
 | Delta Sync | `GET /changes` | Liefert Sync-Zeitstempel pro Tabelle. Benötigt den Parameter `since` (ISO-8601 UTC). |
-| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Quelltabellen unterhalb der Modellschicht, ohne eigenes Versions-Präfix. |
+| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Quelltabellen unterhalb der Modellschicht. Auch unter `/v1/raw/tables` / `/v1/raw/{table_name}` erreichbar — gleiche Daten. |
