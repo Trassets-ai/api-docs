@@ -1,0 +1,12 @@
+overlay: 1.0.0
+info:
+  title: Mark 'since' as required on GET /changes
+  version: 1.0.0
+actions:
+  - target: "$.paths['/changes'].get.parameters[?@.name=='since']"
+    description: >-
+      Backend declares 'since' as Optional[str] but rejects a missing value
+      with 400 (REQ-001) -- spec/runtime mismatch. Overlay until fixed
+      upstream (trassets-data-api#264).
+    update:
+      required: true
