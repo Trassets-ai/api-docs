@@ -72,5 +72,4 @@ Four endpoint groups exist once for the whole API and carry no `/v1/` prefix. Th
 | --- | --- | --- |
 | Catalog | `GET /catalog` | Lists all categories and tables exposed by the API. Use [Data Model Overview](/v1/data-model/overview) for the `/v1/` inventory. |
 | Delta Sync | `GET /changes` | Reports sync timestamps per table. Requires a `since` parameter (ISO-8601 UTC). |
-| Meta | `GET /meta/{api_table}/values/{column}` | Lookup values for a column, where they are configured for your key. Returns `404 Not Found` with `"No lookup values configured"` otherwise. |
 | Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Source tables below the modelled layer, with no version prefix of their own. |

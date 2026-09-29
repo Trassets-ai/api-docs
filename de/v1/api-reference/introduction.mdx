@@ -72,5 +72,4 @@ Vier Endpunkt-Gruppen existieren einmal für die gesamte API und tragen kein `/v
 | --- | --- | --- |
 | Catalog | `GET /catalog` | Listet alle Kategorien und Tabellen, die die API bereitstellt. Für das `/v1/`-Inventar die [Datenmodell-Übersicht](/de/v1/data-model/overview) nutzen. |
 | Delta Sync | `GET /changes` | Liefert Sync-Zeitstempel pro Tabelle. Benötigt den Parameter `since` (ISO-8601 UTC). |
-| Meta | `GET /meta/{api_table}/values/{column}` | Lookup-Werte für eine Spalte, sofern für deinen Key konfiguriert. Andernfalls `404 Not Found` mit `"No lookup values configured"`. |
 | Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Quelltabellen unterhalb der Modellschicht, ohne eigenes Versions-Präfix. |
