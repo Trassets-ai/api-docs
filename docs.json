@@ -181,7 +181,8 @@
                     "group": "Guides",
                     "pages": [
                       "guides/bulk-export",
-                      "guides/delta-sync"
+                      "guides/delta-sync",
+                      "guides/incremental-sync"
                     ]
                   },
                   {
