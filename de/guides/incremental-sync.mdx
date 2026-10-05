@@ -1,46 +1,47 @@
 ---
 title: "Immobiliendaten mit Trassets inkrementell synchronisieren"
-description: "Nur geänderte Daten abrufen — mit Offset-basierter Pagination und Category-Endpunkten, um eine lokale Kopie der Trassets-Daten aktuell zu halten, ohne alles neu abzurufen."
+description: "Eine lokale Kopie der Trassets-Daten aktuell halten — über /changes erfährst du, welche Tabellen neu geladen wurden, und rufst nur diese vollständig erneut ab."
 sidebarTitle: "Incremental Sync"
 ---
 
-Nutze die Category-Endpunkte der Data API, um eine kontinuierlich aktualisierte lokale Kopie deiner Daten zu pflegen, ohne bei jedem Lauf jede Zeile zu übertragen. Offset-basierte Pagination liefert vorhersehbare Fortsetzungspunkte über geplante Syncs hinweg.
+Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufen. Die Tabellen werden einmal täglich vollständig neu geladen, es gibt also kein Delta auf Zeilenebene: Die Einheit der Änderung ist die Tabelle. Frage über [`/changes`](/de/guides/delta-sync) ab, welche Tabellen seit deinem letzten Lauf neu geladen wurden, und rufe genau diese Tabellen erneut ab — vollständig.
+
+<Warning>
+  Speichere `X-Next-Offset` nicht zwischen Läufen. Nach einem Neuladen können sich Zeilen ändern, wegfallen oder ihre Position verschieben. Wer bei einem alten Offset fortsetzt, behält unbemerkt veraltete Daten.
+</Warning>
 
 <Steps>
-  <Step title="Die erste Seite abrufen">
-    Starte mit `limit=1000` und `offset=0`. Das Beispiel nutzt den Endpunkt `/property/properties`, aber das Muster funktioniert für jeden Category-Endpunkt.
+  <Step title="Die neu geladenen Tabellen finden">
+    Rufe `/changes` mit dem `since`-Wert aus deinem letzten Lauf auf. Nimm dafür das höchste `last_sync_at` aus der Antwort dieses Laufs; beim allerersten Lauf einen Zeitstempel bis zu 120 Tage zurück. Jeder Eintrag enthält die `endpoint_url`, die du abrufen musst.
+
+    ```bash
+    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Tabellen, die in der Antwort fehlen, wurden nicht neu geladen. Überspringe sie.
+  </Step>
+  <Step title="Jede geänderte Tabelle vollständig abrufen">
+    Starte mit `limit=1000` und `offset=0`. Prüfe nach jedem Request die Response-Header:
+
+    - `X-Has-More`: `"true"`, wenn weitere Seiten existieren
+    - `X-Next-Offset`: der Offset für die nächste Seite (nur vorhanden, wenn `X-Has-More` `"true"` ist)
+    - `X-Total-Count`: Gesamtzahl der verfügbaren Zeilen für die aktuelle Abfrage
+
+    Solange `X-Has-More` `"true"` ist, rufe die nächste Seite mit `X-Next-Offset` ab. Der Offset dient nur zum Blättern innerhalb eines einzelnen Laufs.
 
     ```bash
     curl -s "https://api.trassets.ai/property/properties?limit=1000&offset=0" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
   </Step>
-  <Step title="Die Pagination-Header prüfen">
-    Prüfe nach jedem Request die Response-Header:
-
-    - `X-Has-More`: `"true"`, wenn weitere Seiten existieren
-    - `X-Next-Offset`: der Offset für die nächste Seite (nur vorhanden, wenn `X-Has-More` `"true"` ist)
-    - `X-Total-Count`: Gesamtzahl der verfügbaren Zeilen für die aktuelle Abfrage
-
-    Wenn `X-Has-More` `"true"` ist, erhöhe den Offset um dein Limit und wiederhole den Vorgang, bis du das Ende erreichst.
-  </Step>
-  <Step title="Den nächsten Offset für den nächsten Lauf speichern">
-    Speichere den Wert von `X-Next-Offset` aus dem letzten erfolgreichen Request dauerhaft. Beginne beim nächsten geplanten Sync bei diesem gespeicherten Offset statt bei null, um zu vermeiden, dass du Zeilen erneut abrufst, die du bereits hast.
-
-    Endete der vorherige Lauf beispielsweise bei Offset `4000`, beginnt dein nächster Lauf mit:
-
-    ```bash
-    curl -s "https://api.trassets.ai/property/properties?limit=1000&offset=4000" \
-      -H "X-API-Key: $TRASSETS_API_KEY"
-    ```
-  </Step>
-  <Step title="Zurücksetzen bei größeren Datenänderungen">
-    Wenn du eine Schema-Änderung, die Notwendigkeit eines vollständigen Neuladens oder eine große Lücke zwischen Syncs feststellst, setze deinen gespeicherten Offset auf `0` zurück und rufe den kompletten Datensatz erneut ab.
+  <Step title="Die lokale Tabelle ersetzen">
+    Sind alle Seiten da, ersetze deine lokale Kopie dieser Tabelle, statt anzuhängen. So verschwinden auch gelöschte Zeilen. Speichere dann das höchste `last_sync_at` als `since`-Wert für den nächsten Lauf.
   </Step>
   <Step title="Vollständiges Python-Beispiel">
-    Ein vollständiges Skript, das jede Seite abruft und dabei von einem gespeicherten Offset aus fortsetzt. Erfordert das Paket [`requests`](https://pypi.org/project/requests/).
+    Ein vollständiges Skript, das jede Tabelle erneut abruft, die seit dem letzten Lauf neu geladen wurde. Erfordert das Paket [`requests`](https://pypi.org/project/requests/).
 
-    ```python sync_properties.py
+    ```python sync_changed_tables.py
     import os
     import requests
 
@@ -49,17 +50,14 @@ Nutze die Category-Endpunkte der Data API, um eine kontinuierlich aktualisierte 
     HEADERS = {"X-API-Key": API_KEY}
 
 
-    def sync_properties(start_offset: int = 0, page_size: int = 1000) -> list[dict]:
-        """Fetch all rows from /property/properties starting at start_offset.
-
-        Returns the combined rows and the offset to resume from on the next run.
-        """
+    def fetch_table(endpoint_url: str, page_size: int = 1000) -> list[dict]:
+        """Fetch all rows of one table, starting at offset 0."""
         rows: list[dict] = []
-        offset = start_offset
+        offset = 0
 
         while True:
             resp = requests.get(
-                f"{BASE_URL}/property/properties",
+                f"{BASE_URL}{endpoint_url}",
                 headers=HEADERS,
                 params={"limit": page_size, "offset": offset},
                 timeout=30,
@@ -67,23 +65,34 @@ Nutze die Category-Endpunkte der Data API, um eine kontinuierlich aktualisierte 
             resp.raise_for_status()
             rows.extend(resp.json())
 
-            has_more = resp.headers.get("X-Has-More") == "true"
-            if not has_more:
-                break
+            if resp.headers.get("X-Has-More") != "true":
+                return rows
             offset = int(resp.headers["X-Next-Offset"])
 
-        return rows, offset
+
+    def sync(since: str) -> tuple[dict[str, list[dict]], str]:
+        """Re-fetch every table reloaded after `since`.
+
+        Returns the rows per table and the `since` value for the next run.
+        """
+        resp = requests.get(
+            f"{BASE_URL}/changes", headers=HEADERS, params={"since": since}, timeout=30
+        )
+        resp.raise_for_status()
+        changed = resp.json()
+
+        tables = {t["table_name"]: fetch_table(t["endpoint_url"]) for t in changed}
+        if not changed:
+            return tables, since
+        # last_sync_at is UTC without a suffix; the API expects it with "Z"
+        return tables, max(t["last_sync_at"] for t in changed) + "Z"
 
 
     if __name__ == "__main__":
-        # On the next scheduled run, pass the returned offset back in as
-        # start_offset instead of 0 to avoid re-fetching rows you already have.
-        rows, next_offset = sync_properties(start_offset=0)
-        print(f"Fetched {len(rows)} rows, resume offset: {next_offset}")
+        tables, next_since = sync(since="2026-07-01T00:00:00Z")
+        for name, rows in tables.items():
+            print(f"{name}: {len(rows)} rows")
+        # Replace the local tables and persist next_since for the next run.
     ```
   </Step>
 </Steps>
-
-<Tip>
-  Bevor du einen vollständigen inkrementellen Abruf ausführst, prüfe den Endpunkt [`/changes`](/de/guides/delta-sync), um herauszufinden, welche Tabellen seit deinem letzten Sync aktualisiert wurden. Überspringe Tabellen, die sich nicht geändert haben, um Requests zu sparen und innerhalb des Rate-Limits von 500 Req/h zu bleiben.
-</Tip>

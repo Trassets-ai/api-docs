@@ -53,7 +53,9 @@ Discover which tables have been updated since your last sync without fetching ev
     If no tables have changed since the ETag was issued, the API returns `304 Not Modified` with an empty body and does not count the request against the change-data query cost.
   </Step>
   <Step title="Advance the since parameter">
-    After a successful sync, store the current timestamp and use it as the `since` value for the next poll. This creates a sliding window so each run evaluates only the interval since the previous run.
+    After a successful sync, store the highest `last_sync_at` from the `/changes` response and use it as the `since` value for the next poll. This creates a sliding window so each run evaluates only the interval since the previous run. If the response is empty, keep the old `since`.
+
+    Do not use your own clock here. Client and server clocks drift, and a table that finished syncing shortly before your timestamp would never appear in a later `/changes` response.
   </Step>
   <Step title="Full Python example">
     A complete poller that tracks the `since` timestamp and `ETag` between runs, and only
@@ -62,7 +64,6 @@ Discover which tables have been updated since your last sync without fetching ev
 
     ```python poll_changes.py
     import os
-    from datetime import datetime, timezone
 
     import requests
 
@@ -74,7 +75,8 @@ Discover which tables have been updated since your last sync without fetching ev
     def poll_changes(since: str, etag: str | None = None):
         """Poll /changes and return (changed_tables, new_etag, new_since).
 
-        changed_tables is an empty list on a 304 Not Modified response.
+        changed_tables is an empty list on a 304 Not Modified response, and
+        new_since stays unchanged then.
         """
         headers = dict(HEADERS)
         if etag:
@@ -84,12 +86,16 @@ Discover which tables have been updated since your last sync without fetching ev
             f"{BASE_URL}/changes", headers=headers, params={"since": since}, timeout=30
         )
 
-        now = datetime.now(timezone.utc).isoformat()
         if resp.status_code == 304:
-            return [], etag, now
+            return [], etag, since
 
         resp.raise_for_status()
-        return resp.json(), resp.headers.get("ETag"), now
+        changed = resp.json()
+        if not changed:
+            return [], resp.headers.get("ETag"), since
+        # last_sync_at is UTC without a suffix; the API expects it with "Z"
+        new_since = max(t["last_sync_at"] for t in changed) + "Z"
+        return changed, resp.headers.get("ETag"), new_since
 
 
     if __name__ == "__main__":

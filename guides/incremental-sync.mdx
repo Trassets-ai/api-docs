@@ -1,46 +1,47 @@
 ---
 title: "Incrementally sync real-estate data with Trassets"
-description: "Fetch only changed data using offset pagination and category endpoints to keep a local copy of Trassets data up to date without re-fetching everything."
+description: "Keep a local copy of Trassets data up to date by asking /changes which tables were reloaded and re-fetching only those tables in full."
 sidebarTitle: "Incremental Sync"
 ---
 
-Use the Data API category endpoints to maintain a continuously updated local copy of your data without transferring every row on each run. Offset-based pagination provides predictable resumption points across scheduled syncs.
+Maintain a local copy of your data without fetching every table on each run. The tables are reloaded in full once a day, so there is no row-level delta: the unit of change is the table. Ask [`/changes`](/guides/delta-sync) which tables were reloaded since your last run, then fetch exactly those tables again, completely.
+
+<Warning>
+  Do not store `X-Next-Offset` between runs. After a reload, rows can change, disappear or shift position, so resuming at an old offset silently keeps stale data.
+</Warning>
 
 <Steps>
-  <Step title="Fetch the first page">
-    Start with `limit=1000` and `offset=0`. The example uses the `/property/properties` endpoint, but the pattern works for any category endpoint.
+  <Step title="Find the reloaded tables">
+    Call `/changes` with the `since` value from your last run. Use the highest `last_sync_at` from that run's response; on the very first run, use a timestamp up to 120 days back. Each entry carries the `endpoint_url` to fetch.
+
+    ```bash
+    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Tables missing from the response have not been reloaded. Skip them.
+  </Step>
+  <Step title="Fetch each changed table in full">
+    Start with `limit=1000` and `offset=0`. Inspect the response headers after each request:
+
+    - `X-Has-More`: `"true"` if additional pages exist
+    - `X-Next-Offset`: the offset for the next page (present only when `X-Has-More` is `"true"`)
+    - `X-Total-Count`: total rows available for the current query
+
+    While `X-Has-More` is `"true"`, request the next page with `X-Next-Offset`. The offset only pages through a single run.
 
     ```bash
     curl -s "https://api.trassets.ai/property/properties?limit=1000&offset=0" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
   </Step>
-  <Step title="Check the pagination headers">
-    Inspect the response headers after each request:
-
-    - `X-Has-More`: `"true"` if additional pages exist
-    - `X-Next-Offset`: the offset to use for the next page (present only when `X-Has-More` is `"true"`)
-    - `X-Total-Count`: total rows available for the current query
-
-    If `X-Has-More` is `"true"`, increment the offset by your limit and repeat until you reach the end.
-  </Step>
-  <Step title="Store the next offset for the next run">
-    Persist the value of `X-Next-Offset` from the last successful request. On the next scheduled sync, start from this stored offset instead of zero to avoid re-fetching rows you already have.
-
-    For example, if the previous run ended at offset `4000`, your next run begins with:
-
-    ```bash
-    curl -s "https://api.trassets.ai/property/properties?limit=1000&offset=4000" \
-      -H "X-API-Key: $TRASSETS_API_KEY"
-    ```
-  </Step>
-  <Step title="Reset when the data changes significantly">
-    If you detect a schema change, a full reload requirement, or a large gap between syncs, reset your stored offset to `0` and pull the full dataset again.
+  <Step title="Replace the local table">
+    Once all pages are in, replace your local copy of that table rather than appending, so deleted rows disappear as well. Then store the highest `last_sync_at` as the `since` value for the next run.
   </Step>
   <Step title="Full Python example">
-    A complete script that fetches every page, resuming from a stored offset. Requires the [`requests`](https://pypi.org/project/requests/) package.
+    A complete script that re-fetches every table reloaded since the last run. Requires the [`requests`](https://pypi.org/project/requests/) package.
 
-    ```python sync_properties.py
+    ```python sync_changed_tables.py
     import os
     import requests
 
@@ -49,17 +50,14 @@ Use the Data API category endpoints to maintain a continuously updated local cop
     HEADERS = {"X-API-Key": API_KEY}
 
 
-    def sync_properties(start_offset: int = 0, page_size: int = 1000) -> list[dict]:
-        """Fetch all rows from /property/properties starting at start_offset.
-
-        Returns the combined rows and the offset to resume from on the next run.
-        """
+    def fetch_table(endpoint_url: str, page_size: int = 1000) -> list[dict]:
+        """Fetch all rows of one table, starting at offset 0."""
         rows: list[dict] = []
-        offset = start_offset
+        offset = 0
 
         while True:
             resp = requests.get(
-                f"{BASE_URL}/property/properties",
+                f"{BASE_URL}{endpoint_url}",
                 headers=HEADERS,
                 params={"limit": page_size, "offset": offset},
                 timeout=30,
@@ -67,23 +65,34 @@ Use the Data API category endpoints to maintain a continuously updated local cop
             resp.raise_for_status()
             rows.extend(resp.json())
 
-            has_more = resp.headers.get("X-Has-More") == "true"
-            if not has_more:
-                break
+            if resp.headers.get("X-Has-More") != "true":
+                return rows
             offset = int(resp.headers["X-Next-Offset"])
 
-        return rows, offset
+
+    def sync(since: str) -> tuple[dict[str, list[dict]], str]:
+        """Re-fetch every table reloaded after `since`.
+
+        Returns the rows per table and the `since` value for the next run.
+        """
+        resp = requests.get(
+            f"{BASE_URL}/changes", headers=HEADERS, params={"since": since}, timeout=30
+        )
+        resp.raise_for_status()
+        changed = resp.json()
+
+        tables = {t["table_name"]: fetch_table(t["endpoint_url"]) for t in changed}
+        if not changed:
+            return tables, since
+        # last_sync_at is UTC without a suffix; the API expects it with "Z"
+        return tables, max(t["last_sync_at"] for t in changed) + "Z"
 
 
     if __name__ == "__main__":
-        # On the next scheduled run, pass the returned offset back in as
-        # start_offset instead of 0 to avoid re-fetching rows you already have.
-        rows, next_offset = sync_properties(start_offset=0)
-        print(f"Fetched {len(rows)} rows, resume offset: {next_offset}")
+        tables, next_since = sync(since="2026-07-01T00:00:00Z")
+        for name, rows in tables.items():
+            print(f"{name}: {len(rows)} rows")
+        # Replace the local tables and persist next_since for the next run.
     ```
   </Step>
 </Steps>
-
-<Tip>
-  Before running a full incremental fetch, check the [`/changes`](/guides/delta-sync) endpoint to discover which tables have been updated since your last sync. Skip any tables that have not changed to save requests and stay within the 500 req/h rate limit.
-</Tip>

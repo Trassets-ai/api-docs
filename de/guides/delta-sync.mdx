@@ -53,7 +53,9 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
     Wenn sich seit der Ausstellung des ETag keine Tabellen geändert haben, liefert die API `304 Not Modified` mit leerem Body und zählt den Request nicht gegen die Abfragekosten für Change-Daten.
   </Step>
   <Step title="Den Parameter since fortschreiben">
-    Speichere nach einem erfolgreichen Sync den aktuellen Zeitstempel und nutze ihn als Wert für `since` bei der nächsten Abfrage. So entsteht ein gleitendes Zeitfenster, sodass jeder Lauf nur das Intervall seit dem vorherigen Lauf bewertet.
+    Speichere nach einem erfolgreichen Sync das höchste `last_sync_at` aus der `/changes`-Antwort und nutze es als Wert für `since` bei der nächsten Abfrage. So entsteht ein gleitendes Zeitfenster, sodass jeder Lauf nur das Intervall seit dem vorherigen Lauf bewertet. Ist die Antwort leer, bleibt das bisherige `since` bestehen.
+
+    Nimm dafür nicht deine eigene Uhr. Client- und Serveruhr weichen voneinander ab, und eine Tabelle, die kurz vor deinem Zeitstempel fertig synchronisiert wurde, würde in keiner späteren `/changes`-Antwort mehr auftauchen.
   </Step>
   <Step title="Vollständiges Python-Beispiel">
     Ein vollständiger Poller, der den Zeitstempel `since` und den `ETag` zwischen den Läufen
@@ -62,7 +64,6 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
 
     ```python poll_changes.py
     import os
-    from datetime import datetime, timezone
 
     import requests
 
@@ -74,7 +75,8 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
     def poll_changes(since: str, etag: str | None = None):
         """Poll /changes and return (changed_tables, new_etag, new_since).
 
-        changed_tables is an empty list on a 304 Not Modified response.
+        changed_tables is an empty list on a 304 Not Modified response, and
+        new_since stays unchanged then.
         """
         headers = dict(HEADERS)
         if etag:
@@ -84,12 +86,16 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
             f"{BASE_URL}/changes", headers=headers, params={"since": since}, timeout=30
         )
 
-        now = datetime.now(timezone.utc).isoformat()
         if resp.status_code == 304:
-            return [], etag, now
+            return [], etag, since
 
         resp.raise_for_status()
-        return resp.json(), resp.headers.get("ETag"), now
+        changed = resp.json()
+        if not changed:
+            return [], resp.headers.get("ETag"), since
+        # last_sync_at is UTC without a suffix; the API expects it with "Z"
+        new_since = max(t["last_sync_at"] for t in changed) + "Z"
+        return changed, resp.headers.get("ETag"), new_since
 
 
     if __name__ == "__main__":
