@@ -33,6 +33,6 @@ Aktuell betrifft das `/contracts/contract_ends` (und die `/v1/`-Variante) — do
 
 ## Spaltenfilterung (vertikal)
 
-Welche Felder in der Response einer Entität enthalten sind, kann pro API-Key eingeschränkt werden. Ein Admin konfiguriert das im Trassets-Portal, pro Key und pro Entität — ein Key ohne explizite Konfiguration liefert den vollen, in der **API-Referenz** dokumentierten Spaltenumfang. Änderungen wirken sofort.
+Welche Felder in der Response einer Entität enthalten sind, kann pro API-Key eingeschränkt werden. Ein Admin konfiguriert das im Trassets-Portal, pro Key und pro Entität — ein Key ohne explizite Konfiguration liefert den vollen, in der **API-Referenz** dokumentierten Spaltenumfang. Änderungen wirken nach etwa einer Minute, weil Berechtigungen bis zu 60 Sekunden zwischengespeichert werden.
 
 Das ist nicht über den Request selbst steuerbar — es gibt keinen `fields`- oder `select`-Query-Parameter. Fehlt ein erwartetes Feld in der Response, obwohl es in der API-Referenz für diese Entität steht, liegt das wahrscheinlich an der Spaltenkonfiguration deines API-Keys — wende dich an den Trassets-Support, um sie zu prüfen oder zu ändern.

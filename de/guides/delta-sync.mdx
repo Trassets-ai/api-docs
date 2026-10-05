@@ -50,7 +50,7 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
       -H "If-None-Match: \"abc123\""
     ```
 
-    Wenn sich seit der Ausstellung des ETag keine Tabellen geändert haben, liefert die API `304 Not Modified` mit leerem Body und zählt den Request nicht gegen die Abfragekosten für Change-Daten.
+    Wenn sich seit der Ausstellung des ETag keine Tabellen geändert haben, liefert die API `304 Not Modified` mit leerem Body und überspringt die Datenbankabfrage. Der Request zählt trotzdem auf dein Rate-Limit.
   </Step>
   <Step title="Den Parameter since fortschreiben">
     Speichere nach einem erfolgreichen Sync das höchste `last_sync_at` aus der `/changes`-Antwort und nutze es als Wert für `since` bei der nächsten Abfrage. So entsteht ein gleitendes Zeitfenster, sodass jeder Lauf nur das Intervall seit dem vorherigen Lauf bewertet. Ist die Antwort leer, bleibt das bisherige `since` bestehen.

@@ -50,7 +50,7 @@ Discover which tables have been updated since your last sync without fetching ev
       -H "If-None-Match: \"abc123\""
     ```
 
-    If no tables have changed since the ETag was issued, the API returns `304 Not Modified` with an empty body and does not count the request against the change-data query cost.
+    If no tables have changed since the ETag was issued, the API returns `304 Not Modified` with an empty body and skips the database query. The request still counts toward your rate limit.
   </Step>
   <Step title="Advance the since parameter">
     After a successful sync, store the highest `last_sync_at` from the `/changes` response and use it as the `since` value for the next poll. This creates a sliding window so each run evaluates only the interval since the previous run. If the response is empty, keep the old `since`.
