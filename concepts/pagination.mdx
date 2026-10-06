@@ -27,18 +27,19 @@ Category endpoints accept `limit` and `offset` query parameters. The API returns
 </ResponseField>
 
 <Note>
-  Not every category endpoint supports cursor pagination. Where the underlying table has no
-  sort column or primary key configured, no `X-Next-Cursor` header comes back, and passing
-  `?cursor=` returns `400 Bad Request` with `"Cursor-based pagination not available: table has
-  no sort_col or primary key configured"`. Treat the presence of the header as the signal:
-  if it's missing on a full page, page through with `limit`/`offset`, which works on every
-  category endpoint.
+  Every category endpoint supports cursor pagination. Rows are ordered by the configured sort
+  column (or the primary key), `NULL` values last, with the internal row position (`ctid`) as
+  tiebreaker — rows with equal values are neither skipped nor repeated. Tables without a sort
+  column or primary key are paged by row position alone. Pass the `X-Next-Cursor` value unchanged
+  as `cursor`; an altered cursor or one in an older format returns `400 Bad Request`,
+  so restart from the first page. The row position is only stable within one sync run — see
+  [Sync cycle](/concepts/sync-cycle).
 </Note>
 
 This example fetches page 2 with an offset of 100:
 
 ```bash
-curl -G "https://api.trassets.ai/v1/property/properties" \
+curl -G "https://api.trassets.ai/property/properties" \
   -H "X-API-Key: $TRASSETS_API_KEY" \
   -d "limit=100" \
   -d "offset=100"
@@ -46,7 +47,7 @@ curl -G "https://api.trassets.ai/v1/property/properties" \
 
 ## Raw Endpoint Pagination
 
-Raw endpoints use cursor-based pagination via the `cursor` query parameter. The cursor value comes from the `next_cursor` field in the response body. Cursors are stable under concurrent writes, so rows added or removed during a bulk export will not cause duplicates or gaps.
+Raw endpoints use cursor-based pagination via the `cursor` query parameter. The cursor value comes from the `next_cursor` field in the response body. Tables without a primary key are paged by row position (`ctid`), so every raw table can be exported completely. Within one sync run the cursor causes no duplicates or gaps; a reload in between (see [Sync cycle](/concepts/sync-cycle)) can shift row positions, so restart the export from the first page after a reload.
 
 The response body contains these fields:
 
