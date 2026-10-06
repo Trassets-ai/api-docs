@@ -25,7 +25,7 @@ Example error response for an invalid API key:
   "type": "about:blank",
   "title": "Forbidden",
   "status": 403,
-  "detail": "Invalid or disabled API key",
+  "detail": "Invalid API key",
   "instance": "/property/properties"
 }
 ```
@@ -35,13 +35,13 @@ Example error response for an invalid API key:
 | Status | Meaning | What to do |
 | --- | --- | --- |
 | **400** | Missing required filter | Check the endpoint documentation for required query parameters and add them to the request. |
-| **401** | Invalid API key | Verify that you are sending the `X-API-Key` header and that the key has not been revoked. |
-| **403** | Missing access tier | Your API key does not have permission for this endpoint or table. Contact Trassets support to upgrade your access tier. |
+| **401** | Missing API key | Send the `X-API-Key` header with every request. |
+| **403** | Key rejected or access tier missing | The key is unknown or disabled, or it has no permission for this endpoint or table. Check the `detail` field. Contact Trassets support to change your access tier. |
 | **404** | Unknown endpoint | Verify the URL path and the category or table name. |
 | **422** | Validation error | A query parameter did not pass validation. Check the `detail` field for the exact parameter and constraint. |
 | **429** | Rate limit exceeded | You have exceeded the 500 requests per hour limit. Back off and retry after the current window resets. |
 | **500** | Internal error | A server-side error occurred. Retry the request after a short delay, and contact support if it persists. |
 
 <Warning>
-  A **403** response means your API key is valid but lacks the required access tier for the requested resource. It is not the same as a 401, which means the key itself is missing or invalid.
+  A **401** only means the `X-API-Key` header is missing. An unknown or disabled key returns **403**, as does a valid key that lacks the required access tier. Read the `detail` field to tell them apart.
 </Warning>

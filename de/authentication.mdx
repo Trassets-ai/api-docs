@@ -8,7 +8,7 @@ Die Data API nutzt ein einfaches API-Key-Schema. Du übergibst deinen Key im `X-
 
 ## Einen Key erstellen
 
-Registriere dich unter [portal.api.trassets.ai](https://portal.api.trassets.ai) und erzeuge einen API-Key über das Dashboard. Der Klartext-Key wird genau einmal angezeigt. Kopiere ihn sofort und speichere ihn in einem sicheren Secrets-Manager. Wenn du ihn verlierst, musst du den alten Key widerrufen und einen neuen erzeugen.
+Trassets richtet den Portal-Zugang für deine Organisation ein; eine öffentliche Registrierung gibt es nicht. Mit diesem Zugang meldet sich ein Administrator deiner Organisation unter [portal.api.trassets.ai](https://portal.api.trassets.ai) an und erzeugt API-Keys selbst über das Dashboard. Der Klartext-Key wird genau einmal angezeigt. Kopiere ihn sofort und speichere ihn in einem sicheren Secrets-Manager. Wenn du ihn verlierst, musst du den alten Key widerrufen und einen neuen erzeugen.
 
 ## Den Key in Requests übergeben
 
@@ -26,7 +26,7 @@ Trassets speichert deinen API-Key niemals im Klartext. Auf unseren Servern wird 
 Behandle deinen Key wie ein Passwort:
 
 - Committe ihn nicht in die Versionskontrolle.
-- Rotiere Keys regelmäßig über das Portal.
+- Rotiere Keys regelmäßig: Erzeuge im Portal einen neuen Key, stelle deine Integration um und lösche dann den alten. Eine Ein-Klick-Rotation gibt es nicht.
 - Beschränke jeden Key auf die minimal nötige Zugriffsstufe für deine Integration.
 
 ## Authentifizierungsfehler
@@ -45,7 +45,7 @@ Wenn der Key fehlt, ungültig ist oder nicht die erforderliche Zugriffsstufe hat
 }
 ```
 
-Das bedeutet, dass der Request keinen gültigen `X-API-Key`-Header enthielt oder der übergebene Key deaktiviert ist.
+Das bedeutet, dass der Request keinen `X-API-Key`-Header enthielt.
 
 ### 403 Forbidden
 
@@ -54,9 +54,9 @@ Das bedeutet, dass der Request keinen gültigen `X-API-Key`-Header enthielt oder
   "type": "about:blank",
   "title": "Forbidden",
   "status": 403,
-  "detail": "Invalid or disabled API key",
+  "detail": "API key is disabled",
   "instance": "/property/properties"
 }
 ```
 
-Eine 403-Antwort zeigt an, dass der Key existiert, der angeforderte Endpunkt oder die Datenstufe aber nicht in deinem Abonnement enthalten ist. Kontaktiere deinen Account-Administrator oder upgrade deinen Plan im Portal.
+Eine 403-Antwort bedeutet, dass der Key nicht akzeptiert wird: Er ist unbekannt (`Invalid API key`) oder deaktiviert (`API key is disabled`), oder er ist gültig, aber der angeforderte Endpunkt oder die Datenstufe ist nicht in deinem Abonnement enthalten. Das Feld `detail` zeigt, welcher Fall vorliegt. Kontaktiere deinen Account-Administrator oder den Trassets-Support, um deinen Zugang zu ändern.
