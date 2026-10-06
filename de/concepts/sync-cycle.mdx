@@ -28,7 +28,7 @@ Bei jedem Sync-Lauf wird jede Tabelle **vollständig gelöscht und komplett neu 
 
 `GET /changes?since=<timestamp>` liefert eine Tabelle nur zurück, wenn sie einen erfolgreichen Sync mit `last_sync_at > since` abgeschlossen hat — ein **strikter** Größer-als-Vergleich, kein `>=`.
 
-Der `ETag`-Response-Header ist das Maximum von `last_sync_at` über alle synchronisierten Tabellen eines Kunden. Polling mit `If-None-Match` erlaubt dir daher, einen Request komplett zu überspringen, wenn seit deinem letzten Poll nichts synchronisiert wurde (siehe [Delta Sync](/de/guides/delta-sync) für das vollständige Polling-Muster).
+Der `ETag`-Response-Header wird aus dem Maximum von `last_sync_at` über alle synchronisierten Tabellen eines Kunden **sowie aus `since` (nach UTC umgerechnet) und dem Filter `category`** gebildet. Ein `ETag` aus einer Abfrage mit anderem `since` oder anderer `category` passt daher nie. Polling mit `If-None-Match` erlaubt dir daher, einen Request komplett zu überspringen, wenn seit deinem letzten Poll nichts synchronisiert wurde (siehe [Delta Sync](/de/guides/delta-sync) für das vollständige Polling-Muster).
 
 <Warning>
   `since` darf nicht älter als 120 Tage sein — ältere Werte werden mit einem 400-Fehler

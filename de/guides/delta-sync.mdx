@@ -12,7 +12,7 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
 
 <Steps>
   <Step title="Geänderte Tabellen abfragen">
-    Sende einen `GET`-Request an `/changes` mit einem ISO-8601-UTC-Zeitstempel `since`. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL. Mit dem optionalen Parameter `category` (z. B. `category=property`) werden nur Tabellen dieser Kategorie zurückgegeben.
+    Sende einen `GET`-Request an `/changes` mit einem ISO-8601-Zeitstempel `since` (UTC, z. B. `…Z`). Ein Offset wie `+02:00` wird nach UTC umgerechnet; schreibe das `+` in der Query-String als `%2B`, sonst wird es als Leerzeichen gelesen und die Anfrage scheitert mit 400. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL. Eine hier gelistete Tabelle musst du **vollständig** neu abrufen — `/changes` meldet geänderte Tabellen, keine geänderten Zeilen. `endpoint_url` zeigt auf einen Pfad, den dein Schlüssel aufrufen darf: `/{category}/{table}` für Kunden der unversionierten API, `/v1/{category}/{table}` für reine v1-Kunden, `/raw/{table}` für Raw-Tabellen. Für dein Konto gesperrte Raw-Tabellen werden nicht gelistet. Mit dem optionalen Parameter `category` (z. B. `category=property`) werden nur Tabellen dieser Kategorie zurückgegeben.
 
     ```bash
     curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
@@ -50,7 +50,7 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
       -H "If-None-Match: \"abc123\""
     ```
 
-    Wenn sich seit der Ausstellung des ETag keine Tabellen geändert haben, liefert die API `304 Not Modified` mit leerem Body und überspringt die Datenbankabfrage. Der Request zählt trotzdem auf dein Rate-Limit.
+    Der `ETag` hängt auch von `since` und `category` ab; bewahre ihn deshalb zusammen mit dem `since` auf, für das er ausgestellt wurde. Wenn sich seit der Ausstellung des ETag keine Tabellen geändert haben, liefert die API `304 Not Modified` mit leerem Body und überspringt die Datenbankabfrage. Der Request zählt trotzdem auf dein Rate-Limit.
   </Step>
   <Step title="Den Parameter since fortschreiben">
     Speichere nach einem erfolgreichen Sync das höchste `last_sync_at` aus der `/changes`-Antwort und nutze es als Wert für `since` bei der nächsten Abfrage. So entsteht ein gleitendes Zeitfenster, sodass jeder Lauf nur das Intervall seit dem vorherigen Lauf bewertet. Ist die Antwort leer, bleibt das bisherige `since` bestehen.

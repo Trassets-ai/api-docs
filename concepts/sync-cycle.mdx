@@ -46,8 +46,10 @@ it. This means:
 `GET /changes?since=<timestamp>` returns a table only if it has completed a successful sync
 with `last_sync_at > since` — a **strict** greater-than comparison, not `>=`.
 
-The `ETag` response header is the maximum `last_sync_at` across all of a customer's synced
-tables, so polling with `If-None-Match` lets you skip a request entirely when nothing has
+The `ETag` response header is derived from the maximum `last_sync_at` across all of a customer's
+synced tables **plus the `since` value (normalised to UTC) and the `category` filter**. A request
+with a different `since` or `category` therefore never matches an `ETag` issued for another one.
+Polling with `If-None-Match` lets you skip a request entirely when nothing has
 synced since your last poll (see [Delta Sync](/guides/delta-sync) for the full polling
 pattern).
 
