@@ -19,20 +19,25 @@ Diese Anleitung bringt dich in wenigen Minuten von null zum erfolgreichen `/v1/`
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
-    Die API liefert ein JSON-Array von Objekten zurück. Eine typische Antwort sieht so aus:
+    Die API liefert ein JSON-Objekt zurück: die Zeilen stehen in `data`, dazu `count`, `next_cursor` (`null` auf der letzten Seite) und `total`. Eine typische Antwort sieht so aus:
 
     ```json
-    [
-      {
-        "to_id": 5231,
-        "property_id": 1622,
-        "floor_area_id": null,
-        "name": "Aufzug Hof",
-        "type": "Aufzug",
-        "built_date": "1998-06-01",
-        "is_meter": false
-      }
-    ]
+    {
+      "data": [
+        {
+          "to_id": 5231,
+          "property_id": 1622,
+          "floor_area_id": null,
+          "name": "Aufzug Hof",
+          "type": "Aufzug",
+          "built_date": "1998-06-01",
+          "is_meter": false
+        }
+      ],
+      "count": 1,
+      "next_cursor": "eyJjb2wiOiAi…",
+      "total": 214
+    }
     ```
 
     <Note>
