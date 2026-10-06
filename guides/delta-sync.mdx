@@ -12,7 +12,7 @@ Discover which tables have been updated since your last sync without fetching ev
 
 <Steps>
   <Step title="Poll for changed tables">
-    Send a `GET` request to `/changes` with an ISO-8601 UTC `since` timestamp. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL. Add an optional `category` parameter (e.g. `category=property`) to only return tables belonging to that category.
+    Send a `GET` request to `/changes` with an ISO-8601 `since` timestamp (UTC, e.g. `…Z`). An offset such as `+02:00` is converted to UTC; in a query string write the `+` as `%2B`, otherwise it is read as a space and the request fails with 400. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL. A table listed here has to be fetched **in full** again — `/changes` reports changed tables, not changed rows. `endpoint_url` points to a path your key can call: `/{category}/{table}` for customers on the unversioned API, `/v1/{category}/{table}` for v1-only customers, `/raw/{table}` for raw tables. Raw tables that are blocked for your account are not listed. Add an optional `category` parameter (e.g. `category=property`) to only return tables belonging to that category.
 
     ```bash
     curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
@@ -50,7 +50,7 @@ Discover which tables have been updated since your last sync without fetching ev
       -H "If-None-Match: \"abc123\""
     ```
 
-    If no tables have changed since the ETag was issued, the API returns `304 Not Modified` with an empty body and skips the database query. The request still counts toward your rate limit.
+    The `ETag` depends on `since` and `category` as well, so keep the `ETag` together with the `since` it was issued for. If no tables have changed since the ETag was issued, the API returns `304 Not Modified` with an empty body and skips the database query. The request still counts toward your rate limit.
   </Step>
   <Step title="Advance the since parameter">
     After a successful sync, store the highest `last_sync_at` from the `/changes` response and use it as the `since` value for the next poll. This creates a sliding window so each run evaluates only the interval since the previous run. If the response is empty, keep the old `since`.
