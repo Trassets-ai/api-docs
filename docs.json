@@ -13,7 +13,6 @@
       {
         "version": "Current",
         "tag": "Deprecated",
-        "default": true,
         "languages": [
       {
         "language": "en",
@@ -151,6 +150,7 @@
       },
       {
         "version": "v1",
+        "default": true,
         "languages": [
           {
             "language": "en",
