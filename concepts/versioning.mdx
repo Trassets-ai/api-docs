@@ -4,38 +4,38 @@ sidebarTitle: "Versioning"
 description: "/v1/ is the stable, versioned interface of the Data API. The unversioned category and raw paths will be switched off once the /v1/ rollout is complete; /catalog and /changes remain."
 ---
 
-The Data API is served from two path families: `/v1/`, the versioned interface, and the original base path without a version prefix. The unversioned category and raw paths will be **switched off once the `/v1/` rollout is complete**. New integrations should use `/v1/` only.
+<mark>The Data API is served from two path families: `/v1/`, the versioned interface, and the original base path without a version prefix. The unversioned category and raw paths will be **switched off once the `/v1/` rollout is complete**. New integrations should use `/v1/` only.</mark>
 
 ## Current State
 
-Tables are available under `/v1/`, e.g.:
+<mark>Tables are available under `/v1/`, e.g.:</mark>
 
 ```text
 https://api.trassets.ai/v1/accounting/budgets
 https://api.trassets.ai/v1/raw/sollart
 ```
 
-Every `/v1/` route follows the [response structure](/v1/response-shape-conventions) rules. For the current list of available tables, check the **API Reference** tab under the `v1` version selector.
+<mark>Every `/v1/` route follows the [response structure](/v1/response-shape-conventions) rules. For the current list of available tables, check the **API Reference** tab under the `v1` version selector.</mark>
 
-Until the switch-off, the same tables also remain available under the base path:
+<mark>Until the switch-off, the same tables also remain available under the base path:</mark>
 
 ```text
 https://api.trassets.ai/accounting/accounts
 https://api.trassets.ai/raw/sollart
 ```
 
-`GET /catalog` and `GET /changes` have no version prefix and are **not** affected by the switch-off.
+<mark>`GET /catalog` and `GET /changes` have no version prefix and are **not** affected by the switch-off.</mark>
 
 <Warning>
-  Once a table has a `/v1/` route, breaking changes land under a new prefix such as `/v2/`, not on the published path. The unversioned base paths carry no such guarantee.
+  <mark>Once a table has a `/v1/` route, breaking changes land under a new prefix such as `/v2/`, not on the published path. The unversioned base paths carry no such guarantee.</mark>
 </Warning>
 
 ## Migrating to /v1/
 
-Migrate every table you use before the unversioned paths are switched off:
+<mark>Migrate every table you use before the unversioned paths are switched off:</mark>
 
-1. Check whether `/v1/{category}/{api_table}` exists for the table you use.
-2. If it does, switch to it — the response shape differs from the base path (see [Response Structure](/v1/response-shape-conventions) and [Pagination](/v1/api-reference/introduction#pagination)).
-3. Raw tables: switch from `/raw/{table_name}` to `/v1/raw/{table_name}` — same data, response key `total` instead of `total_rows`.
+1. <mark>Check whether `/v1/{category}/{api_table}` exists for the table you use.</mark>
+2. <mark>If it does, switch to it — the response shape differs from the base path (see [Response Structure](/v1/response-shape-conventions) and [Pagination](/v1/api-reference/introduction#pagination)).</mark>
+3. <mark>Raw tables: switch from `/raw/{table_name}` to `/v1/raw/{table_name}` — same data, response key `total` instead of `total_rows`.</mark>
 
-`/catalog` and `/changes` need no change.
+<mark>`/catalog` and `/changes` need no change.</mark>
