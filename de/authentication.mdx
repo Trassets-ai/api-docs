@@ -31,9 +31,9 @@ Jeder Key hat einen Typ, `raw` oder `transformed`. Der Typ entscheidet, ob der K
 | `GET /catalog` | alle Kategorien und Tabellen | nur die Kategorien und Tabellen, auf die der Key zugreifen darf |
 | `GET /changes` | alle geänderten Tabellen | nur geänderte Tabellen innerhalb der Kategorien und Tabellen des Keys; `?category=X` außerhalb davon liefert 403 |
 
-<mark>Ein `raw`-Key kann keine Einschränkungen tragen. Zum Lesen einer Raw-Tabelle braucht er zusätzlich beide Grants für personenbezogene Daten, `personal` und `personal_financial`, weil sich Raw-Tabellen nicht spaltenweise filtern lassen; `/raw/tables` listet die Tabellen in jedem Fall. Ein `transformed`-Key bekommt keine Rohdaten und keine Tabellen ohne Kategorie.</mark>
+<p><mark>Ein `raw`-Key kann keine Einschränkungen tragen. Zum Lesen einer Raw-Tabelle braucht er zusätzlich beide Grants für personenbezogene Daten, `personal` und `personal_financial`, weil sich Raw-Tabellen nicht spaltenweise filtern lassen; `/raw/tables` listet die Tabellen in jedem Fall. Ein `transformed`-Key bekommt keine Rohdaten und keine Tabellen ohne Kategorie.</mark></p>
 
-<mark>Ist `/raw/tables` leer, obwohl der Key gültig ist, ist der Key `transformed`. Liefert eine Raw-Tabelle 403 mit `detail` "Raw export requires an API key of type raw with personal data grants. Contact your administrator or Trassets support.", ist der Key `transformed` oder ihm fehlt einer der beiden Grants — frag deinen Administrator oder den Trassets-Support. Ein geänderter Key-Typ oder Grant wirkt nach etwa einer Minute.</mark>
+<p><mark>Ist `/raw/tables` leer, obwohl der Key gültig ist, ist der Key `transformed`. Liefert eine Raw-Tabelle 403 mit `detail` "Raw export requires an API key of type raw with personal data grants. Contact your administrator or Trassets support.", ist der Key `transformed` oder ihm fehlt einer der beiden Grants — frag deinen Administrator oder den Trassets-Support. Ein geänderter Key-Typ oder Grant wirkt nach etwa einer Minute.</mark></p>
 
 ## Speicherung und Sicherheit des Keys
 
