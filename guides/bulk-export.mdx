@@ -7,7 +7,7 @@ sidebarTitle: "Bulk Export"
 Export an entire source table from the Data API into your warehouse or analytics pipeline. Raw endpoints return unfiltered rows from the underlying database with cursor-based pagination and snapshot consistency headers.
 
 <Note>
-  Raw endpoints require a key of type `raw`; a `transformed` key gets 403 on `GET /raw/{table_name}` and an empty list from `GET /raw/tables` — see [Key types](/authentication#key-types). Raw tables that are not released for your environment appear neither in `/raw/tables` nor in `/changes`, and a direct call returns 404.
+  Raw endpoints require a key of type `raw`; reading a table (`GET /raw/{table_name}`) additionally needs both personal data grants, `personal` and `personal_financial`, otherwise it returns 403. A `transformed` key gets 403 on `GET /raw/{table_name}` and an empty list from `GET /raw/tables` — see [Key types](/authentication#key-types). Raw tables that are not released for your environment appear neither in `/raw/tables` nor in `/changes`, and a direct call returns 404.
 </Note>
 
 <Steps>

@@ -70,10 +70,12 @@ can serve multiple properties, referenced by `creditor_id` from `Property.techni
 </ResponseField>
 
 <ResponseField name="name_1" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Primary name line (company or last name).
 </ResponseField>
 
 <ResponseField name="name_2" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Secondary name line.
 </ResponseField>
 
@@ -82,46 +84,57 @@ can serve multiple properties, referenced by `creditor_id` from `Property.techni
 </ResponseField>
 
 <ResponseField name="address_line_1" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   First line of the postal address, above `street_nr`.
 </ResponseField>
 
 <ResponseField name="street_nr" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Street and house number.
 </ResponseField>
 
 <ResponseField name="zipcode_city" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Postal code and city, combined into one field.
 </ResponseField>
 
 <ResponseField name="mail" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Email address.
 </ResponseField>
 
 <ResponseField name="homepage" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Website URL. A literal `"---"` placeholder in the source system is converted to `null`.
 </ResponseField>
 
 <ResponseField name="contact_person" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Named contact at the creditor.
 </ResponseField>
 
 <ResponseField name="phones" type="string[]">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Phone numbers, up to three per record. Empty entries are omitted.
 </ResponseField>
 
 <ResponseField name="bank" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   Bank name.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   Bank account IBAN.
 </ResponseField>
 
 <ResponseField name="swift" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   SWIFT/BIC code of the creditor's bank — the same thing `owner` calls `bic`.
 </ResponseField>
 
 <ResponseField name="tax_id" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   Tax identification number.
 </ResponseField>
 
@@ -161,18 +174,22 @@ can serve multiple properties, referenced by `creditor_id` from `Property.techni
 </ResponseField>
 
 <ResponseField name="first_name" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Employee first name.
 </ResponseField>
 
 <ResponseField name="last_name" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Employee last name.
 </ResponseField>
 
 <ResponseField name="phone" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Contact phone number.
 </ResponseField>
 
 <ResponseField name="mail" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Contact email address.
 </ResponseField>
 
@@ -204,50 +221,62 @@ co-owned properties.
 </ResponseField>
 
 <ResponseField name="salutation" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Salutation/title.
 </ResponseField>
 
 <ResponseField name="name" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Owner name (individual or company).
 </ResponseField>
 
 <ResponseField name="name_2" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Secondary name line.
 </ResponseField>
 
 <ResponseField name="street_nr" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Street and house number.
 </ResponseField>
 
 <ResponseField name="zipcode_city" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Postal code and city, combined into one field.
 </ResponseField>
 
 <ResponseField name="phone" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Contact phone number.
 </ResponseField>
 
 <ResponseField name="bank" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   Bank name.
 </ResponseField>
 
 <ResponseField name="fax" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Fax number.
 </ResponseField>
 
 <ResponseField name="mail" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Contact email address.
 </ResponseField>
 
 <ResponseField name="bic" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   BIC code of the owner's bank — the same thing `creditor` calls `swift`.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   Bank account IBAN.
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   The owner's own bank account number, paired with `iban`. Unrelated to
   `Accounting.accounts.account_number`, which identifies an account in the chart of
   accounts.
@@ -279,43 +308,53 @@ co-owned properties.
 </ResponseField>
 
 <ResponseField name="person_name" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Full tenant name as a single field. No separate first/last name available.
 </ResponseField>
 
 <ResponseField name="name_1" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Primary name line of the tenant's own contact address, if different from the unit address.
 </ResponseField>
 
 <ResponseField name="name_2" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Secondary name line of the tenant's own contact address.
 </ResponseField>
 
 <ResponseField name="street_nr" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Street and house number of the tenant's own contact address.
 </ResponseField>
 
 <ResponseField name="zipcode_city" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Postal code and city of the tenant's own contact address, combined into one field.
 </ResponseField>
 
 <ResponseField name="contact_phone_main" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Main phone number.
 </ResponseField>
 
 <ResponseField name="contact_mail" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Contact email address.
 </ResponseField>
 
 <ResponseField name="phones" type="string[]">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Additional phone numbers, up to three per record — same shape as `Stakeholder.creditor.phones`.
   Empty entries are omitted.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   Bank account IBAN.
 </ResponseField>
 
 <ResponseField name="bank" type="string">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
   Bank name.
 </ResponseField>
 
