@@ -10,6 +10,10 @@ Discover which tables have been updated since your last sync without fetching ev
   Poll `/changes` every 15–60 minutes. The underlying sync runs as a daily batch, so polling more often will not surface newer data — it only spends more of your 500 req/h budget. Combine this with the `since`/ETag pattern below so unchanged polls stay cheap.
 </Tip>
 
+<Note>
+  With a `transformed` key, `/changes` lists only tables within the key's categories and tables; tables without a category are never listed, and `?category=X` outside the key's scope returns 403. A `raw` key sees all tables — see [Key types](/authentication#key-types).
+</Note>
+
 <Steps>
   <Step title="Poll for changed tables">
     Send a `GET` request to `/changes` with an ISO-8601 `since` timestamp (UTC, e.g. `…Z`). An offset such as `+02:00` is converted to UTC; in a query string write the `+` as `%2B`, otherwise it is read as a space and the request fails with 400. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL. A table listed here has to be fetched **in full** again — `/changes` reports changed tables, not changed rows. `endpoint_url` points to a path your key can call: `/{category}/{table}` for customers on the unversioned API, `/v1/{category}/{table}` for v1-only customers, `/raw/{table}` for raw tables. Raw tables that are blocked for your account are not listed. Add an optional `category` parameter (e.g. `category=property`) to only return tables belonging to that category.

@@ -19,6 +19,20 @@ curl "https://api.trassets.ai/v1/property/technical_objects?limit=1" \
   -H "X-API-Key: $TRASSETS_API_KEY"
 ```
 
+## Key types
+
+Every key has a type, `raw` or `transformed`. The type decides whether the key may read raw source tables. An administrator sets it in the portal; keys created for customers are `transformed`.
+
+| Endpoint | `raw` key | `transformed` key |
+| --- | --- | --- |
+| Category endpoints (`/{category}/{table}`) | all data | all data, within the key's configured restrictions |
+| `GET /raw/{table_name}` and `/v1/raw/{table_name}` | 200 | 403 |
+| `GET /raw/tables` and `/v1/raw/tables` | list of tables | empty list |
+| `GET /catalog` | all categories and tables | only the categories and tables the key may access |
+| `GET /changes` | all changed tables | only changed tables within the key's categories and tables; `?category=X` outside them returns 403 |
+
+A `raw` key sees everything and cannot carry restrictions. A `transformed` key gets no raw data and no tables without a category. If a call to `/raw` returns 403 or `/raw/tables` is empty although the key is valid, the key is `transformed` — ask your administrator or Trassets support for a `raw` key. A changed key type takes effect within about a minute.
+
 ## Key storage and security
 
 Trassets never stores your API key in plaintext. Only an HMAC-SHA-256 hash is retained on our servers for verification. This means we cannot recover or display a key after creation.

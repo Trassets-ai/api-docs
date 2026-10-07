@@ -6,6 +6,10 @@ sidebarTitle: "Bulk Export"
 
 Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder deine Analytics-Pipeline. Raw-Endpunkte liefern ungefilterte Zeilen aus der zugrunde liegenden Datenbank mit Cursor-basierter Pagination und Headern für Snapshot-Konsistenz.
 
+<Note>
+  Raw-Endpunkte erfordern einen Key vom Typ `raw`; ein `transformed`-Key bekommt auf `GET /raw/{table_name}` ein 403 und von `GET /raw/tables` eine leere Liste — siehe [Key-Typen](/de/authentication#key-typen). Raw-Tabellen, die für deine Umgebung nicht freigegeben sind, erscheinen weder in `/raw/tables` noch in `/changes`; ein direkter Aufruf liefert 404.
+</Note>
+
 <Steps>
   <Step title="Verfügbare Tabellen auflisten">
     Rufe `GET /raw/tables` auf, um herauszufinden, welche Tabellen verfügbar sind, ihre Primärschlüssel, Zeilenanzahlen und den Sync-Status.
