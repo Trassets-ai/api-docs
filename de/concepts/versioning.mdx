@@ -38,4 +38,6 @@ https://api.trassets.ai/raw/sollart
 2. <p><mark>Falls ja: umstellen — die Response-Struktur weicht vom Basis-Pfad ab (siehe [Response-Struktur](/de/v1/response-shape-conventions) und [Pagination](/de/v1/api-reference/introduction#pagination)).</mark></p>
 3. <p><mark>Raw-Tabellen: von `/raw/{table_name}` auf `/v1/raw/{table_name}` umstellen — gleiche Daten, Response-Schlüssel `total` statt `total_rows`.</mark></p>
 
+<p><mark>`/operations/offers` und `/operations/orders` haben noch keine `/v1/`-Route; sie kommen unter `/v1/` hinzu. Bis dahin nutzt du für sie weiter den Basis-Pfad. `/accounting/kontenmapping_ranges` hat keinen Nachfolger unter `/v1/` und entfällt mit den Basis-Pfaden.</mark></p>
+
 <p><mark>`/catalog` und `/changes` brauchen keine Änderung.</mark></p>
