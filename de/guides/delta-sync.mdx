@@ -10,6 +10,10 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
   Frage `/changes` alle 15–60 Minuten ab. Der zugrunde liegende Sync läuft als täglicher Batch — häufigeres Abfragen liefert keine neueren Daten, sondern verbraucht nur mehr von deinem 500-Requests/h-Budget. Kombiniere das mit dem `since`/ETag-Muster weiter unten, damit unveränderte Abfragen günstig bleiben.
 </Tip>
 
+<Note>
+  Mit einem `transformed`-Key listet `/changes` nur Tabellen innerhalb der Kategorien und Tabellen des Keys; Tabellen ohne Kategorie erscheinen nie, und `?category=X` außerhalb des Keys liefert 403. Ein `raw`-Key sieht alle Tabellen — siehe [Key-Typen](/de/authentication#key-typen).
+</Note>
+
 <Steps>
   <Step title="Geänderte Tabellen abfragen">
     Sende einen `GET`-Request an `/changes` mit einem ISO-8601-Zeitstempel `since` (UTC, z. B. `…Z`). Ein Offset wie `+02:00` wird nach UTC umgerechnet; schreibe das `+` in der Query-String als `%2B`, sonst wird es als Leerzeichen gelesen und die Anfrage scheitert mit 400. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL. Eine hier gelistete Tabelle musst du **vollständig** neu abrufen — `/changes` meldet geänderte Tabellen, keine geänderten Zeilen. `endpoint_url` zeigt auf einen Pfad, den dein Schlüssel aufrufen darf: `/{category}/{table}` für Kunden der unversionierten API, `/v1/{category}/{table}` für reine v1-Kunden, `/raw/{table}` für Raw-Tabellen. Für dein Konto gesperrte Raw-Tabellen werden nicht gelistet. Mit dem optionalen Parameter `category` (z. B. `category=property`) werden nur Tabellen dieser Kategorie zurückgegeben.
