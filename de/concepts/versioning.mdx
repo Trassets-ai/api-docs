@@ -1,39 +1,41 @@
 ---
 title: "API-Versionierungsrichtlinie für die Data API"
 sidebarTitle: "Versionierung"
-description: "Die Data API rollt /v1/-Pfadversionierung schrittweise pro Tabelle aus, parallel zur bestehenden unversionierten Basis-URL. Für unversionierte Pfade steht noch kein Sunset-Datum fest."
+description: "/v1/ ist die stabile, versionierte Schnittstelle der Data API. Die unversionierten Category- und Raw-Pfade werden nach Abschluss des /v1/-Rollouts abgeschaltet; /catalog und /changes bleiben."
 ---
 
-Die Data API wird über zwei Pfadfamilien gleichzeitig bereitgestellt: den ursprünglichen Basis-Pfad (ohne Versionspräfix) und `/v1/`, das schrittweise Tabelle für Tabelle ausgerollt wird. Beide funktionieren aktuell nebeneinander — es gibt keine Weiterleitung zwischen ihnen und noch kein bestätigtes Sunset-Datum für die unversionierten Pfade.
+Die Data API wird über zwei Pfadfamilien bereitgestellt: `/v1/`, die versionierte Schnittstelle, und den ursprünglichen Basis-Pfad ohne Versionspräfix. Die unversionierten Category- und Raw-Pfade werden **nach Abschluss des `/v1/`-Rollouts abgeschaltet**. Neue Integrationen nutzen ausschließlich `/v1/`.
 
 ## Aktueller Stand
 
-Jede Tabelle bleibt über die Basis-URL verfügbar:
+Die Tabellen sind unter `/v1/` verfügbar, z. B.:
+
+```text
+https://api.trassets.ai/v1/accounting/budgets
+https://api.trassets.ai/v1/raw/sollart
+```
+
+Jede `/v1/`-Route folgt den Regeln der [Response-Struktur](/de/v1/response-shape-conventions). Die aktuelle Liste der verfügbaren Tabellen steht im Tab **API-Referenz** unter dem `v1`-Versionsumschalter.
+
+Bis zur Abschaltung sind dieselben Tabellen zusätzlich über den Basis-Pfad erreichbar:
 
 ```text
 https://api.trassets.ai/accounting/accounts
 https://api.trassets.ai/raw/sollart
-https://api.trassets.ai/changes
 ```
 
-Eine wachsende Teilmenge der Tabellen ist zusätzlich unter `/v1/` verfügbar, z.B.:
-
-```text
-https://api.trassets.ai/v1/accounting/budgets
-```
-
-Jede `/v1/`-Route folgt den Regeln der [Response-Struktur](/de/v1/response-shape-conventions). Die aktuelle Liste der verfügbaren Tabellen steht im Tab **API-Referenz** unter dem `v1`-Versionsumschalter — nicht einfach annehmen, dass eine Tabelle bereits dort ist.
+`GET /catalog` und `GET /changes` tragen kein Versionspräfix und sind von der Abschaltung **nicht** betroffen.
 
 <Warning>
-  Da die meisten Tabellen noch unversioniert sind, können auf Basis-Pfaden ohne `/v1/`-Pendant weiterhin Breaking Changes auftreten (umbenannte Felder, entfernte Query-Parameter, veränderte Response-Formate). Sobald eine Tabelle eine `/v1/`-Route hat, ist die Absicht, sie als versioniert zu behandeln: weitere Breaking Changes würden dann unter einem neuen Präfix wie `/v2/` landen, nicht auf dem bereits veröffentlichten Pfad. Diese Absicht wurde noch nicht an einem echten Fall getestet — aktuell eher Zielbild als Garantie.
+  Sobald eine Tabelle eine `/v1/`-Route hat, landen Breaking Changes unter einem neuen Präfix wie `/v2/`, nicht auf dem veröffentlichten Pfad. Für die unversionierten Basis-Pfade gilt diese Zusage nicht.
 </Warning>
 
-## Schrittweise migrieren
+## Auf /v1/ migrieren
 
-Es ist keine Sammel-Umstellung geplant. Migriere Tabelle für Tabelle, sobald sie unter `/v1/` erscheint:
+Stelle jede genutzte Tabelle um, bevor die unversionierten Pfade abgeschaltet werden:
 
 1. Prüfen, ob `/v1/{category}/{api_table}` für die genutzte Tabelle existiert.
-2. Falls ja: umstellen — die Response-Struktur kann vom Basis-Pfad abweichen (siehe [Response-Struktur](/de/v1/response-shape-conventions)).
-3. Falls noch nicht: vorerst weiterhin den Basis-Pfad nutzen — eine Sammel-Umstellung ist nicht geplant, aber Breaking Changes bleiben dort möglich (siehe Warnhinweis oben), bis eine `/v1/`-Route für diese Tabelle veröffentlicht wird.
+2. Falls ja: umstellen — die Response-Struktur weicht vom Basis-Pfad ab (siehe [Response-Struktur](/de/v1/response-shape-conventions) und [Pagination](/de/v1/api-reference/introduction#pagination)).
+3. Raw-Tabellen: von `/raw/{table_name}` auf `/v1/raw/{table_name}` umstellen — gleiche Daten, Response-Schlüssel `total` statt `total_rows`.
 
-Um vorbereitet zu bleiben, abonniere die Trassets Release Notes und halte deinen Integrationscode flexibel genug, um sich an neue Felder, Parameteränderungen und — bei noch nicht auf `/v1/` migrierten Tabellen — gelegentliche Response-Struktur-Änderungen ohne Versionssprung anzupassen.
+`/catalog` und `/changes` brauchen keine Änderung.
