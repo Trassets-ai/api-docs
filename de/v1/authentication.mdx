@@ -33,6 +33,10 @@ Jeder Key hat einen Typ, `raw` oder `transformed`. Der Typ entscheidet, ob der K
 
 Ein `raw`-Key sieht alles und kann keine Einschränkungen tragen. Ein `transformed`-Key bekommt keine Rohdaten und keine Tabellen ohne Kategorie. Liefert ein Aufruf von `/raw` ein 403 oder ist `/raw/tables` leer, obwohl der Key gültig ist, ist der Key `transformed` — frag deinen Administrator oder den Trassets-Support nach einem `raw`-Key. Ein geänderter Key-Typ wirkt nach etwa einer Minute.
 
+### Property-Einschränkungen
+
+Ein `transformed`-Key kann zusätzlich auf eine Liste von Property-IDs eingeschränkt sein. Category-Endpunkte liefern dann nur Zeilen dieser Properties, und eine Tabelle ohne `property_id`-Spalte (zum Beispiel `/stakeholder/creditor`) liefert für einen solchen Key 403. `/catalog` und `/changes` werden nicht nach Property gefiltert; sie listen Tabellen, keine Zeilen. Ein Administrator setzt die Property-Liste im Portal; ein Key ohne Liste sieht alle Properties.
+
 ## Speicherung und Sicherheit des Keys
 
 Trassets speichert deinen API-Key niemals im Klartext. Auf unseren Servern wird nur ein HMAC-SHA-256-Hash zur Verifikation aufbewahrt. Das bedeutet: Wir können einen Key nach der Erstellung nicht wiederherstellen oder erneut anzeigen.
