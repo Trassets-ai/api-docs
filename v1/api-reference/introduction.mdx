@@ -37,11 +37,6 @@ Raw endpoints are generic per customer (no per-table content review), so both th
 
 Loop until `next_cursor` is `null`. `/v1/raw/{table_name}` uses the same keys and adds `table_name`.
 
-<Note>
-  `/v1/` is a preview: the response envelope and pagination changed during the preview and may change again.
-  The unversioned endpoints are unaffected — they keep the array response with `X-*` headers and `offset`, see [Pagination](/concepts/pagination).
-</Note>
-
 ## Error format
 
 Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`application/problem+json`). Every error object contains `type`, `title`, `status`, `detail`, and `instance`. See [Errors](/concepts/errors) for a full list of status codes and retry guidance.

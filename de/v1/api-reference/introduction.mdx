@@ -37,11 +37,6 @@ Raw-Endpunkte sind generisch pro Kunde (keine tabellenweise Inhaltsprüfung), de
 
 Wiederhole die Abrufe, bis `next_cursor` `null` ist. `/v1/raw/{table_name}` nutzt dieselben Schlüssel und ergänzt `table_name`.
 
-<Note>
-  `/v1/` ist eine Preview: Der Response-Envelope und die Pagination wurden in der Preview geändert und können sich erneut ändern.
-  Die unversionierten Endpunkte sind nicht betroffen — sie behalten die Array-Response mit `X-*`-Headern und `offset`, siehe [Pagination](/de/concepts/pagination).
-</Note>
-
 ## Fehlerformat
 
 Fehler folgen [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`application/problem+json`). Jedes Fehlerobjekt enthält `type`, `title`, `status`, `detail` und `instance`. Siehe [Fehler](/de/concepts/errors) für eine vollständige Liste der Status-Codes und Hinweise zu Wiederholungsversuchen.
