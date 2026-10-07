@@ -36,7 +36,7 @@ Beispiel-Fehlerantwort für einen ungültigen API-Key:
 | --- | --- | --- |
 | **400** | Erforderlicher Filter fehlt | Prüfe die Endpunkt-Dokumentation auf erforderliche Query-Parameter und ergänze sie im Request. |
 | **401** | API-Key fehlt | Sende den `X-API-Key`-Header bei jedem Request. |
-| **403** | Key abgelehnt oder Zugriffsstufe fehlt | Der Key ist unbekannt oder deaktiviert, oder er hat keine Berechtigung für diesen Endpunkt oder diese Tabelle. Prüfe das Feld `detail`. Kontaktiere den Trassets-Support, um deine Zugriffsstufe zu ändern. |
+| **403** | Key abgelehnt oder Zugriffsstufe fehlt | Der Key ist unbekannt oder deaktiviert, oder er hat keine Berechtigung für diesen Endpunkt oder diese Tabelle, oder er ist auf Properties eingeschränkt und die Tabelle hat keine `property_id`-Spalte. Prüfe das Feld `detail`. Kontaktiere den Trassets-Support, um deine Zugriffsstufe zu ändern. |
 | **404** | Unbekannter Endpunkt | Überprüfe den URL-Pfad sowie den Category- oder Tabellennamen. |
 | **422** | Validierungsfehler | Ein Query-Parameter hat die Validierung nicht bestanden. Prüfe das `detail`-Feld für den genauen Parameter und die Einschränkung. |
 | **429** | Rate-Limit überschritten | Du hast das Limit von 500 Requests pro Stunde überschritten. Warte ab und versuche es erneut, nachdem das aktuelle Zeitfenster zurückgesetzt wurde. |

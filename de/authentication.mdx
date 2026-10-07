@@ -35,6 +35,10 @@ Ein `raw`-Key kann keine Einschränkungen tragen. Zum Lesen einer Raw-Tabelle br
 
 Ist `/raw/tables` leer, obwohl der Key gültig ist, ist der Key `transformed`. Liefert eine Raw-Tabelle 403 mit `detail` "Raw export requires an API key of type raw with personal data grants. Contact your administrator or Trassets support.", ist der Key `transformed` oder ihm fehlt einer der beiden Grants — frag deinen Administrator oder den Trassets-Support. Ein geänderter Key-Typ oder Grant wirkt nach etwa einer Minute.
 
+### Property-Einschränkungen
+
+Ein `transformed`-Key kann zusätzlich auf eine Liste von Property-IDs eingeschränkt sein. Category-Endpunkte liefern dann nur Zeilen dieser Properties, und eine Tabelle ohne `property_id`-Spalte (zum Beispiel `/stakeholder/creditor`) liefert für einen solchen Key 403. `/catalog` und `/changes` werden nicht nach Property gefiltert; sie listen Tabellen, keine Zeilen. Ein Administrator setzt die Property-Liste im Portal; ein Key ohne Liste sieht alle Properties.
+
 ## Speicherung und Sicherheit des Keys
 
 Trassets speichert deinen API-Key niemals im Klartext. Auf unseren Servern wird nur ein HMAC-SHA-256-Hash zur Verifikation aufbewahrt. Das bedeutet: Wir können einen Key nach der Erstellung nicht wiederherstellen oder erneut anzeigen.

@@ -41,6 +41,10 @@ Spalten mit personenbezogenen Daten — Namen, Kontakt- und Bankdaten von Mieter
 
 Grants gelten für jeden Key, `raw` oder `transformed`, und haben Vorrang vor einem Spaltenfilter, der die Spalte nennt. Die unversionierten Category-Endpunkte sind nicht betroffen. Raw-Tabellen brauchen beide Grants (siehe oben). Ein Administrator setzt Grants im Portal; eine Änderung wirkt nach etwa einer Minute.
 
+### Property-Einschränkungen
+
+Ein `transformed`-Key kann zusätzlich auf eine Liste von Property-IDs eingeschränkt sein. Category-Endpunkte liefern dann nur Zeilen dieser Properties, und eine Tabelle ohne `property_id`-Spalte (zum Beispiel `/v1/stakeholder/creditor`) liefert für einen solchen Key 403. `/catalog` und `/changes` werden nicht nach Property gefiltert; sie listen Tabellen, keine Zeilen. Ein Administrator setzt die Property-Liste im Portal; ein Key ohne Liste sieht alle Properties.
+
 ## Speicherung und Sicherheit des Keys
 
 Trassets speichert deinen API-Key niemals im Klartext. Auf unseren Servern wird nur ein HMAC-SHA-256-Hash zur Verifikation aufbewahrt. Das bedeutet: Wir können einen Key nach der Erstellung nicht wiederherstellen oder erneut anzeigen.
