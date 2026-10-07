@@ -37,18 +37,13 @@ Raw endpoints are generic per customer (no per-table content review), so both th
 
 Loop until `next_cursor` is `null`. `/v1/raw/{table_name}` uses the same keys and adds `table_name`.
 
-<Note>
-  `/v1/` is a preview: the response envelope and pagination changed during the preview and may change again.
-  The unversioned endpoints are unaffected — they keep the array response with `X-*` headers and `offset`, see [Pagination](/concepts/pagination).
-</Note>
-
 ## Error format
 
 Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`application/problem+json`). Every error object contains `type`, `title`, `status`, `detail`, and `instance`. See [Errors](/concepts/errors) for a full list of status codes and retry guidance.
 
 ## Versioning
 
-Tables are migrated to `/v1/` one at a time. See [Versioning](/concepts/versioning) for the current rollout state.
+`/v1/` replaces the unversioned category and raw paths, which will be switched off. See [Versioning](/concepts/versioning) for the migration steps.
 
 ## Endpoint groups
 
@@ -78,7 +73,7 @@ Tables are migrated to `/v1/` one at a time. See [Versioning](/concepts/versioni
   </Card>
 </CardGroup>
 
-[Data Model Overview](/v1/data-model/overview) lists what `/v1/` covers today.
+[Data Model Overview](/v1/data-model/overview) lists all `/v1/` tables and how they join.
 
 ## Endpoint groups without a version prefix
 
