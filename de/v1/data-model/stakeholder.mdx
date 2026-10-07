@@ -72,10 +72,12 @@ tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objec
 </ResponseField>
 
 <ResponseField name="name_1" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Erster Namensteil (Firma oder Nachname).
 </ResponseField>
 
 <ResponseField name="name_2" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Zweiter Namensteil.
 </ResponseField>
 
@@ -84,46 +86,57 @@ tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objec
 </ResponseField>
 
 <ResponseField name="address_line_1" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Erste Adresszeile, oberhalb von `street_nr`.
 </ResponseField>
 
 <ResponseField name="street_nr" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Straße und Hausnummer.
 </ResponseField>
 
 <ResponseField name="zipcode_city" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Postleitzahl und Ort, zu einem Feld zusammengefasst.
 </ResponseField>
 
 <ResponseField name="mail" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   E-Mail-Adresse.
 </ResponseField>
 
 <ResponseField name="homepage" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Website-URL. Ein wörtlicher Platzhalter `"---"` im Quellsystem wird zu `null`.
 </ResponseField>
 
 <ResponseField name="contact_person" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Benannter Ansprechpartner beim Kreditor.
 </ResponseField>
 
 <ResponseField name="phones" type="string[]">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Telefonnummern, bis zu drei je Datensatz. Leere Einträge werden weggelassen.
 </ResponseField>
 
 <ResponseField name="bank" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Bankname.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   IBAN.
 </ResponseField>
 
 <ResponseField name="swift" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   SWIFT/BIC-Code der Bank des Kreditors — entspricht `bic` bei `owner`.
 </ResponseField>
 
 <ResponseField name="tax_id" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Steuernummer.
 </ResponseField>
 
@@ -162,18 +175,22 @@ tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objec
 </ResponseField>
 
 <ResponseField name="first_name" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Vorname des Mitarbeiters.
 </ResponseField>
 
 <ResponseField name="last_name" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Nachname des Mitarbeiters.
 </ResponseField>
 
 <ResponseField name="phone" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Kontakt-Telefonnummer.
 </ResponseField>
 
 <ResponseField name="mail" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Kontakt-E-Mail-Adresse.
 </ResponseField>
 
@@ -205,50 +222,62 @@ Miteigentum.
 </ResponseField>
 
 <ResponseField name="salutation" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Anrede/Titel.
 </ResponseField>
 
 <ResponseField name="name" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Eigentümername (Person oder Firma).
 </ResponseField>
 
 <ResponseField name="name_2" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Zweiter Namensteil.
 </ResponseField>
 
 <ResponseField name="street_nr" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Straße und Hausnummer.
 </ResponseField>
 
 <ResponseField name="zipcode_city" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Postleitzahl und Ort, zu einem Feld zusammengefasst.
 </ResponseField>
 
 <ResponseField name="phone" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Kontakt-Telefonnummer.
 </ResponseField>
 
 <ResponseField name="bank" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Bankname.
 </ResponseField>
 
 <ResponseField name="fax" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Faxnummer.
 </ResponseField>
 
 <ResponseField name="mail" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Kontakt-E-Mail-Adresse.
 </ResponseField>
 
 <ResponseField name="bic" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   BIC-Code der Bank des Eigentümers — entspricht `swift` bei `creditor`.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   IBAN.
 </ResponseField>
 
 <ResponseField name="account_number" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Eigene Kontonummer des Eigentümers, zusammen mit `iban`. Nicht zu verwechseln mit
   `Accounting.accounts.account_number`, das ein Konto in der Kontenübersicht identifiziert.
 </ResponseField>
@@ -281,44 +310,54 @@ Miteigentum.
 </ResponseField>
 
 <ResponseField name="person_name" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Vollständiger Mietername als ein Feld. Kein getrennter Vor-/Nachname verfügbar.
 </ResponseField>
 
 <ResponseField name="name_1" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Erster Namensteil der eigenen Kontaktadresse des Mieters, sofern abweichend von der
   Flächenadresse.
 </ResponseField>
 
 <ResponseField name="name_2" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Zweiter Namensteil der eigenen Kontaktadresse des Mieters.
 </ResponseField>
 
 <ResponseField name="street_nr" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Straße und Hausnummer der eigenen Kontaktadresse des Mieters.
 </ResponseField>
 
 <ResponseField name="zipcode_city" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Postleitzahl und Ort der eigenen Kontaktadresse des Mieters, zu einem Feld zusammengefasst.
 </ResponseField>
 
 <ResponseField name="contact_phone_main" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Haupttelefonnummer.
 </ResponseField>
 
 <ResponseField name="contact_mail" type="string">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Kontakt-E-Mail-Adresse.
 </ResponseField>
 
 <ResponseField name="phones" type="string[]">
+  <mark>Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Weitere Telefonnummern, bis zu drei je Datensatz — dieselbe Form wie
   `Stakeholder.creditor.phones`. Leere Einträge werden weggelassen.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   IBAN.
 </ResponseField>
 
 <ResponseField name="bank" type="string">
+  <mark>Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.</mark>
   Bankname.
 </ResponseField>
 

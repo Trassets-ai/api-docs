@@ -26,14 +26,14 @@ Every key has a type, `raw` or `transformed`. The type decides whether the key m
 | Endpoint | `raw` key | `transformed` key |
 | --- | --- | --- |
 | Category endpoints (`/{category}/{table}`) | all data | all data, within the key's configured restrictions |
-| `GET /raw/{table_name}` | 200 with both personal data grants, otherwise 403 | 403 |
+| `GET /raw/{table_name}` | <mark>200 with both personal data grants, otherwise 403</mark> | 403 |
 | `GET /raw/tables` | list of tables | empty list |
 | `GET /catalog` | all categories and tables | only the categories and tables the key may access |
 | `GET /changes` | all changed tables | only changed tables within the key's categories and tables; `?category=X` outside them returns 403 |
 
-A `raw` key cannot carry restrictions. Reading a raw table additionally needs both personal data grants, `personal` and `personal_financial`, because raw tables cannot be split by column; `/raw/tables` lists the tables either way. A `transformed` key gets no raw data and no tables without a category.
+<mark>A `raw` key cannot carry restrictions. Reading a raw table additionally needs both personal data grants, `personal` and `personal_financial`, because raw tables cannot be split by column; `/raw/tables` lists the tables either way. A `transformed` key gets no raw data and no tables without a category.</mark>
 
-If `/raw/tables` is empty although the key is valid, the key is `transformed`. If a raw table returns 403 with `detail` "Raw export requires an API key of type raw with personal data grants. Contact your administrator or Trassets support.", the key is `transformed` or lacks one of the two grants — ask your administrator or Trassets support. A changed key type or grant takes effect within about a minute.
+<mark>If `/raw/tables` is empty although the key is valid, the key is `transformed`. If a raw table returns 403 with `detail` "Raw export requires an API key of type raw with personal data grants. Contact your administrator or Trassets support.", the key is `transformed` or lacks one of the two grants — ask your administrator or Trassets support. A changed key type or grant takes effect within about a minute.</mark>
 
 ## Key storage and security
 
