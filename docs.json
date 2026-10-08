@@ -171,6 +171,7 @@
                     "pages": [
                       "v1/response-shape-conventions",
                       "v1/concepts/endpoint-types",
+                      "v1/concepts/pagination",
                       "concepts/errors",
                       "concepts/rate-limits",
                       "concepts/sync-cycle",
@@ -249,6 +250,7 @@
                     "pages": [
                       "de/v1/response-shape-conventions",
                       "de/v1/concepts/endpoint-types",
+                      "de/v1/concepts/pagination",
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
                       "de/concepts/sync-cycle",
