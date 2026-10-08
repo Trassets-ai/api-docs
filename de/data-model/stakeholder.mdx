@@ -5,12 +5,12 @@ description: "Die Stakeholder-Domäne der Data API: Kreditoren, Mitarbeiter, Obj
 ---
 
 Die Stakeholder-Domäne enthält Stammdaten zu jeder Person oder Organisation, die mit einem
-Objekt in Verbindung steht: die Lieferanten, die du bezahlst (`creditor`), dein eigenes
-Team (`employees`), die Eigentümer (`owner`) und die Mieter (`tenants`).
+Objekt in Verbindung steht: die Lieferanten, die du bezahlst (`creditors`), dein eigenes
+Team (`employees`), die Eigentümer (`owners`) und die Mieter (`tenants`).
 
 ## creditor
 
-`GET /stakeholder/creditor` — Lieferanten- und Kreditoren-Stammdaten. Dies ist der einzige
+`GET /stakeholder/creditors` — Lieferanten- und Kreditoren-Stammdaten. Dies ist der einzige
 Stakeholder-Endpunkt ohne `property_id`-Spalte — ein Kreditor ist eine eigenständige
 Entität, die mehrere Objekte bedienen kann; die Beziehung wird über `creditor_id` in
 anderen Domänen ausgedrückt (`Property.property_creditor_services`,
@@ -97,7 +97,7 @@ nicht umgekehrt.
 
 ## owner
 
-`GET /stakeholder/owner` — Stammdaten zu Objekteigentümern, einschließlich des
+`GET /stakeholder/owners` — Stammdaten zu Objekteigentümern, einschließlich des
 Eigentumsanteils bei Objekten mit mehreren Eigentümern.
 
 <ResponseField name="property_id" type="integer" required>

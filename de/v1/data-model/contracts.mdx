@@ -21,7 +21,7 @@ graph LR
   properties["Property.properties"]
   accounts["Accounting.accounts"]
   tenants["Stakeholder.tenants"]
-  creditor["Stakeholder.creditor"]
+  creditor["Stakeholder.creditors"]
 
   contract_debits -->|floor_area_person_id| contract_ends
   contract_debits -->|floor_area_person_id| index_rent
@@ -60,7 +60,7 @@ graph LR
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string" required>
-  Identifiziert den Dienstleister. Referenziert `Stakeholder.creditor`.
+  Identifiziert den Dienstleister. Referenziert `Stakeholder.creditors`.
 </ResponseField>
 
 <ResponseField name="creditor_name" type="string">
@@ -148,7 +148,7 @@ Sollstellungen mit dem tatsächlichen Zahlungsfluss abgleichen.
   Datum, von dem an eine Zahlungserinnerung für diese Abweichung gilt, falls vorhanden.
 </ResponseField>
 
-<ResponseField name="debit_diff_reminder_manual" type="boolean">
+<ResponseField name="is_debit_diff_reminder_manual" type="boolean">
   Ob die Erinnerung manuell gesetzt wurde statt automatisch erzeugt.
 </ResponseField>
 
@@ -220,15 +220,15 @@ Datensatz repräsentiert eine geplante Sollstellung mit einem Gültigkeitsinterv
   Status des Sollstellungsdatensatzes.
 </ResponseField>
 
-<ResponseField name="tax_type" type="boolean">
+<ResponseField name="is_taxable" type="boolean">
   Ob die Sollstellung umsatzsteuerpflichtig ist.
 </ResponseField>
 
-<ResponseField name="net_rent" type="boolean">
+<ResponseField name="is_net_rent" type="boolean">
   Ob die Sollstellung einen Nettomietanteil enthält.
 </ResponseField>
 
-<ResponseField name="side_costs" type="boolean">
+<ResponseField name="is_side_costs" type="boolean">
   Ob die Sollstellung einen Nebenkostenanteil enthält.
 </ResponseField>
 
@@ -308,7 +308,7 @@ Ausübung von Optionen und den aktuellen Ausübungsstatus zu verfolgen.
   Vorlaufzeit in Monaten vor `option_deadline`, ab der Erinnerungen ausgelöst werden.
 </ResponseField>
 
-<ResponseField name="auto_use_option" type="boolean">
+<ResponseField name="is_option_auto_used" type="boolean">
   Ob die Option automatisch ausgeübt wird, wenn der Mieter nicht antwortet.
 </ResponseField>
 
@@ -428,15 +428,15 @@ Basis eines Verbraucherpreisindex (VPI).
   gibt die volle Änderung weiter, ein niedrigerer Wert nur einen Teil davon.
 </ResponseField>
 
-<ResponseField name="adjustment_locked" type="boolean">
+<ResponseField name="is_adjustment_locked" type="boolean">
   Ob eine Mietanpassung für dieses Mietverhältnis aktuell gesperrt ist.
 </ResponseField>
 
 <ResponseField name="adjustment_locked_until" type="date">
-  Datum, bis zu dem `adjustment_locked` gilt.
+  Datum, bis zu dem `is_adjustment_locked` gilt.
 </ResponseField>
 
-<ResponseField name="notification_required" type="boolean">
+<ResponseField name="is_notification_required" type="boolean">
   Ob eine förmliche Mitteilung an den Mieter erforderlich ist, damit die Anpassung wirksam
   wird — relevant, wenn `adjustment_type` datumsbasiert ist.
 </ResponseField>

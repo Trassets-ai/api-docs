@@ -1,7 +1,7 @@
 ---
 title: "Accounting"
 sidebarTitle: "Accounting"
-description: "Field reference for the accounts, booking_header, booking_positions, and budgets tables under /v1/accounting/."
+description: "Field reference for the accounts, booking_headers, booking_positions, and budgets tables under /v1/accounting/."
 ---
 
 The four tables below join to each other and to three other domains — Property, Contracts,
@@ -11,7 +11,7 @@ cross-domain diagram.
 ```mermaid
 graph LR
   subgraph Accounting
-    booking_header["booking_header"]
+    booking_header["booking_headers"]
     booking_positions["booking_positions"]
     accounts["accounts"]
     budgets["budgets"]
@@ -22,7 +22,7 @@ graph LR
   contract_debits["Contracts.contract_debits"]
   contract_debit_diffs["Contracts.contract_debit_diffs"]
   tenants["Stakeholder.tenants"]
-  creditor["Stakeholder.creditor"]
+  creditor["Stakeholder.creditors"]
 
   booking_header -->|booking_header_id| booking_positions
   booking_positions -->|account_id| accounts
@@ -43,16 +43,16 @@ graph LR
 
 ### How the booking model fits together
 
-A booking transaction has one `booking_header`, which groups every individual posting
+A booking transaction has one `booking_headers`, which groups every individual posting
 (`booking_positions`) it triggers. A posting can hit a general ledger account, a tenant
 account, a creditor account, a project account, or a cost centre — see
 `accounts.account_type_name`. A transaction usually has at most one posting against a
 creditor, tenant, or cost-centre account, so those are already exposed directly on
-`booking_header` (`creditor_id`, `person_id`, `property_structure_account_id`) rather than
+`booking_headers` (`creditor_id`, `person_id`, `property_structure_account_id`) rather than
 requiring a join through `accounts`.
 
 `booking_positions` also carries a `person_id`. To link a posting to a tenant, go through
-`booking_positions.booking_header_id` to `booking_header.person_id` instead.
+`booking_positions.booking_header_id` to `booking_headers.person_id` instead.
 
 Every transaction belongs to one property. An account can have a budget (`budgets`) for a
 given month. A cost centre is always tied to part of the property structure
@@ -104,7 +104,7 @@ see `account_type_name`.
   Whether the account is income-affecting or balance-neutral.
 </ResponseField>
 
-<ResponseField name="nr" type="integer">
+<ResponseField name="sort_order" type="integer">
   Sort order of the reporting position within its category.
 </ResponseField>
 
@@ -145,9 +145,9 @@ see `account_type_name`.
   Tax-model code of the property.
 </ResponseField>
 
-## booking_header
+## booking_headers
 
-`GET /v1/accounting/booking_header` — general ledger booking headers. Each header groups
+`GET /v1/accounting/booking_headers` — general ledger booking headers. Each header groups
 related line items.
 
 <ResponseField name="property_id" type="string" required>
@@ -159,12 +159,12 @@ related line items.
   `booking_header_id`.
 </ResponseField>
 
-<ResponseField name="booking_nr" type="integer">
+<ResponseField name="booking_number" type="integer">
   Sequential number of the booking within the journal (Primanota) — the chronological log of all bookings.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string">
-  Creditor linked to the booking. References `Stakeholder.creditor`.
+  Creditor linked to the booking. References `Stakeholder.creditors`.
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
@@ -179,7 +179,7 @@ related line items.
   Total value of the booking header.
 </ResponseField>
 
-<ResponseField name="m2" type="number">
+<ResponseField name="sqm" type="number">
   Floor area in square metres associated with the booking, if applicable.
 </ResponseField>
 
@@ -219,7 +219,7 @@ belongs to exactly one booking header via `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="booking_header_id" type="integer" required>
-  Identifier of the parent booking header. Joins to `booking_header.booking_header_id`.
+  Identifier of the parent booking header. Joins to `booking_headers.booking_header_id`.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
@@ -241,7 +241,7 @@ belongs to exactly one booking header via `booking_header_id`.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string">
-  Creditor linked to the posting. References `Stakeholder.creditor`.
+  Creditor linked to the posting. References `Stakeholder.creditors`.
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
@@ -302,11 +302,11 @@ belongs to exactly one booking header via `booking_header_id`.
   Date of the posting.
 </ResponseField>
 
-<ResponseField name="booking_nr" type="integer">
+<ResponseField name="booking_number" type="integer">
   Sequential number of the booking within the journal (Primanota) — the chronological log of all bookings.
 </ResponseField>
 
-<ResponseField name="booking_Lfd_nr" type="integer">
+<ResponseField name="booking_position_number" type="integer">
   Sequential position number within the booking.
 </ResponseField>
 
@@ -321,10 +321,10 @@ belongs to exactly one booking header via `booking_header_id`.
 
 <ResponseField name="booking_position_text" type="string">
   Free-text description of this line item. Can differ from the parent booking's
-  `booking_header.booking_text`.
+  `booking_headers.booking_text`.
 </ResponseField>
 
-<ResponseField name="sh" type="string">
+<ResponseField name="debit_credit" type="string">
   Debit/credit indicator. Not reliably derivable from the sign of `amount.net`.
 </ResponseField>
 

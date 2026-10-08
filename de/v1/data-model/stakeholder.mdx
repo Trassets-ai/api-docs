@@ -1,12 +1,12 @@
 ---
 title: "Stakeholder"
 sidebarTitle: "Stakeholder"
-description: "Feldreferenz für die Tabellen creditor, employees, owner und tenants unter /v1/stakeholder/."
+description: "Feldreferenz für die Tabellen creditors, employees, owners und tenants unter /v1/stakeholder/."
 ---
 
-Keine der vier Tabellen unten verknüpft sich direkt mit einer anderen. `employees`, `owner`
+Keine der vier Tabellen unten verknüpft sich direkt mit einer anderen. `employees`, `owners`
 und `tenants` verknüpfen sich über `property_id` mit Property; `tenants` überbrückt zusätzlich
-über `floor_area_person_id` nach Contracts. `creditor` ist eine eigenständige Entität ohne
+über `floor_area_person_id` nach Contracts. `creditors` ist eine eigenständige Entität ohne
 `property_id`-Spalte, referenziert aus Property und Accounting über `creditor_id`. Das
 vollständige domänenübergreifende Diagramm steht in der
 [Datenmodell-Übersicht](/de/v1/data-model/overview).
@@ -14,9 +14,9 @@ vollständige domänenübergreifende Diagramm steht in der
 ```mermaid
 graph LR
   subgraph Stakeholder
-    creditor["creditor"]
+    creditor["creditors"]
     employees["employees"]
-    owner["owner"]
+    owner["owners"]
     tenants["tenants"]
   end
 
@@ -25,7 +25,7 @@ graph LR
   technical_objects["Property.technical_objects"]
   property_creditor_services["Property.property_creditor_services"]
   service_contracts["Contracts.service_contracts"]
-  booking_header["Accounting.booking_header"]
+  booking_header["Accounting.booking_headers"]
   booking_positions["Accounting.booking_positions"]
   contract_debits["Contracts.contract_debits"]
   contract_ends["Contracts.contract_ends"]
@@ -51,21 +51,21 @@ verknüpft sich direkt mit einer anderen.*
 
 <Note>
   `person_id` ist nicht über alle Endpunkte hinweg typkonsistent, die es führen:
-  `tenants.person_id` und `Accounting.booking_header.person_id` sind Strings (z. B.
+  `tenants.person_id` und `Accounting.booking_headers.person_id` sind Strings (z. B.
   `"2001-1"`), `Accounting.booking_positions.person_id` dagegen ein Integer, bei dem der
   Bindestrich beim Cast entfernt wurde — ein Rück-Cast auf String liefert nicht den
   ursprünglichen Wert. `booking_positions` deshalb nicht direkt über `person_id` mit
   `tenants` verknüpfen, sondern über `booking_positions.booking_header_id` →
-  `booking_header.person_id`.
+  `booking_headers.person_id`.
 </Note>
 
-## creditor
+## creditors
 
-`GET /v1/stakeholder/creditor` — Kreditoren-Stammdaten. Der einzige Stakeholder-Endpunkt ohne
+`GET /v1/stakeholder/creditors` — Kreditoren-Stammdaten. Der einzige Stakeholder-Endpunkt ohne
 `property_id`-Spalte — ein Kreditor ist eine eigenständige Entität, die für mehrere Objekte
 tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objects`,
 `Property.property_creditor_services`, `Contracts.service_contracts` und
-`Accounting.booking_header`/`booking_positions`.
+`Accounting.booking_headers`/`booking_positions`.
 
 <ResponseField name="creditor_id" type="string" required>
   Eindeutige Kreditorenkennung.
@@ -87,10 +87,10 @@ tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objec
 
 <ResponseField name="address_line_1" type="string">
   Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
-  Erste Adresszeile, oberhalb von `street_nr`.
+  Erste Adresszeile, oberhalb von `street_address`.
 </ResponseField>
 
-<ResponseField name="street_nr" type="string">
+<ResponseField name="street_address" type="string">
   Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Straße und Hausnummer.
 </ResponseField>
@@ -130,9 +130,9 @@ tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objec
   IBAN.
 </ResponseField>
 
-<ResponseField name="swift" type="string">
+<ResponseField name="bic" type="string">
   Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
-  SWIFT/BIC-Code der Bank des Kreditors — entspricht `bic` bei `owner`.
+  BIC-Code der Bank des Kreditors.
 </ResponseField>
 
 <ResponseField name="tax_id" type="string">
@@ -140,7 +140,7 @@ tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objec
   Steuernummer.
 </ResponseField>
 
-<ResponseField name="exemption_certificate" type="boolean">
+<ResponseField name="has_exemption_certificate" type="boolean">
   Ob eine Freistellungsbescheinigung (§48b EStG) vorliegt. Relevant, wenn der Kreditor
   Bauleistungen erbringt.
 </ResponseField>
@@ -194,7 +194,7 @@ tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objec
   Kontakt-E-Mail-Adresse.
 </ResponseField>
 
-<ResponseField name="inactive" type="boolean">
+<ResponseField name="is_inactive" type="boolean">
   Ob der Mitarbeiter-Datensatz inaktiv ist.
 </ResponseField>
 
@@ -203,22 +203,22 @@ tätig sein kann, referenziert über `creditor_id` aus `Property.technical_objec
   allgemeines Mitarbeiterverzeichnis.
 </Note>
 
-## owner
+## owners
 
-`GET /v1/stakeholder/owner` — Eigentümer-Stammdaten inklusive Eigentumsanteil bei
+`GET /v1/stakeholder/owners` — Eigentümer-Stammdaten inklusive Eigentumsanteil bei
 Miteigentum.
 
 <ResponseField name="property_id" type="string" required>
   Eindeutige Objektkennung.
 </ResponseField>
 
-<ResponseField name="debitor_id" type="integer" required>
+<ResponseField name="debtor_id" type="integer" required>
   Eigentümerkennung.
 </ResponseField>
 
 <ResponseField name="share" type="number">
   Eigentumsanteil in Prozent, auf 100 gekappt. `null` bedeutet: kein Anteil erfasst. Ein
-  Objekt kann mehrere `owner`-Zeilen haben, die sich zum Gesamtanteil summieren.
+  Objekt kann mehrere `owners`-Zeilen haben, die sich zum Gesamtanteil summieren.
 </ResponseField>
 
 <ResponseField name="salutation" type="string">
@@ -236,7 +236,7 @@ Miteigentum.
   Zweiter Namensteil.
 </ResponseField>
 
-<ResponseField name="street_nr" type="string">
+<ResponseField name="street_address" type="string">
   Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Straße und Hausnummer.
 </ResponseField>
@@ -268,7 +268,7 @@ Miteigentum.
 
 <ResponseField name="bic" type="string">
   Nur mit dem [Grant `personal_financial`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
-  BIC-Code der Bank des Eigentümers — entspricht `swift` bei `creditor`.
+  BIC-Code der Bank des Eigentümers.
 </ResponseField>
 
 <ResponseField name="iban" type="string">
@@ -325,7 +325,7 @@ Miteigentum.
   Zweiter Namensteil der eigenen Kontaktadresse des Mieters.
 </ResponseField>
 
-<ResponseField name="street_nr" type="string">
+<ResponseField name="street_address" type="string">
   Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Straße und Hausnummer der eigenen Kontaktadresse des Mieters.
 </ResponseField>
@@ -348,7 +348,7 @@ Miteigentum.
 <ResponseField name="phones" type="string[]">
   Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Weitere Telefonnummern, bis zu drei je Datensatz — dieselbe Form wie
-  `Stakeholder.creditor.phones`. Leere Einträge werden weggelassen.
+  `Stakeholder.creditors.phones`. Leere Einträge werden weggelassen.
 </ResponseField>
 
 <ResponseField name="iban" type="string">

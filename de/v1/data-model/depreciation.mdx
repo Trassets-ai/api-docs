@@ -44,7 +44,7 @@ graph LR
   Datum der Inbetriebnahme der Anlage.
 </ResponseField>
 
-<ResponseField name="afa_period" type="object">
+<ResponseField name="depreciation_period" type="object">
   Beginn und Ende des Abschreibungszeitraums dieser Anlage.
   <Expandable title="properties">
     <ResponseField name="start" type="date">
@@ -56,7 +56,7 @@ graph LR
   </Expandable>
 </ResponseField>
 
-<ResponseField name="depreciation_active" type="boolean">
+<ResponseField name="is_depreciation_active" type="boolean">
   Ob für diese Anlage aktuell abgeschrieben wird.
 </ResponseField>
 
@@ -64,17 +64,17 @@ graph LR
   Anlagebezeichnung.
 </ResponseField>
 
-<ResponseField name="afa_duration" type="string">
+<ResponseField name="depreciation_duration" type="string">
   Nutzungsdauer der Anlage, in Monaten.
 </ResponseField>
 
 <ResponseField name="afa_validity" type="string">
   Gültigkeitsdatum der AfA-Konfiguration, die für diese Anlage angewendet wird. In der
-  Praxis immer identisch mit `afa_period.start` — ein ETL-Duplikat, kein eigenständiges
+  Praxis immer identisch mit `depreciation_period.start` — ein ETL-Duplikat, kein eigenständiges
   Signal. Für eine künftige API-Version zur Entfernung vorgesehen.
 </ResponseField>
 
-<ResponseField name="afa_method" type="string">
+<ResponseField name="depreciation_method" type="string">
   Angewendete Abschreibungsmethode, als Bezeichnung (z. B. linear).
 </ResponseField>
 
@@ -82,7 +82,7 @@ graph LR
   ID des Anlagenkontos, auf das die Buchungen dieser Anlage laufen.
 </ResponseField>
 
-<ResponseField name="afa_group" type="string">
+<ResponseField name="depreciation_group" type="string">
   Anlagenbuchungsgruppe, der diese Anlage zugeordnet ist.
 </ResponseField>
 

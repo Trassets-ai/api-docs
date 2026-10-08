@@ -5,12 +5,12 @@ description: "Understand the Stakeholder domain in the Data API: creditors, empl
 ---
 
 The Stakeholder domain contains master data for every person or organisation involved with
-a property: the vendors you pay (`creditor`), your own team (`employees`), the owners
-(`owner`), and the tenants (`tenants`).
+a property: the vendors you pay (`creditors`), your own team (`employees`), the owners
+(`owners`), and the tenants (`tenants`).
 
 ## creditor
 
-`GET /stakeholder/creditor` — vendor and creditor master data. This is the only Stakeholder
+`GET /stakeholder/creditors` — vendor and creditor master data. This is the only Stakeholder
 endpoint without a `property_id` column — a creditor is a standalone entity that may serve
 multiple properties; the relationship is expressed through `creditor_id` on other
 domains (`Property.property_creditor_services`, `Contracts.service_contracts`,
@@ -96,7 +96,7 @@ domains (`Property.property_creditor_services`, `Contracts.service_contracts`,
 
 ## owner
 
-`GET /stakeholder/owner` — property owner master data, including ownership share for
+`GET /stakeholder/owners` — property owner master data, including ownership share for
 co-owned properties.
 
 <ResponseField name="property_id" type="integer" required>

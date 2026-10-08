@@ -37,7 +37,7 @@ Ist `/raw/tables` leer, obwohl der Key gültig ist, ist der Key `transformed`. L
 
 ### Property-Einschränkungen
 
-Ein `transformed`-Key kann zusätzlich auf eine Liste von Property-IDs eingeschränkt sein. Category-Endpunkte liefern dann nur Zeilen dieser Properties, und eine Tabelle ohne `property_id`-Spalte (zum Beispiel `/stakeholder/creditor`) liefert für einen solchen Key 403. `/catalog` und `/changes` werden nicht nach Property gefiltert; sie listen Tabellen, keine Zeilen. Ein Administrator setzt die Property-Liste im Portal; ein Key ohne Liste sieht alle Properties.
+Ein `transformed`-Key kann zusätzlich auf eine Liste von Property-IDs eingeschränkt sein. Category-Endpunkte liefern dann nur Zeilen dieser Properties, und eine Tabelle ohne `property_id`-Spalte (zum Beispiel `/stakeholder/creditors`) liefert für einen solchen Key 403. `/catalog` und `/changes` werden nicht nach Property gefiltert; sie listen Tabellen, keine Zeilen. Ein Administrator setzt die Property-Liste im Portal; ein Key ohne Liste sieht alle Properties.
 
 ## Speicherung und Sicherheit des Keys
 
