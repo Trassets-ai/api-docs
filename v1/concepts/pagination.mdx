@@ -4,7 +4,7 @@ sidebarTitle: "Pagination"
 description: "All /v1/ list endpoints use cursor pagination: request a page with limit, follow next_cursor from the response body until it is null."
 ---
 
-<p><mark>Every list endpoint under `/v1/` — category and raw — uses cursor pagination. The pagination fields are part of the response body. There are no pagination headers and no `offset` parameter: category endpoints answer a request with `offset` with `400 Bad Request`, raw endpoints ignore it and return the first page. Don't send `offset`.</mark></p>
+Every list endpoint under `/v1/` — category and raw — uses cursor pagination. The pagination fields are part of the response body. There are no pagination headers and no `offset` parameter: category endpoints answer a request with `offset` with `400 Bad Request`, raw endpoints ignore it and return the first page. Don't send `offset`.
 
 ## Request
 
@@ -38,11 +38,11 @@ Keep the same filter parameters on every page of one run.
 </ResponseField>
 
 <ResponseField name="next_cursor" type="string | null">
-  <p><mark>Opaque cursor for the next page. `null` when no rows are left. On raw endpoints every full page carries a cursor, so the final request can return an empty `data` array.</mark></p>
+  Opaque cursor for the next page. `null` when no rows are left. On raw endpoints every full page carries a cursor, so the final request can return an empty `data` array.
 </ResponseField>
 
 <ResponseField name="total" type="integer">
-  <p><mark>Category endpoints: rows matching the query from the cursor position onward; on the first page, all matching rows. Raw endpoints: the table's row count at the last sync, the same on every page.</mark></p>
+  Category endpoints: rows matching the query from the cursor position onward; on the first page, all matching rows. Raw endpoints: the table's row count at the last sync, the same on every page.
 </ResponseField>
 
 Raw endpoints (`/v1/raw/{table_name}`) add `table_name` to the body and send an `X-Snapshot-At` header with the timestamp of the last successful sync for the table.
@@ -66,10 +66,10 @@ Repeat until `next_cursor` is `null`. [Incremental Sync](/v1/guides/incremental-
 
 ## Order and stability
 
-<p><mark>**Category endpoints:** rows are ordered by the table's sort column (or primary key), `NULL` values last, with the internal row position as tiebreaker — rows with equal values are neither skipped nor repeated. Tables without a sort column or primary key are paged by row position alone.</mark></p>
+**Category endpoints:** rows are ordered by the table's sort column (or primary key), `NULL` values last, with the internal row position as tiebreaker — rows with equal values are neither skipped nor repeated. Tables without a sort column or primary key are paged by row position alone.
 
-<p><mark>**Raw endpoints:** rows are ordered by the table's key column, then by row position; tables without a key column are paged by row position alone. If the key column contains `NULL` values, those rows can be missing after the first page. Compare the number of exported rows with `total` after a full export.</mark></p>
+**Raw endpoints:** rows are ordered by the table's key column, then by row position; tables without a key column are paged by row position alone. If the key column contains `NULL` values, those rows can be missing after the first page. Compare the number of exported rows with `total` after a full export.
 
 <Warning>
-  <p><mark>A cursor is only valid within one sync run. Tables are reloaded on every sync, with no fixed schedule (see [Sync cycle](/concepts/sync-cycle)); after a reload, row positions shift. A cursor from before the reload is still accepted, but the following pages can skip or repeat rows. Do not store `next_cursor` between runs — start each run from the first page. On raw endpoints, compare `X-Snapshot-At` across the pages of one run; if it changes, restart. An altered cursor or one from an older format returns `400 Bad Request`; restart from the first page in that case.</mark></p>
+  A cursor is only valid within one sync run. Tables are reloaded on every sync, with no fixed schedule (see [Sync cycle](/concepts/sync-cycle)); after a reload, row positions shift. A cursor from before the reload is still accepted, but the following pages can skip or repeat rows. Do not store `next_cursor` between runs — start each run from the first page. On raw endpoints, compare `X-Snapshot-At` across the pages of one run; if it changes, restart. An altered cursor or one from an older format returns `400 Bad Request`; restart from the first page in that case.
 </Warning>
