@@ -170,7 +170,7 @@
                     "group": "Core Concepts",
                     "pages": [
                       "v1/response-shape-conventions",
-                      "concepts/endpoint-types",
+                      "v1/concepts/endpoint-types",
                       "concepts/errors",
                       "concepts/rate-limits",
                       "concepts/sync-cycle",
@@ -182,7 +182,7 @@
                     "pages": [
                       "guides/bulk-export",
                       "guides/delta-sync",
-                      "guides/incremental-sync"
+                      "v1/guides/incremental-sync"
                     ]
                   },
                   {
@@ -255,7 +255,7 @@
                     "group": "Kernkonzepte",
                     "pages": [
                       "de/v1/response-shape-conventions",
-                      "de/concepts/endpoint-types",
+                      "de/v1/concepts/endpoint-types",
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
                       "de/concepts/sync-cycle",
@@ -267,7 +267,7 @@
                     "pages": [
                       "de/guides/bulk-export",
                       "de/guides/delta-sync",
-                      "de/guides/incremental-sync"
+                      "de/v1/guides/incremental-sync"
                     ]
                   },
                   {

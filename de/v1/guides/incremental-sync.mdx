@@ -1,0 +1,97 @@
+---
+title: "Immobiliendaten mit Trassets inkrementell synchronisieren"
+description: "Eine lokale Kopie der Trassets-Daten aktuell halten — über /changes erfährst du, welche Tabellen neu geladen wurden, und rufst nur diese vollständig erneut ab."
+sidebarTitle: "Incremental Sync"
+---
+
+Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufen. Die Tabellen werden einmal täglich vollständig neu geladen, es gibt also kein Delta auf Zeilenebene: Die Einheit der Änderung ist die Tabelle. Frage über [`/changes`](/de/guides/delta-sync) ab, welche Tabellen seit deinem letzten Lauf neu geladen wurden, und rufe genau diese Tabellen erneut ab — vollständig.
+
+<Warning>
+  Speichere `next_cursor` nicht zwischen Läufen. Nach einem Neuladen können sich Zeilen ändern, wegfallen oder ihre Position verschieben. Wer bei einem alten Cursor fortsetzt, behält unbemerkt veraltete Daten.
+</Warning>
+
+<Steps>
+  <Step title="Die neu geladenen Tabellen finden">
+    Rufe `/changes` mit dem `since`-Wert aus deinem letzten Lauf auf. Nimm dafür das höchste `last_sync_at` aus der Antwort dieses Laufs; beim allerersten Lauf einen Zeitstempel bis zu 120 Tage zurück. Jeder Eintrag einer Category-Tabelle enthält `category` und `api_table_name`; abgerufen wird sie unter `/v1/{category}/{api_table_name}`.
+
+    ```bash
+    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+
+    Tabellen, die in der Antwort fehlen, wurden nicht neu geladen. Überspringe sie.
+  </Step>
+  <Step title="Jede geänderte Tabelle vollständig abrufen">
+    Rufe die erste Seite ohne `cursor` ab. Die Zeilen stehen in `data`; `next_cursor` im Response-Body verweist auf die nächste Seite. Übergib ihn unverändert als `cursor`-Parameter und wiederhole das, bis `next_cursor` `null` ist. Der Cursor dient nur zum Blättern innerhalb eines einzelnen Laufs.
+
+    ```bash
+    curl -s "https://api.trassets.ai/v1/property/properties?limit=1000" \
+      -H "X-API-Key: $TRASSETS_API_KEY"
+    ```
+  </Step>
+  <Step title="Die lokale Tabelle ersetzen">
+    Sind alle Seiten da, ersetze deine lokale Kopie dieser Tabelle, statt anzuhängen. So verschwinden auch gelöschte Zeilen. Speichere dann das höchste `last_sync_at` als `since`-Wert für den nächsten Lauf.
+  </Step>
+  <Step title="Vollständiges Python-Beispiel">
+    Ein vollständiges Skript, das jede Tabelle erneut abruft, die seit dem letzten Lauf neu geladen wurde. Erfordert das Paket [`requests`](https://pypi.org/project/requests/).
+
+    ```python sync_changed_tables.py
+    import os
+    import requests
+
+    API_KEY = os.environ["TRASSETS_API_KEY"]
+    BASE_URL = "https://api.trassets.ai"
+    HEADERS = {"X-API-Key": API_KEY}
+
+
+    def fetch_table(path: str, page_size: int = 1000) -> list[dict]:
+        """Fetch all rows of one table, following next_cursor."""
+        rows: list[dict] = []
+        params: dict = {"limit": page_size}
+
+        while True:
+            resp = requests.get(
+                f"{BASE_URL}{path}", headers=HEADERS, params=params, timeout=30
+            )
+            resp.raise_for_status()
+            body = resp.json()
+            rows.extend(body["data"])
+
+            if body["next_cursor"] is None:
+                return rows
+            params["cursor"] = body["next_cursor"]
+
+
+    def table_path(entry: dict) -> str:
+        """Category tables live under /v1/; raw tables keep their endpoint_url."""
+        if entry.get("category"):
+            return f"/v1/{entry['category']}/{entry['api_table_name']}"
+        return entry["endpoint_url"]
+
+
+    def sync(since: str) -> tuple[dict[str, list[dict]], str]:
+        """Re-fetch every table reloaded after `since`.
+
+        Returns the rows per table and the `since` value for the next run.
+        """
+        resp = requests.get(
+            f"{BASE_URL}/changes", headers=HEADERS, params={"since": since}, timeout=30
+        )
+        resp.raise_for_status()
+        changed = resp.json()
+
+        tables = {t["table_name"]: fetch_table(table_path(t)) for t in changed}
+        if not changed:
+            return tables, since
+        # last_sync_at is UTC without a suffix; the API expects it with "Z"
+        return tables, max(t["last_sync_at"] for t in changed) + "Z"
+
+
+    if __name__ == "__main__":
+        tables, next_since = sync(since="2026-07-01T00:00:00Z")
+        for name, rows in tables.items():
+            print(f"{name}: {len(rows)} rows")
+        # Replace the local tables and persist next_since for the next run.
+    ```
+  </Step>
+</Steps>

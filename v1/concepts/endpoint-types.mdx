@@ -1,0 +1,54 @@
+---
+title: "Category and Raw Endpoints Explained"
+sidebarTitle: "Endpoint Types"
+description: "Data API offers two endpoint types: normalized category endpoints for dashboards and raw endpoints for bulk warehouse syncs. Choose the right one for your use case."
+---
+
+The Data API exposes your real-estate data through two distinct endpoint types. Each type is optimized for a different integration pattern: category endpoints serve normalized, business-ready data that you can query directly, while raw endpoints expose full source tables for bulk replication and data warehousing.
+
+Both types use the same cursor-based pagination: the rows are in `data`, and `next_cursor` in the response body points to the next page. See [Pagination](/v1/api-reference/introduction#pagination).
+
+## Category Endpoints
+
+Category endpoints follow the path pattern `/v1/{category}/{api_table}` and return denormalized, business-ready data that is pre-filtered to your customer scope.
+
+Use these endpoints for day-to-day integrations, dashboards, and incremental data fetches.
+
+Example request to a category endpoint:
+
+```bash
+curl -G "https://api.trassets.ai/v1/property/properties" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=10"
+```
+
+## Raw Endpoints
+
+Raw endpoints follow the path pattern `/v1/raw/{table_name}` and return full, unfiltered source tables exactly as they exist in the replication layer. The same tables are also available under `/raw/{table_name}`.
+
+Use these endpoints for bulk synchronization, full-table exports, and loading data into a data warehouse. The response includes an `X-Snapshot-At` header that tells you the sync timestamp for the current snapshot.
+
+Example request to a raw endpoint:
+
+```bash
+curl -G "https://api.trassets.ai/v1/raw/sollart" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -d "limit=5000"
+```
+
+To continue paginating, pass the `next_cursor` value from the previous response as the `cursor` parameter on the next request. When `next_cursor` is `null`, you have fetched every row.
+
+## Comparison
+
+| Aspect | Category Endpoints | Raw Endpoints |
+| --- | --- | --- |
+| Path | `/v1/{category}/{api_table}` | `/v1/raw/{table_name}` |
+| Data | Normalized, business-ready | Full source table, unfiltered |
+| Pagination | Cursor-based (`cursor`/`next_cursor`) | Cursor-based (`cursor`/`next_cursor`) |
+| Max page size | 100,000 rows | 10,000 rows |
+| Best for | Dashboards, incremental fetches | Bulk sync, data warehousing |
+| Headers | – | `X-Snapshot-At` |
+
+<Tip>
+  Use category endpoints for day-to-day operational queries and raw endpoints for full-table replication into your data warehouse. If you only need a subset of records, category endpoints are faster because they accept filter parameters.
+</Tip>
