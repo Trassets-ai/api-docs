@@ -39,7 +39,7 @@ If `/raw/tables` is empty although the key is valid, the key is `transformed`. I
 
 Columns with personal data — names, contact and bank details of tenants, owners, employees, and creditors — belong to one of two classes, `personal` and `personal_financial`. A key sees a class only with the matching grant; `personal` does not include `personal_financial`. Without the grant, `/v1/{category}/{table}` returns the rows without those columns. ID columns and `property_id` always remain.
 
-Grants apply to every key, `raw` or `transformed`, and override a column filter that names the column. The unversioned category endpoints are not affected. Raw tables need both grants (see above). An administrator sets grants in the portal; a change takes effect within about a minute.
+Grants apply to every key, `raw` or `transformed`, and override a column filter that names the column. Raw tables need both grants (see above). An administrator sets grants in the portal; a change takes effect within about a minute.
 
 ### Property restrictions
 

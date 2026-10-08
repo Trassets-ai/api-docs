@@ -11,12 +11,12 @@ Discover which tables have been updated since your last sync without fetching ev
 </Tip>
 
 <Note>
-  With a `transformed` key, `/changes` lists only tables within the key's categories and tables; tables without a category are never listed, and `?category=X` outside the key's scope returns 403. A `raw` key sees all tables — see [Key types](/authentication#key-types).
+  With a `transformed` key, `/changes` lists only tables within the key's categories and tables; tables without a category are never listed, and `?category=X` outside the key's scope returns 403. A `raw` key sees all tables — see [Key types](/v1/authentication#key-types).
 </Note>
 
 <Steps>
   <Step title="Poll for changed tables">
-    Send a `GET` request to `/changes` with an ISO-8601 `since` timestamp (UTC, e.g. `…Z`). An offset such as `+02:00` is converted to UTC; in a query string write the `+` as `%2B`, otherwise it is read as a space and the request fails with 400. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL. A table listed here has to be fetched **in full** again — `/changes` reports changed tables, not changed rows. `endpoint_url` points to a path your key can call: `/{category}/{table}` for customers on the unversioned API, `/v1/{category}/{table}` for v1-only customers, `/raw/{table}` for raw tables. Raw tables that are blocked for your account are not listed. Add an optional `category` parameter (e.g. `category=property`) to only return tables belonging to that category.
+    Send a `GET` request to `/changes` with an ISO-8601 `since` timestamp (UTC, e.g. `…Z`). An offset such as `+02:00` is converted to UTC; in a query string write the `+` as `%2B`, otherwise it is read as a space and the request fails with 400. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL. A table listed here has to be fetched **in full** again — `/changes` reports changed tables, not changed rows. <mark>`endpoint_url` points to a path your key can call: `/v1/{category}/{table}` for category tables, `/raw/{table}` for raw tables.</mark> Raw tables that are blocked for your account are not listed. Add an optional `category` parameter (e.g. `category=property`) to only return tables belonging to that category.
 
     ```bash
     curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
@@ -32,7 +32,7 @@ Discover which tables have been updated since your last sync without fetching ev
         "last_sync_at": "2026-07-07T06:00:00",
         "category": "property",
         "api_table_name": "properties",
-        "endpoint_url": "/property/properties"
+        "endpoint_url": "/v1/property/properties"
       },
       {
         "table_name": "sollart",

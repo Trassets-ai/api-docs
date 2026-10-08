@@ -11,12 +11,12 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
 </Tip>
 
 <Note>
-  Mit einem `transformed`-Key listet `/changes` nur Tabellen innerhalb der Kategorien und Tabellen des Keys; Tabellen ohne Kategorie erscheinen nie, und `?category=X` außerhalb des Keys liefert 403. Ein `raw`-Key sieht alle Tabellen — siehe [Key-Typen](/de/authentication#key-typen).
+  Mit einem `transformed`-Key listet `/changes` nur Tabellen innerhalb der Kategorien und Tabellen des Keys; Tabellen ohne Kategorie erscheinen nie, und `?category=X` außerhalb des Keys liefert 403. Ein `raw`-Key sieht alle Tabellen — siehe [Key-Typen](/de/v1/authentication#key-typen).
 </Note>
 
 <Steps>
   <Step title="Geänderte Tabellen abfragen">
-    Sende einen `GET`-Request an `/changes` mit einem ISO-8601-Zeitstempel `since` (UTC, z. B. `…Z`). Ein Offset wie `+02:00` wird nach UTC umgerechnet; schreibe das `+` in der Query-String als `%2B`, sonst wird es als Leerzeichen gelesen und die Anfrage scheitert mit 400. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL. Eine hier gelistete Tabelle musst du **vollständig** neu abrufen — `/changes` meldet geänderte Tabellen, keine geänderten Zeilen. `endpoint_url` zeigt auf einen Pfad, den dein Schlüssel aufrufen darf: `/{category}/{table}` für Kunden der unversionierten API, `/v1/{category}/{table}` für reine v1-Kunden, `/raw/{table}` für Raw-Tabellen. Für dein Konto gesperrte Raw-Tabellen werden nicht gelistet. Mit dem optionalen Parameter `category` (z. B. `category=property`) werden nur Tabellen dieser Kategorie zurückgegeben.
+    Sende einen `GET`-Request an `/changes` mit einem ISO-8601-Zeitstempel `since` (UTC, z. B. `…Z`). Ein Offset wie `+02:00` wird nach UTC umgerechnet; schreibe das `+` in der Query-String als `%2B`, sonst wird es als Leerzeichen gelesen und die Anfrage scheitert mit 400. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL. Eine hier gelistete Tabelle musst du **vollständig** neu abrufen — `/changes` meldet geänderte Tabellen, keine geänderten Zeilen. <mark>`endpoint_url` zeigt auf einen Pfad, den dein Schlüssel aufrufen darf: `/v1/{category}/{table}` für Category-Tabellen, `/raw/{table}` für Raw-Tabellen.</mark> Für dein Konto gesperrte Raw-Tabellen werden nicht gelistet. Mit dem optionalen Parameter `category` (z. B. `category=property`) werden nur Tabellen dieser Kategorie zurückgegeben.
 
     ```bash
     curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
@@ -32,7 +32,7 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
         "last_sync_at": "2026-07-07T06:00:00",
         "category": "property",
         "api_table_name": "properties",
-        "endpoint_url": "/property/properties"
+        "endpoint_url": "/v1/property/properties"
       },
       {
         "table_name": "sollart",

@@ -11,8 +11,8 @@ The Data API has two independent filtering axes: which **rows** come back, contr
 Category endpoints accept query parameters named after the columns you can filter on — each one does an exact match. Which columns are filterable varies per endpoint; check the **API Reference** tab for the exact list on the endpoint you're calling.
 
 ```text
-GET /property/properties?city=Berlin&use_type=Wohnen
-GET /contracts/contract_debits?property_id=1234&date_begin=2024-01-01
+GET /v1/property/properties?city=Berlin&use_type=Wohnen
+GET /v1/contracts/contract_debits?property_id=1234&date_begin=2024-01-01
 ```
 
 There is no range, wildcard, or `OR` syntax — a query parameter matches rows where that column equals the given value exactly. To narrow further, combine multiple parameters; they are ANDed together.
@@ -25,14 +25,14 @@ Filters are optional on almost every endpoint, but a few require one and reject 
 { "detail": "Missing required filter(s): ['property_id']" }
 ```
 
-`/contracts/contract_ends` (and its `/v1/` counterpart) is the current case — it always needs a `property_id`. Required parameters are marked as required per endpoint in the **API Reference** tab, so check there rather than assuming an unfiltered call will work.
+<mark>`/v1/contracts/contract_ends` is the current case</mark> — it always needs a `property_id`. Required parameters are marked as required per endpoint in the **API Reference** tab, so check there rather than assuming an unfiltered call will work.
 
 <Note>
-  Raw endpoints (`/raw/{table_name}`) do not support these filters — they always return the full unfiltered table, paginated via cursor. See [Endpoint Types](/concepts/endpoint-types).
+  <mark>Raw endpoints (`/v1/raw/{table_name}`) do not support</mark> these filters — they always return the full unfiltered table, paginated via cursor. See [Endpoint Types](/v1/concepts/endpoint-types).
 </Note>
 
 ## Column filtering (vertical)
 
-Which fields an entity's response includes can be restricted per API key. An admin configures this in the Trassets portal, per key and per entity — a key without explicit configuration returns the full column set documented in the **API Reference**. Changes take effect within about a minute, because permissions are cached for up to 60 seconds.
+Which fields an entity's response includes can be restricted per API key. An admin configures this in the Trassets portal, per key and per entity — a key without explicit configuration returns the full column set documented in the **API Reference**. <mark>Columns with personal data additionally need a grant, see [Personal data grants](/v1/authentication#personal-data-grants).</mark> Changes take effect within about a minute, because permissions are cached for up to 60 seconds.
 
 This is not something you control via the request itself — there is no `fields` or `select` query parameter. If a field you expect is missing from a response even though it's listed in the API Reference for that entity, your API key's column configuration is the likely cause; contact Trassets support to review or change it.

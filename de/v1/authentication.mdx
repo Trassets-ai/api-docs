@@ -39,7 +39,7 @@ Ist `/raw/tables` leer, obwohl der Key gültig ist, ist der Key `transformed`. L
 
 Spalten mit personenbezogenen Daten — Namen, Kontakt- und Bankdaten von Mietern, Eigentümern, Mitarbeitern und Kreditoren — gehören zu einer von zwei Klassen, `personal` und `personal_financial`. Ein Key sieht eine Klasse nur mit dem passenden Grant; `personal` schließt `personal_financial` nicht ein. Ohne Grant liefert `/v1/{category}/{table}` die Zeilen ohne diese Spalten. ID-Spalten und `property_id` bleiben immer erhalten.
 
-Grants gelten für jeden Key, `raw` oder `transformed`, und haben Vorrang vor einem Spaltenfilter, der die Spalte nennt. Die unversionierten Category-Endpunkte sind nicht betroffen. Raw-Tabellen brauchen beide Grants (siehe oben). Ein Administrator setzt Grants im Portal; eine Änderung wirkt nach etwa einer Minute.
+Grants gelten für jeden Key, `raw` oder `transformed`, und haben Vorrang vor einem Spaltenfilter, der die Spalte nennt. Raw-Tabellen brauchen beide Grants (siehe oben). Ein Administrator setzt Grants im Portal; eine Änderung wirkt nach etwa einer Minute.
 
 ### Property-Einschränkungen
 

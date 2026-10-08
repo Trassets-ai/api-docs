@@ -1,10 +1,10 @@
 ---
 title: "API-Versionierungsrichtlinie für die Data API"
 sidebarTitle: "Versionierung"
-description: "/v1/ ist die stabile, versionierte Schnittstelle der Data API. Die unversionierten Category- und Raw-Pfade werden nach Abschluss des /v1/-Rollouts abgeschaltet; /catalog und /changes bleiben."
+description: "/v1/ ist die versionierte Schnittstelle der Data API. Category-Endpunkte gibt es nur unter /v1/; /catalog und /changes tragen kein Versionspräfix."
 ---
 
-Die Data API wird über zwei Pfadfamilien bereitgestellt: `/v1/`, die versionierte Schnittstelle, und den ursprünglichen Basis-Pfad ohne Versionspräfix. Die unversionierten Category- und Raw-Pfade werden **nach Abschluss des `/v1/`-Rollouts abgeschaltet**. Neue Integrationen nutzen ausschließlich `/v1/`.
+<p><mark>Category-Endpunkte sind nur unter `/v1/{category}/{api_table}` verfügbar. Die unversionierten Category-Pfade, z. B. `/accounting/accounts`, liefern `404 Not Found`.</mark></p>
 
 ## Aktueller Stand
 
@@ -15,29 +15,16 @@ https://api.trassets.ai/v1/accounting/budgets
 https://api.trassets.ai/v1/raw/sollart
 ```
 
-Jede `/v1/`-Route folgt den Regeln der [Response-Struktur](/de/v1/response-shape-conventions). Die aktuelle Liste der verfügbaren Tabellen steht im Tab **API-Referenz** unter dem `v1`-Versionsumschalter.
+Jede `/v1/`-Route folgt den Regeln der [Response-Struktur](/de/v1/response-shape-conventions). <mark>Die aktuelle Liste der verfügbaren Tabellen steht im Tab **API-Referenz**.</mark>
 
-Bis zur Abschaltung sind dieselben Tabellen zusätzlich über den Basis-Pfad erreichbar:
+<p><mark>Raw-Tabellen sind zusätzlich über den Basis-Pfad `/raw/{table_name}` erreichbar, mit denselben Daten; dort heißt der Response-Schlüssel `total_rows` statt `total`. Nutze `/v1/raw/{table_name}`.</mark></p>
 
-```text
-https://api.trassets.ai/accounting/accounts
-https://api.trassets.ai/raw/sollart
-```
-
-`GET /catalog` und `GET /changes` tragen kein Versionspräfix und sind von der Abschaltung **nicht** betroffen.
+`GET /catalog` und `GET /changes` tragen kein Versionspräfix.
 
 <Warning>
-  Sobald eine Tabelle eine `/v1/`-Route hat, landen Breaking Changes unter einem neuen Präfix wie `/v2/`, nicht auf dem veröffentlichten Pfad. Für die unversionierten Basis-Pfade gilt diese Zusage nicht.
+  Sobald eine Tabelle eine `/v1/`-Route hat, landen Breaking Changes unter einem neuen Präfix wie `/v2/`, nicht auf dem veröffentlichten Pfad. <mark>Für die unversionierten Raw-Pfade gilt diese Zusage nicht.</mark>
 </Warning>
 
-## Auf /v1/ migrieren
+## Tabellen ohne /v1/-Route
 
-Stelle jede genutzte Tabelle um, bevor die unversionierten Pfade abgeschaltet werden:
-
-1. Prüfen, ob `/v1/{category}/{api_table}` für die genutzte Tabelle existiert.
-2. Falls ja: umstellen — die Response-Struktur weicht vom Basis-Pfad ab (siehe [Response-Struktur](/de/v1/response-shape-conventions) und [Pagination](/de/v1/concepts/pagination)).
-3. Raw-Tabellen: von `/raw/{table_name}` auf `/v1/raw/{table_name}` umstellen — gleiche Daten, Response-Schlüssel `total` statt `total_rows`.
-
-`/v1/operations/offers` und `/v1/operations/orders` sind angekündigt und folgen in einem späteren Release.
-
-`/catalog` und `/changes` brauchen keine Änderung.
+<p><mark>`operations/offers` und `operations/orders` sind derzeit nicht verfügbar. Sie folgen unter `/v1/` in einem späteren Release.</mark></p>

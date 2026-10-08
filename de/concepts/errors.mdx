@@ -38,7 +38,7 @@ Beispiel-Fehlerantwort für einen ungültigen API-Key:
 | **401** | API-Key fehlt | Sende den `X-API-Key`-Header bei jedem Request. |
 | **403** | Key abgelehnt oder Zugriffsstufe fehlt | Der Key ist unbekannt oder deaktiviert, oder er hat keine Berechtigung für diesen Endpunkt oder diese Tabelle, oder er ist auf Properties eingeschränkt und die Tabelle hat keine `property_id`-Spalte. Prüfe das Feld `detail`. Kontaktiere den Trassets-Support, um deine Zugriffsstufe zu ändern. |
 | **404** | Unbekannter Endpunkt | Überprüfe den URL-Pfad sowie den Category- oder Tabellennamen. |
-| **409** | Snapshot geändert | Die Tabelle wurde während deiner Pagination neu synchronisiert. Starte neu ab der ersten Seite ohne `cursor`. Siehe [Pagination](/de/concepts/pagination). |
+| **409** | Snapshot geändert | Die Tabelle wurde während deiner Pagination neu synchronisiert. Starte neu ab der ersten Seite ohne `cursor`. Siehe [Pagination](/de/v1/concepts/pagination). |
 | **422** | Validierungsfehler | Ein Query-Parameter hat die Validierung nicht bestanden. Prüfe das `detail`-Feld für den genauen Parameter und die Einschränkung. |
 | **429** | Rate-Limit überschritten | Du hast das Limit von 500 Requests pro Stunde überschritten. Warte ab und versuche es erneut, nachdem das aktuelle Zeitfenster zurückgesetzt wurde. |
 | **500** | Interner Fehler | Ein serverseitiger Fehler ist aufgetreten. Wiederhole den Request nach einer kurzen Verzögerung und kontaktiere den Support, falls das Problem weiterhin besteht. |

@@ -19,7 +19,7 @@ Raw-Endpunkte sind generisch pro Kunde (keine tabellenweise Inhaltsprüfung), de
 
 ### Pagination
 
-Nur Cursor, die Pagination-Felder stehen im Body statt in Headern. Wer von der unversionierten API kommt: `X-Total-Count` → `total`, `X-Has-More` und `X-Next-Cursor` → `next_cursor` (`null` = keine weitere Seite), `X-Next-Offset` → entfällt, `/v1/` kennt kein `offset`. Details: [Pagination](/de/v1/concepts/pagination).
+<mark>Nur Cursor, die Pagination-Felder stehen im Body: `total` und `next_cursor` (`null` = keine weitere Seite). Ein `offset` gibt es nicht.</mark> Details: [Pagination](/de/v1/concepts/pagination).
 
 ## Fehlerformat
 
@@ -27,7 +27,7 @@ Fehler folgen [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versionierung
 
-`/v1/` ersetzt die unversionierten Category- und Raw-Pfade, die abgeschaltet werden. Die Migrationsschritte stehen unter [Versionierung](/de/concepts/versioning).
+<mark>Category-Endpunkte gibt es nur unter `/v1/`; die unversionierten Category-Pfade liefern `404`.</mark> Siehe [Versionierung](/de/concepts/versioning).
 
 ## Endpunkt-Gruppen
 
