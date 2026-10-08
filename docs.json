@@ -24,7 +24,7 @@
                 "group": "Get Started",
                 "pages": [
                   "authentication",
-                  "index",
+                  "introduction",
                   "quickstart"
                 ]
               },
@@ -339,5 +339,8 @@
   },
   "footer": {
     "socials": {}
-  }
+  },
+  "redirects": [
+    { "source": "/", "destination": "/de/v1/overview" }
+  ]
 }
