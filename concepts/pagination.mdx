@@ -69,6 +69,8 @@ The response body contains these fields:
 
 The response also includes an `X-Snapshot-At` header with the ISO-8601 timestamp of the last successful sync for this table.
 
+A cursor belongs to the snapshot it was issued for. If the table is re-synced while you paginate, the next request with that cursor returns `409 Conflict`. Restart the export from the first page (without `cursor`) — this way an export never silently mixes rows from two snapshots.
+
 This example fetches the first page and then uses the cursor to continue:
 
 ```bash
