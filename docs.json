@@ -172,6 +172,7 @@
                       "v1/response-shape-conventions",
                       "concepts/endpoint-types",
                       "concepts/errors",
+                      "concepts/rate-limits",
                       "concepts/sync-cycle",
                       "concepts/versioning"
                     ]
@@ -257,6 +258,7 @@
                       "de/concepts/endpoint-types",
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
+                      "de/concepts/sync-cycle",
                       "de/concepts/versioning"
                     ]
                   },
@@ -302,7 +304,7 @@
                   },
                   {
                     "group": "Catalog",
-                    "pages": []
+                    "pages": ["v1/api-reference/unversioned/catalog"]
                   },
                   {
                     "group": "Delta Sync",
