@@ -4,7 +4,7 @@ description: "Keep a local copy of Trassets data up to date by asking /changes w
 sidebarTitle: "Incremental Sync"
 ---
 
-Maintain a local copy of your data without fetching every table on each run. The tables are reloaded in full once a day, so there is no row-level delta: the unit of change is the table. Ask [`/changes`](/guides/delta-sync) which tables were reloaded since your last run, then fetch exactly those tables again, completely.
+Maintain a local copy of your data without fetching every table on each run. Every sync reloads the tables in full, so there is no row-level delta: the unit of change is the table. Ask [`/changes`](/guides/delta-sync) which tables were reloaded since your last run, then fetch exactly those tables again, completely.
 
 <Warning>
   Do not store `next_cursor` between runs. After a reload, rows can change, disappear or shift position, so resuming at an old cursor silently keeps stale data.

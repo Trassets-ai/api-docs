@@ -6,7 +6,7 @@ description: "Überblick über die /v1/-Endpunkte: Basis-URL, Authentifizierung,
 
 Die `/v1/`-Endpunkte sind die versionierte Schnittstelle auf dieselben Immobiliendaten. Basis-URL: `https://api.trassets.ai`. Sende deinen API-Key im `X-API-Key`-Header bei jedem Request. Alle Antworten sind JSON.
 
-Jede `/v1/{category}/{api_table}`-Response ist ein JSON-Objekt: die Zeilen stehen in `data`, daneben die Pagination-Felder (siehe [Pagination](/de/v1/concepts/pagination)). Siehe [Response-Struktur](/de/v1/response-shape-conventions) für die Objekt-, Array- und Code/Label-Muster, denen die Zeilen folgen.
+Jede `/v1/{category}/{api_table}`-Response ist ein JSON-Objekt: die Zeilen stehen in `data`, daneben die Pagination-Felder. Siehe [Response-Struktur](/de/v1/response-shape-conventions) für die Objekt-, Array- und Code/Label-Muster, denen die Zeilen folgen.
 
 ## Endpunkt-Typen
 
@@ -19,7 +19,7 @@ Raw-Endpunkte sind generisch pro Kunde (keine tabellenweise Inhaltsprüfung), de
 
 ### Pagination
 
-Request-Parameter, Response-Felder, Reihenfolge und das Verhalten von Cursorn über Syncs hinweg: siehe [Pagination](/de/v1/concepts/pagination).
+Nur Cursor, die Pagination-Felder stehen im Body statt in Headern. Wer von der unversionierten API kommt: `X-Total-Count` → `total`, `X-Has-More` und `X-Next-Cursor` → `next_cursor` (`null` = keine weitere Seite), `X-Next-Offset` → entfällt, `/v1/` kennt kein `offset`. Details: [Pagination](/de/v1/concepts/pagination).
 
 ## Fehlerformat
 
