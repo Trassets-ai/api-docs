@@ -70,6 +70,8 @@ Der Response-Body enthält diese Felder:
 
 Die Antwort enthält außerdem einen `X-Snapshot-At`-Header mit dem ISO-8601-Zeitstempel des letzten erfolgreichen Syncs für diese Tabelle.
 
+Ein Cursor gehört zu dem Snapshot, für den er ausgegeben wurde. Wird die Tabelle während deiner Pagination neu synchronisiert, liefert die nächste Anfrage mit diesem Cursor `409 Conflict`. Starte den Export dann neu ab der ersten Seite (ohne `cursor`) — so mischt ein Export nie still Zeilen aus zwei Snapshots.
+
 Dieses Beispiel ruft die erste Seite ab und nutzt dann den Cursor, um fortzufahren:
 
 ```bash
