@@ -1,0 +1,12 @@
+name: nav-check
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  nav-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/check_nav.py
