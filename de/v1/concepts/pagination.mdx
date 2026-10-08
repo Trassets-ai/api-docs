@@ -42,12 +42,12 @@ Behalte innerhalb eines Laufs auf jeder Seite dieselben Filterparameter bei.
 </ResponseField>
 
 <ResponseField name="total" type="integer">
-  <p><mark>Category-Endpunkte: Zeilen, die ab der Cursor-Position zur Abfrage passen; auf der ersten Seite alle passenden Zeilen. Raw-Endpunkte: Zeilenzahl der Tabelle aus dem letzten abgeschlossenen Sync; sie ändert sich, wenn während deines Laufs ein Sync fertig wird.</mark></p>
+  <p><mark>Category-Endpunkte: Zeilen, die ab der Cursor-Position zur Abfrage passen; auf der ersten Seite alle passenden Zeilen. Raw-Endpunkte: Zeilenzahl der Tabelle aus dem letzten abgeschlossenen Sync.</mark></p>
 </ResponseField>
 
 Raw-Endpunkte (`/v1/raw/{table_name}`) ergänzen den Body um `table_name` und senden einen `X-Snapshot-At`-Header mit dem Zeitstempel des letzten erfolgreichen Syncs der Tabelle.
 
-<p><mark>Während eine Raw-Tabelle synchronisiert wird, und nach einem fehlgeschlagenen Sync bis zum nächsten erfolgreichen, liefert `/v1/raw/{table_name}` `400 Bad Request` mit `RAW table '…' is not ready (status: …)`. `GET /v1/raw/tables` zeigt den `status` jeder Tabelle. Versuche es später erneut; ein sofortiger Neustart bei der ersten Seite liefert denselben Fehler.</mark></p>
+<p><mark>Eine Raw-Tabelle, deren `status` in `GET /v1/raw/tables` nicht `synced` ist, liefert `400 Bad Request` mit `RAW table '…' is not ready (status: …)`. Versuche es nach dem nächsten Sync erneut; ein sofortiger Neustart bei der ersten Seite liefert denselben Fehler.</mark></p>
 
 ## Beispiel
 
@@ -73,5 +73,5 @@ Wiederhole das, bis `next_cursor` `null` ist. Eine vollständige Python-Schleife
 <p><mark>**Raw-Endpunkte:** Die Zeilen sind nach der Schlüsselspalte der Tabelle sortiert — dem Feld `primary_key` in `GET /v1/raw/tables` —, danach nach Zeilenposition; Tabellen ohne Schlüsselspalte werden allein nach Zeilenposition paginiert. Enthält die Schlüsselspalte `NULL`-Werte, verliert der Cursor Zeilen: `NULL`-Zeilen nach der ersten Seite werden übersprungen, und endet eine Seite auf einem `NULL`-Schlüssel, ist `next_cursor` `null` und der Export endet zu früh. Vergleiche nach einem vollständigen Export die Zahl der Zeilen mit `total`. Weichen sie ab, lässt sich die Tabelle über den Cursor nicht vollständig exportieren; wende dich an den Trassets-Support.</mark></p>
 
 <Warning>
-  <p><mark>Ein Cursor gilt nur innerhalb eines Sync-Laufs. Jeder Sync lädt die Tabellen vollständig neu (wann Syncs laufen: siehe [Sync-Zyklus](/de/concepts/sync-cycle)); danach verschieben sich Zeilenpositionen. Ein Cursor von vor dem Neuladen wird weiter akzeptiert, die folgenden Seiten können aber Zeilen überspringen oder doppelt liefern. Speichere `next_cursor` nicht zwischen Läufen — starte jeden Lauf mit der ersten Seite. Vergleiche auf Raw-Endpunkten `X-Snapshot-At` über die Seiten eines Laufs; ändert er sich, starte neu. Ein veränderter Cursor oder einer aus einem älteren Format liefert `400 Bad Request`; starte dann ebenfalls bei der ersten Seite.</mark></p>
+  <p><mark>Ein Cursor gilt nur innerhalb eines Sync-Laufs. Jeder Sync lädt die Tabellen vollständig neu (wann Syncs laufen: siehe [Sync-Zyklus](/de/concepts/sync-cycle)); danach verschieben sich Zeilenpositionen. Wird eine Tabelle während deiner Pagination neu synchronisiert, liefert die nächste Anfrage mit einem Cursor von davor `409 Conflict` (`Table was re-synced during pagination; restart without cursor.`) — starte dann neu ab der ersten Seite ohne `cursor`. So mischt ein Lauf nie Zeilen aus zwei Syncs. Speichere `next_cursor` nicht zwischen Läufen — starte jeden Lauf mit der ersten Seite. Ein veränderter Cursor oder einer aus einem älteren Format liefert `400 Bad Request`; starte dann ebenfalls bei der ersten Seite.</mark></p>
 </Warning>
