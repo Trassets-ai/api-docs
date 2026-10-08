@@ -77,10 +77,10 @@ Die [Datenmodell-Übersicht](/de/v1/data-model/overview) listet alle `/v1/`-Tabe
 
 ## Endpunkt-Gruppen ohne Versions-Präfix
 
-Drei Endpunkt-Gruppen existieren einmal für die gesamte API und tragen kein `/v1/`-Präfix. Sie stehen in der Seitenleiste unterhalb der Kategorien.
+Drei Endpunkt-Gruppen existieren einmal für die gesamte API und tragen kein `/v1/`-Präfix. Catalog und Delta Sync stehen in der Seitenleiste unterhalb der Kategorien.
 
 | Gruppe | Endpunkt | Was unter `/v1/` zu erwarten ist |
 | --- | --- | --- |
 | Catalog | `GET /catalog` | Listet alle Kategorien und Tabellen, die die API bereitstellt. Für das `/v1/`-Inventar die [Datenmodell-Übersicht](/de/v1/data-model/overview) nutzen. |
 | Delta Sync | `GET /changes` | Liefert Sync-Zeitstempel pro Tabelle. Benötigt den Parameter `since` (ISO-8601 UTC). |
-| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Quelltabellen unterhalb der Modellschicht. Auch unter `/v1/raw/tables` / `/v1/raw/{table_name}` erreichbar — gleiche Daten. |
+| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Quelltabellen unterhalb der Modellschicht. Gleiche Daten wie `/v1/raw/tables` / `/v1/raw/{table_name}`, dokumentiert in der Gruppe **Endpunkte**. |

@@ -77,10 +77,10 @@ Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Endpoint groups without a version prefix
 
-Three endpoint groups exist once for the whole API and carry no `/v1/` prefix. They are listed in the sidebar below the categories.
+Three endpoint groups exist once for the whole API and carry no `/v1/` prefix. Catalog and Delta Sync are listed in the sidebar below the categories.
 
 | Group | Endpoint | What to expect under `/v1/` |
 | --- | --- | --- |
 | Catalog | `GET /catalog` | Lists all categories and tables exposed by the API. Use [Data Model Overview](/v1/data-model/overview) for the `/v1/` inventory. |
 | Delta Sync | `GET /changes` | Reports sync timestamps per table. Requires a `since` parameter (ISO-8601 UTC). |
-| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Source tables below the modelled layer. Also available under `/v1/raw/tables` / `/v1/raw/{table_name}` — same data either way. |
+| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Source tables below the modelled layer. Same data as `/v1/raw/tables` / `/v1/raw/{table_name}`, documented in the **Endpoints** group. |

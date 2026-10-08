@@ -74,7 +74,7 @@
                 "group": "Endpoints",
                 "openapi": {
                   "source": "https://api.trassets.ai/openapi.json",
-                  "overlays": ["overlays/add-servers.yaml", "overlays/require-changes-since.yaml"]
+                  "overlays": ["overlays/add-servers.yaml"]
                 }
               }
             ]
@@ -139,7 +139,7 @@
                 "group": "Endpunkte",
                 "openapi": {
                   "source": "https://api.trassets.ai/openapi.json",
-                  "overlays": ["overlays/add-servers.yaml", "overlays/require-changes-since.yaml"]
+                  "overlays": ["overlays/add-servers.yaml"]
                 }
               }
             ]
@@ -224,13 +224,6 @@
                   {
                     "group": "Delta Sync",
                     "pages": ["v1/api-reference/unversioned/changes"]
-                  },
-                  {
-                    "group": "Raw Data",
-                    "pages": [
-                      "v1/api-reference/unversioned/raw-tables",
-                      "v1/api-reference/unversioned/raw-table"
-                    ]
                   }
                 ]
               }
@@ -304,15 +297,11 @@
                   },
                   {
                     "group": "Catalog",
-                    "pages": ["v1/api-reference/unversioned/catalog"]
+                    "pages": ["de/v1/api-reference/unversioned/catalog"]
                   },
                   {
                     "group": "Delta Sync",
-                    "pages": ["v1/api-reference/unversioned/changes"]
-                  },
-                  {
-                    "group": "Raw Data",
-                    "pages": ["v1/api-reference/unversioned/raw-tables", "v1/api-reference/unversioned/raw-table"]
+                    "pages": ["de/v1/api-reference/unversioned/changes"]
                   }
                 ]
               }
@@ -345,6 +334,8 @@
   "redirects": [
     { "source": "/de", "destination": "/" },
     { "source": "/de/v1/overview", "destination": "/" },
-    { "source": "/v1/overview", "destination": "/en" }
+    { "source": "/v1/overview", "destination": "/en" },
+    { "source": "/v1/api-reference/unversioned/raw-tables", "destination": "/v1/api-reference/introduction" },
+    { "source": "/v1/api-reference/unversioned/raw-table", "destination": "/v1/api-reference/introduction" }
   ]
 }
