@@ -1,7 +1,7 @@
 ---
 title: "Accounting"
 sidebarTitle: "Accounting"
-description: "Feldreferenz für die Tabellen accounts, booking_header, booking_positions und budgets unter /v1/accounting/."
+description: "Feldreferenz für die Tabellen accounts, booking_headers, booking_positions und budgets unter /v1/accounting/."
 ---
 
 Die vier Tabellen unten verknüpfen sich untereinander und mit drei weiteren Domänen —
@@ -11,7 +11,7 @@ Property, Contracts und Stakeholder. Das vollständige Cross-Domain-Diagramm ste
 ```mermaid
 graph LR
   subgraph Accounting
-    booking_header["booking_header"]
+    booking_header["booking_headers"]
     booking_positions["booking_positions"]
     accounts["accounts"]
     budgets["budgets"]
@@ -22,7 +22,7 @@ graph LR
   contract_debits["Contracts.contract_debits"]
   contract_debit_diffs["Contracts.contract_debit_diffs"]
   tenants["Stakeholder.tenants"]
-  creditor["Stakeholder.creditor"]
+  creditor["Stakeholder.creditors"]
 
   booking_header -->|booking_header_id| booking_positions
   booking_positions -->|account_id| accounts
@@ -43,17 +43,17 @@ graph LR
 
 ### So hängt das Buchungsmodell zusammen
 
-Ein Buchungsvorgang hat einen `booking_header`, der alle dabei ausgelösten Positionen
+Ein Buchungsvorgang hat einen `booking_headers`, der alle dabei ausgelösten Positionen
 (`booking_positions`) vereint. Eine Buchung kann ein Sachkonto, ein Personenkonto, ein
 Kreditorkonto, ein Projektkonto oder eine Kostenstelle betreffen — siehe
 `accounts.account_type_name`. Da ein Vorgang in der Regel nur eine Buchung auf ein
-Kreditor-, Personen- oder Kostenstellenkonto enthält, hat `booking_header` `creditor_id`,
+Kreditor-, Personen- oder Kostenstellenkonto enthält, hat `booking_headers` `creditor_id`,
 `person_id` und `property_structure_account_id` bereits als eigene Felder — eine
 Verknüpfung über `accounts` ist dafür nicht nötig.
 
 Auch `booking_positions` führt ein `person_id`-Feld. Um eine Position einem Mieter
 zuzuordnen, führt der Weg über `booking_positions.booking_header_id` zu
-`booking_header.person_id`.
+`booking_headers.person_id`.
 
 Jeder Buchungsvorgang gehört zu genau einem Objekt. Zu einem Konto kann es ein Budget
 (`budgets`) für einen bestimmten Monat geben. Eine Kostenstelle ist immer mit einem Teil
@@ -107,7 +107,7 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
   Ob das Konto ergebniswirksam oder bilanzneutral ist.
 </ResponseField>
 
-<ResponseField name="nr" type="integer">
+<ResponseField name="sort_order" type="integer">
   Sortiernummer der Position innerhalb ihrer Kategorie.
 </ResponseField>
 
@@ -148,9 +148,9 @@ Kreditorkonten, Projektkonten, Kostenstellen und Anlagenkonten — siehe
   Steuermodell-Code des Objekts.
 </ResponseField>
 
-## booking_header
+## booking_headers
 
-`GET /v1/accounting/booking_header` — Hauptbuch-Buchungsköpfe. Jeder Kopf gruppiert
+`GET /v1/accounting/booking_headers` — Hauptbuch-Buchungsköpfe. Jeder Kopf gruppiert
 zusammengehörige Positionen.
 
 <ResponseField name="property_id" type="string" required>
@@ -162,12 +162,12 @@ zusammengehörige Positionen.
   `booking_header_id`.
 </ResponseField>
 
-<ResponseField name="booking_nr" type="integer">
+<ResponseField name="booking_number" type="integer">
   Laufende Nummer der Buchung im Journal (Primanota) — dem chronologischen Buchungsprotokoll.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string">
-  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
+  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditors`.
 </ResponseField>
 
 <ResponseField name="person_id" type="string">
@@ -182,7 +182,7 @@ zusammengehörige Positionen.
   Gesamtwert des Buchungskopfs.
 </ResponseField>
 
-<ResponseField name="m2" type="number">
+<ResponseField name="sqm" type="number">
   Mit der Buchung verbundene Fläche in Quadratmetern, falls zutreffend.
 </ResponseField>
 
@@ -224,7 +224,7 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
 
 <ResponseField name="booking_header_id" type="integer" required>
   ID des übergeordneten Buchungskopfs. Verknüpft sich mit
-  `booking_header.booking_header_id`.
+  `booking_headers.booking_header_id`.
 </ResponseField>
 
 <ResponseField name="account_id" type="integer" required>
@@ -247,7 +247,7 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string">
-  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditor`.
+  Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditors`.
 </ResponseField>
 
 <ResponseField name="person_id" type="integer">
@@ -309,11 +309,11 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
   Datum der Buchung.
 </ResponseField>
 
-<ResponseField name="booking_nr" type="integer">
+<ResponseField name="booking_number" type="integer">
   Laufende Nummer der Buchung im Journal (Primanota) — dem chronologischen Buchungsprotokoll.
 </ResponseField>
 
-<ResponseField name="booking_Lfd_nr" type="integer">
+<ResponseField name="booking_position_number" type="integer">
   Laufende Positionsnummer innerhalb der Buchung.
 </ResponseField>
 
@@ -328,10 +328,10 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
 
 <ResponseField name="booking_position_text" type="string">
   Freitextbeschreibung dieser Position. Kann vom Buchungstext des Buchungskopfs
-  (`booking_header.booking_text`) abweichen.
+  (`booking_headers.booking_text`) abweichen.
 </ResponseField>
 
-<ResponseField name="sh" type="string">
+<ResponseField name="debit_credit" type="string">
   Soll/Haben-Kennzeichen. Nicht verlässlich aus dem Vorzeichen von `amount.net` ableitbar.
 </ResponseField>
 

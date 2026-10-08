@@ -18,7 +18,7 @@ graph LR
     property_structure["property_structure"]
   end
 
-  booking_header["Accounting.booking_header"]
+  booking_header["Accounting.booking_headers"]
   booking_positions["Accounting.booking_positions"]
   budgets["Accounting.budgets"]
   accounts["Accounting.accounts"]
@@ -28,9 +28,9 @@ graph LR
   contract_debit_diffs["Contracts.contract_debit_diffs"]
   assets["Depreciation.assets"]
   tenants["Stakeholder.tenants"]
-  owner["Stakeholder.owner"]
+  owner["Stakeholder.owners"]
   employees["Stakeholder.employees"]
-  creditor["Stakeholder.creditor"]
+  creditor["Stakeholder.creditors"]
 
   properties -->|property_id| technical_objects
   properties -->|property_id| property_creditor_services
@@ -88,7 +88,7 @@ graph LR
   this same endpoint.
 </ResponseField>
 
-<ResponseField name="obj_name" type="string">
+<ResponseField name="property_name" type="string">
   Property name.
 </ResponseField>
 
@@ -96,13 +96,8 @@ graph LR
   Postal code.
 </ResponseField>
 
-<ResponseField name="adr_city" type="string">
-  City, cleaned.
-</ResponseField>
-
 <ResponseField name="city" type="string">
-  City, as originally entered. Can differ from `adr_city` where the source data wasn't
-  normalized.
+  City, cleaned.
 </ResponseField>
 
 <ResponseField name="country" type="string">
@@ -237,7 +232,7 @@ floor, or a unit / rental area.
   Cost-centre name.
 </ResponseField>
 
-<ResponseField name="floor_area_nr" type="string">
+<ResponseField name="floor_area_number" type="string">
   Unit number.
 </ResponseField>
 
@@ -269,15 +264,15 @@ floor, or a unit / rental area.
   Usage type of the unit.
 </ResponseField>
 
-<ResponseField name="no_marketing" type="boolean">
+<ResponseField name="is_excluded_from_marketing" type="boolean">
   Whether this unit is excluded from marketing.
 </ResponseField>
 
-<ResponseField name="target_rent_per_m2" type="number">
+<ResponseField name="target_rent_per_sqm" type="number">
   Target rent per square metre.
 </ResponseField>
 
-<ResponseField name="market_rent_per_m2" type="number">
+<ResponseField name="market_rent_per_sqm" type="number">
   Market rent per square metre.
 </ResponseField>
 
@@ -301,7 +296,7 @@ floor, or a unit / rental area.
   URL of a photo of the unit.
 </ResponseField>
 
-<ResponseField name="m2" type="number">
+<ResponseField name="sqm" type="number">
   Unit size in square metres.
 </ResponseField>
 
@@ -327,7 +322,7 @@ assigned to a property, by trade.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string" required>
-  Identifies the creditor. See `Stakeholder.creditor`.
+  Identifies the creditor. See `Stakeholder.creditors`.
 </ResponseField>
 
 <ResponseField name="exclusivity" type="object">
@@ -363,11 +358,11 @@ maintenance, and inspection details.
   Unit the object is located in, if assigned at that level.
 </ResponseField>
 
-<ResponseField name="to_id" type="integer" required>
+<ResponseField name="technical_object_id" type="integer" required>
   Unique identifier for the technical object.
 </ResponseField>
 
-<ResponseField name="to_nr" type="string">
+<ResponseField name="technical_object_number" type="string">
   Business number of the technical object.
 </ResponseField>
 
@@ -428,7 +423,7 @@ maintenance, and inspection details.
   Inspection-type code.
 </ResponseField>
 
-<ResponseField name="inactive" type="boolean">
+<ResponseField name="is_inactive" type="boolean">
   Whether this object is decommissioned.
 </ResponseField>
 

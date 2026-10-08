@@ -86,7 +86,7 @@ graph LR
   Angaben zur meldenden Person.
 </ResponseField>
 
-<ResponseField name="report_nr" type="string">
+<ResponseField name="report_number" type="string">
   Meldungsnummer.
 </ResponseField>
 
@@ -123,7 +123,7 @@ graph LR
   Anzahl Tage, die die Meldung schon in Bearbeitung ist.
 </ResponseField>
 
-<ResponseField name="insurance_case" type="boolean">
+<ResponseField name="is_insurance_case" type="boolean">
   Ob es sich um einen Versicherungsfall handelt.
 </ResponseField>
 
@@ -217,7 +217,7 @@ graph LR
   eine.
 </ResponseField>
 
-<ResponseField name="ledger_account_nr" type="string">
+<ResponseField name="ledger_account_number" type="string">
   Trotz des Namens keine sachkontobezogene ID — identischer Wert wie `cost_center_id`, nur
   unter anderem Feldnamen (beide stammen aus derselben Rohspalte). Für die
   tatsächliche(n) Sachkontonummer(n) `ledger_account` verwenden.
@@ -258,7 +258,7 @@ graph LR
   Obligo-Limit (zugesagt, aber noch nicht in Rechnung gestellt).
 </ResponseField>
 
-<ResponseField name="is_value" type="number">
+<ResponseField name="actual_value" type="number">
   Ist-Wert (gebucht) bis heute.
 </ResponseField>
 
@@ -278,7 +278,7 @@ graph LR
   Instandhaltungswert.
 </ResponseField>
 
-<ResponseField name="is_project_management_flag" type="string">
+<ResponseField name="is_project_management" type="string">
   Klassifizierungs-Flag zur Projektleitung (`"0"`/`"1"`).
 </ResponseField>
 
@@ -314,11 +314,11 @@ graph LR
   Bezeichnung des zugehörigen technischen Objekts.
 </ResponseField>
 
-<ResponseField name="request_nr" type="string">
+<ResponseField name="request_number" type="string">
   Geschäftsnummer der ursprünglichen Anfrage.
 </ResponseField>
 
-<ResponseField name="offer_nr" type="string">
+<ResponseField name="offer_number" type="string">
   Geschäftsnummer des zugehörigen Angebots.
 </ResponseField>
 

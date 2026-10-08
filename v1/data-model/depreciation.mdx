@@ -43,7 +43,7 @@ configuration applied to each asset.
   Date the asset was put into service.
 </ResponseField>
 
-<ResponseField name="afa_period" type="object">
+<ResponseField name="depreciation_period" type="object">
   Start and end date of the asset's own depreciation schedule.
   <Expandable title="properties">
     <ResponseField name="start" type="date">
@@ -55,7 +55,7 @@ configuration applied to each asset.
   </Expandable>
 </ResponseField>
 
-<ResponseField name="depreciation_active" type="boolean">
+<ResponseField name="is_depreciation_active" type="boolean">
   Whether depreciation is currently active for this asset.
 </ResponseField>
 
@@ -63,17 +63,17 @@ configuration applied to each asset.
   Asset name.
 </ResponseField>
 
-<ResponseField name="afa_duration" type="string">
+<ResponseField name="depreciation_duration" type="string">
   Useful life of the asset, in months.
 </ResponseField>
 
 <ResponseField name="afa_validity" type="string">
   Validity date of the depreciation-rate configuration applied to this asset. In practice,
-  always identical to `afa_period.start` — an ETL duplicate, not an independent signal.
+  always identical to `depreciation_period.start` — an ETL duplicate, not an independent signal.
   Scheduled for removal in a future API version.
 </ResponseField>
 
-<ResponseField name="afa_method" type="string">
+<ResponseField name="depreciation_method" type="string">
   Depreciation method applied, as a label (e.g. straight-line).
 </ResponseField>
 
@@ -81,7 +81,7 @@ configuration applied to each asset.
   Identifier of the depreciation account this asset's postings are booked to.
 </ResponseField>
 
-<ResponseField name="afa_group" type="string">
+<ResponseField name="depreciation_group" type="string">
   Asset posting group this asset is classified under.
 </ResponseField>
 

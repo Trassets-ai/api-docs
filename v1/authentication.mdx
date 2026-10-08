@@ -43,7 +43,7 @@ Grants apply to every key, `raw` or `transformed`, and override a column filter 
 
 ### Property restrictions
 
-A `transformed` key can additionally be limited to a list of property IDs. Category endpoints then return only rows of those properties, and a table that has no `property_id` column (for example `/v1/stakeholder/creditor`) returns 403 for such a key. `/catalog` and `/changes` are not filtered by property; they list tables, not rows. An administrator sets the property list in the portal; a key without a list sees all properties.
+A `transformed` key can additionally be limited to a list of property IDs. Category endpoints then return only rows of those properties, and a table that has no `property_id` column (for example `/v1/stakeholder/creditors`) returns 403 for such a key. `/catalog` and `/changes` are not filtered by property; they list tables, not rows. An administrator sets the property list in the portal; a key without a list sees all properties.
 
 ## Key storage and security
 

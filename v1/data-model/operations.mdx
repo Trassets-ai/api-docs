@@ -84,7 +84,7 @@ graph LR
   Details of the reporting person.
 </ResponseField>
 
-<ResponseField name="report_nr" type="string">
+<ResponseField name="report_number" type="string">
   Report number.
 </ResponseField>
 
@@ -121,7 +121,7 @@ graph LR
   Number of days the report has been in process.
 </ResponseField>
 
-<ResponseField name="insurance_case" type="boolean">
+<ResponseField name="is_insurance_case" type="boolean">
   Whether this report is an insurance claim.
 </ResponseField>
 
@@ -215,7 +215,7 @@ graph LR
   several, not a single value.
 </ResponseField>
 
-<ResponseField name="ledger_account_nr" type="string">
+<ResponseField name="ledger_account_number" type="string">
   Despite the name, not a ledger-account identifier — the same value as `cost_center_id`
   under a different field name (both derive from the same source column). Use
   `ledger_account` for the actual general ledger account number(s).
@@ -255,7 +255,7 @@ graph LR
   Committed-but-not-yet-invoiced budget limit.
 </ResponseField>
 
-<ResponseField name="is_value" type="number">
+<ResponseField name="actual_value" type="number">
   Actual, booked value to date.
 </ResponseField>
 
@@ -275,7 +275,7 @@ graph LR
   Maintenance value.
 </ResponseField>
 
-<ResponseField name="is_project_management_flag" type="string">
+<ResponseField name="is_project_management" type="string">
   Project management classification flag (`"0"`/`"1"`).
 </ResponseField>
 
@@ -311,11 +311,11 @@ graph LR
   Name of the related technical object.
 </ResponseField>
 
-<ResponseField name="request_nr" type="string">
+<ResponseField name="request_number" type="string">
   Business number of the originating request.
 </ResponseField>
 
-<ResponseField name="offer_nr" type="string">
+<ResponseField name="offer_number" type="string">
   Business number of the related offer.
 </ResponseField>
 

@@ -19,7 +19,7 @@ graph LR
     property_structure["property_structure"]
   end
 
-  booking_header["Accounting.booking_header"]
+  booking_header["Accounting.booking_headers"]
   booking_positions["Accounting.booking_positions"]
   budgets["Accounting.budgets"]
   accounts["Accounting.accounts"]
@@ -29,9 +29,9 @@ graph LR
   contract_debit_diffs["Contracts.contract_debit_diffs"]
   assets["Depreciation.assets"]
   tenants["Stakeholder.tenants"]
-  owner["Stakeholder.owner"]
+  owner["Stakeholder.owners"]
   employees["Stakeholder.employees"]
-  creditor["Stakeholder.creditor"]
+  creditor["Stakeholder.creditors"]
 
   properties -->|property_id| technical_objects
   properties -->|property_id| property_creditor_services
@@ -89,7 +89,7 @@ graph LR
   Endpunkts auflösen.
 </ResponseField>
 
-<ResponseField name="obj_name" type="string">
+<ResponseField name="property_name" type="string">
   Objektbezeichnung.
 </ResponseField>
 
@@ -97,12 +97,8 @@ graph LR
   Postleitzahl.
 </ResponseField>
 
-<ResponseField name="adr_city" type="string">
-  Ort, bereinigt.
-</ResponseField>
-
 <ResponseField name="city" type="string">
-  Ort, wie ursprünglich erfasst — kann von der bereinigten Fassung in `adr_city` abweichen.
+  Ort, bereinigt.
 </ResponseField>
 
 <ResponseField name="country" type="string">
@@ -236,7 +232,7 @@ Etage oder eine Fläche/Mieteinheit.
   Kostenstellenbezeichnung.
 </ResponseField>
 
-<ResponseField name="floor_area_nr" type="string">
+<ResponseField name="floor_area_number" type="string">
   Flächennummer.
 </ResponseField>
 
@@ -268,15 +264,15 @@ Etage oder eine Fläche/Mieteinheit.
   Nutzungsart der Fläche.
 </ResponseField>
 
-<ResponseField name="no_marketing" type="boolean">
+<ResponseField name="is_excluded_from_marketing" type="boolean">
   Ob diese Fläche von der Vermarktung ausgeschlossen ist.
 </ResponseField>
 
-<ResponseField name="target_rent_per_m2" type="number">
+<ResponseField name="target_rent_per_sqm" type="number">
   Sollmiete je Quadratmeter.
 </ResponseField>
 
-<ResponseField name="market_rent_per_m2" type="number">
+<ResponseField name="market_rent_per_sqm" type="number">
   Marktmiete je Quadratmeter.
 </ResponseField>
 
@@ -300,7 +296,7 @@ Etage oder eine Fläche/Mieteinheit.
   URL eines Fotos der Fläche.
 </ResponseField>
 
-<ResponseField name="m2" type="number">
+<ResponseField name="sqm" type="number">
   Flächengröße in Quadratmetern.
 </ResponseField>
 
@@ -326,7 +322,7 @@ Objekt nach Gewerk zugeordnet sind.
 </ResponseField>
 
 <ResponseField name="creditor_id" type="string" required>
-  Kennzeichnet den Kreditor. Siehe `Stakeholder.creditor`.
+  Kennzeichnet den Kreditor. Siehe `Stakeholder.creditors`.
 </ResponseField>
 
 <ResponseField name="exclusivity" type="object">
@@ -362,11 +358,11 @@ Wartungs- und Prüfinformationen.
   Fläche, in der sich die Anlage befindet, sofern auf dieser Ebene zugeordnet.
 </ResponseField>
 
-<ResponseField name="to_id" type="integer" required>
+<ResponseField name="technical_object_id" type="integer" required>
   Eindeutige Kennung der technischen Anlage.
 </ResponseField>
 
-<ResponseField name="to_nr" type="string">
+<ResponseField name="technical_object_number" type="string">
   Geschäftsnummer der technischen Anlage.
 </ResponseField>
 
@@ -427,7 +423,7 @@ Wartungs- und Prüfinformationen.
   Prüfungstyp-Code.
 </ResponseField>
 
-<ResponseField name="inactive" type="boolean">
+<ResponseField name="is_inactive" type="boolean">
   Ob die Anlage außer Betrieb ist.
 </ResponseField>
 
