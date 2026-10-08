@@ -16,7 +16,6 @@
         "languages": [
       {
         "language": "en",
-        "default": true,
         "tabs": [
           {
             "tab": "Documentation",
@@ -25,7 +24,7 @@
                 "group": "Get Started",
                 "pages": [
                   "authentication",
-                  "index",
+                  "introduction",
                   "quickstart"
                 ]
               },
@@ -84,6 +83,7 @@
       },
       {
         "language": "de",
+        "default": true,
         "tabs": [
           {
             "tab": "Dokumentation",
@@ -154,7 +154,6 @@
         "languages": [
           {
             "language": "en",
-            "default": true,
             "tabs": [
               {
                 "tab": "Documentation",
@@ -162,7 +161,7 @@
                   {
                     "group": "Get Started",
                     "pages": [
-                      "v1/overview",
+                      "en/index",
                       "v1/quickstart",
                       "v1/authentication"
                     ]
@@ -238,6 +237,7 @@
           },
           {
             "language": "de",
+            "default": true,
             "tabs": [
               {
                 "tab": "Dokumentation",
@@ -245,7 +245,7 @@
                   {
                     "group": "Erste Schritte",
                     "pages": [
-                      "de/v1/overview",
+                      "index",
                       "de/v1/quickstart",
                       "de/v1/authentication"
                     ]
@@ -339,5 +339,10 @@
   },
   "footer": {
     "socials": {}
-  }
+  },
+  "redirects": [
+    { "source": "/de", "destination": "/" },
+    { "source": "/de/v1/overview", "destination": "/" },
+    { "source": "/v1/overview", "destination": "/en" }
+  ]
 }

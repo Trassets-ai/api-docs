@@ -1,38 +1,37 @@
 ---
-title: "Data API: Real-Estate Data for Developers"
-description: "The Data API provides property, contract, accounting, and operations data for developers building property management integrations and analytics."
-sidebarTitle: "Overview"
+title: "Data API v1"
+sidebarTitle: "Übersicht"
+description: "Was die Trassets Data API ist und wo der Einstieg in den versionierten /v1/-Pfad liegt."
 ---
 
-The Data API delivers structured, machine-readable real estate data to developers and data engineers. It exposes property information, rental contracts, financial bookings, fixed assets, and maintenance operations through a single REST interface so you can build dashboards, sync pipelines, and reporting tools without maintaining multiple integrations.
+Die Trassets Data API ist eine Read-only-REST-Schnittstelle über Immobiliendaten — Objekte, Verträge, Buchhaltung und mehr — gebaut für Softwarepartner und Integratoren, die an Trassets-verwaltete Portfolios andocken. Jede Anfrage wird per `X-API-Key`-Header authentifiziert, jede Antwort ist JSON.
+
+Dieser Bereich behandelt `/v1/`, die versionierte Pfad-Familie der API (`/v1/{category}/{api_table}`), mit einer Response-Struktur, die pro Endpunkt stabil bleibt, sobald sie veröffentlicht ist.
+
+## Für wen ist die API gedacht?
+
+- **Softwarepartner & Integratoren**, die Tools auf Basis von Trassets-verwalteten Portfolios bauen.
+- **IT-Teams der Immobilienverwalter selbst**, die interne Systeme oder Reporting an Live-Portfoliodaten anbinden.
+- **Data- & BI-Teams**, die Data Warehouses, Dashboards oder Analyse-Pipelines speisen.
 
 <CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Make your first API call in under five minutes.
+  <Card title="Quickstart" icon="rocket" href="/de/v1/quickstart">
+    API-Key holen und den ersten `/v1/`-Call machen.
   </Card>
 
-  <Card title="Authentication" icon="key" href="/authentication">
-    How to request and use API keys.
+  <Card title="Authentication" icon="key" href="/de/v1/authentication">
+    Key-Management und Zugriffsstufen.
   </Card>
 
-  <Card title="Endpoint Types" icon="server" href="/concepts/endpoint-types">
-    Category and raw endpoints explained.
+  <Card title="Response-Struktur" icon="brackets-curly" href="/de/v1/response-shape-conventions">
+    Die strukturellen Regeln, denen jede `/v1/`-Response folgt.
   </Card>
 
-  <Card title="API Reference Overview" icon="book-open" href="/api-reference/introduction">
-    Browse the endpoint catalog and conventions.
+  <Card title="Datenmodell" icon="diagram-project" href="/de/v1/data-model/overview">
+    Die unter `/v1/` verfügbaren Tabellen und wie sie zusammenhängen.
+  </Card>
+
+  <Card title="API-Referenz" icon="book-open" href="/de/v1/api-reference/introduction">
+    Jeder `/v1/`-Endpunkt.
   </Card>
 </CardGroup>
-
-## What you can access
-
-The API is organized into data categories that match the live category tags (see `GET /catalog`):
-
-- **Property** — Objects, the property structure tree, technical objects, and creditor service assignments.
-- **Contracts** — Rental debits and diffs, service contracts, and lease/contract ends.
-- **Accounting** — Chart of accounts, booking headers and positions, budgets, and account-range mappings.
-- **Depreciation** — Fixed assets and their depreciation postings.
-- **Operations** — Maintenance notifications, offers, orders, and capital projects.
-- **Stakeholder** — Creditors, employees, owners, and tenants.
-
-Each category exposes normalized, business-ready endpoints under `/{category}/{table}`, plus corresponding raw tables under `/raw/{table_name}` for bulk exports. See the [Data Model](/data-model/overview) section for entity relationships and real field names.
