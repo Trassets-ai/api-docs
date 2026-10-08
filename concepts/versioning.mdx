@@ -35,7 +35,7 @@ https://api.trassets.ai/raw/sollart
 Migrate every table you use before the unversioned paths are switched off:
 
 1. Check whether `/v1/{category}/{api_table}` exists for the table you use.
-2. If it does, switch to it — the response shape differs from the base path (see [Response Structure](/v1/response-shape-conventions) and [Pagination](/v1/api-reference/introduction#pagination)).
+2. <p><mark>If it does, switch to it — the response shape differs from the base path (see [Response Structure](/v1/response-shape-conventions) and [Pagination](/v1/concepts/pagination)).</mark></p>
 3. Raw tables: switch from `/raw/{table_name}` to `/v1/raw/{table_name}` — same data, response key `total` instead of `total_rows`.
 
 `/v1/operations/offers` and `/v1/operations/orders` are announced and will follow in a later release.

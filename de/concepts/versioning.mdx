@@ -35,7 +35,7 @@ https://api.trassets.ai/raw/sollart
 Stelle jede genutzte Tabelle um, bevor die unversionierten Pfade abgeschaltet werden:
 
 1. Prüfen, ob `/v1/{category}/{api_table}` für die genutzte Tabelle existiert.
-2. Falls ja: umstellen — die Response-Struktur weicht vom Basis-Pfad ab (siehe [Response-Struktur](/de/v1/response-shape-conventions) und [Pagination](/de/v1/api-reference/introduction#pagination)).
+2. <p><mark>Falls ja: umstellen — die Response-Struktur weicht vom Basis-Pfad ab (siehe [Response-Struktur](/de/v1/response-shape-conventions) und [Pagination](/de/v1/concepts/pagination)).</mark></p>
 3. Raw-Tabellen: von `/raw/{table_name}` auf `/v1/raw/{table_name}` umstellen — gleiche Daten, Response-Schlüssel `total` statt `total_rows`.
 
 `/v1/operations/offers` und `/v1/operations/orders` sind angekündigt und folgen in einem späteren Release.
