@@ -6,7 +6,7 @@ description: "Die Data API bietet zwei Endpunkt-Typen: normalisierte Category-En
 
 Die Data API stellt deine Immobiliendaten über zwei unterschiedliche Endpunkt-Typen bereit. Jeder Typ ist auf ein anderes Integrationsmuster optimiert: Category-Endpunkte liefern normalisierte, geschäftsfertige Daten, die du direkt abfragen kannst, während Raw-Endpunkte vollständige Quelltabellen für Bulk-Replikation und Data-Warehousing bereitstellen.
 
-<p><mark>Beide Typen nutzen Cursor-Pagination: Die Zeilen stehen in `data`, und `next_cursor` im Response-Body verweist auf die nächste Seite. Raw-Endpunkte weichen in einigen Details ab (`total`, Reihenfolge); siehe [Pagination](/de/v1/concepts/pagination).</mark></p>
+Beide Typen nutzen Cursor-Pagination: Die Zeilen stehen in `data`, und `next_cursor` im Response-Body verweist auf die nächste Seite. Raw-Endpunkte weichen in einigen Details ab (`total`, Reihenfolge); siehe [Pagination](/de/v1/concepts/pagination).
 
 ## Category-Endpunkte
 
@@ -36,7 +36,7 @@ curl -G "https://api.trassets.ai/v1/raw/sollart" \
   -d "limit=5000"
 ```
 
-<p><mark>Um die Pagination fortzusetzen, übergib den `next_cursor`-Wert aus der vorherigen Antwort als `cursor`-Parameter im nächsten Request. Wiederhole das, bis `next_cursor` `null` ist.</mark></p>
+Um die Pagination fortzusetzen, übergib den `next_cursor`-Wert aus der vorherigen Antwort als `cursor`-Parameter im nächsten Request. Wiederhole das, bis `next_cursor` `null` ist.
 
 ## Vergleich
 

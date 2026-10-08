@@ -4,7 +4,7 @@ sidebarTitle: "Pagination"
 description: "Alle Listen-Endpunkte unter /v1/ nutzen Cursor-Pagination: eine Seite mit limit abrufen und next_cursor aus dem Response-Body folgen, bis er null ist."
 ---
 
-<p><mark>Jeder Listen-Endpunkt unter `/v1/` — Category wie Raw — nutzt Cursor-Pagination. Die Pagination-Felder stehen im Response-Body. Es gibt keine Pagination-Header und keinen `offset`-Parameter; ein Request mit `offset` liefert `400 Bad Request`.</mark></p>
+Jeder Listen-Endpunkt unter `/v1/` — Category wie Raw — nutzt Cursor-Pagination. Die Pagination-Felder stehen im Response-Body. Es gibt keine Pagination-Header und keinen `offset`-Parameter; ein Request mit `offset` liefert `400 Bad Request`.
 
 ## Request
 
@@ -38,7 +38,7 @@ Behalte innerhalb eines Laufs auf jeder Seite dieselben Filterparameter bei.
 </ResponseField>
 
 <ResponseField name="next_cursor" type="string | null">
-  <p><mark>Opaker Cursor für die nächste Seite. `null`, wenn keine Zeilen mehr folgen. Auf Raw-Endpunkten trägt jede volle Seite einen Cursor, der letzte Request kann deshalb ein leeres `data`-Array liefern.</mark></p>
+  Opaker Cursor für die nächste Seite. `null`, wenn keine Zeilen mehr folgen. Auf Raw-Endpunkten trägt jede volle Seite einen Cursor, der letzte Request kann deshalb ein leeres `data`-Array liefern.
 </ResponseField>
 
 <ResponseField name="total" type="integer">
@@ -70,7 +70,7 @@ Wiederhole das, bis `next_cursor` `null` ist. Eine vollständige Python-Schleife
 
 **Category-Endpunkte:** Die Zeilen sind nach der Sortierspalte der Tabelle (oder dem Primärschlüssel) sortiert, `NULL`-Werte zuletzt, bei Gleichstand entscheidet die interne Zeilenposition — Zeilen mit gleichem Wert werden weder übersprungen noch doppelt geliefert. Tabellen ohne Sortierspalte und Primärschlüssel werden allein nach Zeilenposition paginiert.
 
-<p><mark>**Raw-Endpunkte:** Die Zeilen sind nach der Schlüsselspalte der Tabelle sortiert — dem Feld `primary_key` in `GET /v1/raw/tables` —, `NULL`-Werte zuletzt, bei Gleichstand entscheidet die interne Zeilenposition; keine Zeile wird übersprungen oder doppelt geliefert. Tabellen ohne Schlüsselspalte werden allein nach Zeilenposition paginiert.</mark></p>
+**Raw-Endpunkte:** Die Zeilen sind nach der Schlüsselspalte der Tabelle sortiert — dem Feld `primary_key` in `GET /v1/raw/tables` —, `NULL`-Werte zuletzt, bei Gleichstand entscheidet die interne Zeilenposition; keine Zeile wird übersprungen oder doppelt geliefert. Tabellen ohne Schlüsselspalte werden allein nach Zeilenposition paginiert.
 
 <Warning>
   Ein Cursor gilt nur innerhalb eines Sync-Laufs. Jeder Sync lädt die Tabellen vollständig neu (wann Syncs laufen: siehe [Sync-Zyklus](/de/concepts/sync-cycle)); danach verschieben sich Zeilenpositionen. Wird eine Tabelle während deiner Pagination neu synchronisiert, liefert die nächste Anfrage mit einem Cursor von davor `409 Conflict` (`Table was re-synced during pagination; restart without cursor.`) — starte dann neu ab der ersten Seite ohne `cursor`. So mischt ein Lauf nie Zeilen aus zwei Syncs. Speichere `next_cursor` nicht zwischen Läufen — starte jeden Lauf mit der ersten Seite. Ein veränderter Cursor oder einer aus einem älteren Format liefert `400 Bad Request`; starte dann ebenfalls bei der ersten Seite.
