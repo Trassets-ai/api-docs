@@ -12,7 +12,7 @@ Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufe
 
 <Steps>
   <Step title="Die neu geladenen Tabellen finden">
-    Rufe `/changes` mit dem `since`-Wert aus deinem letzten Lauf auf. Nimm dafür das höchste `last_sync_at` aus der Antwort dieses Laufs; beim allerersten Lauf einen Zeitstempel bis zu 120 Tage zurück. Jeder Eintrag einer Category-Tabelle enthält `category` und `api_table_name`; abgerufen wird sie unter `/v1/{category}/{api_table_name}`.
+    Rufe `/changes` mit dem `since`-Wert aus deinem letzten Lauf auf. Nimm dafür das höchste `last_sync_at` aus der Antwort dieses Laufs; beim allerersten Lauf einen Zeitstempel bis zu 120 Tage zurück. Jeder Eintrag enthält die `endpoint_url`, die du abrufen musst.
 
     ```bash
     curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
@@ -62,13 +62,6 @@ Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufe
             params["cursor"] = body["next_cursor"]
 
 
-    def table_path(entry: dict) -> str:
-        """Category tables live under /v1/; raw tables keep their endpoint_url."""
-        if entry.get("category"):
-            return f"/v1/{entry['category']}/{entry['api_table_name']}"
-        return entry["endpoint_url"]
-
-
     def sync(since: str) -> tuple[dict[str, list[dict]], str]:
         """Re-fetch every table reloaded after `since`.
 
@@ -80,7 +73,7 @@ Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufe
         resp.raise_for_status()
         changed = resp.json()
 
-        tables = {t["table_name"]: fetch_table(table_path(t)) for t in changed}
+        tables = {t["table_name"]: fetch_table(t["endpoint_url"]) for t in changed}
         if not changed:
             return tables, since
         # last_sync_at is UTC without a suffix; the API expects it with "Z"

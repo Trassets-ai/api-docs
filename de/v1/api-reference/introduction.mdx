@@ -15,7 +15,7 @@ Jede `/v1/{category}/{api_table}`-Response ist ein JSON-Objekt: die Zeilen stehe
 | Category-Endpunkte | `/v1/{category}/{api_table}` | Cursor-basiert (`limit` / `cursor`, `next_cursor` im Body) | Business-Abfragen, Dashboards, inkrementelle Abrufe |
 | Raw-Endpunkte | `/v1/raw/{table_name}` (oder `/raw/{table_name}`) | Cursor-basiert (`cursor` aus `next_cursor` im Body) | Bulk-Sync, vollständige Exporte, Data Warehousing |
 
-Raw-Endpunkte sind generisch pro Kunde (keine tabellenweise Inhaltsprüfung), deshalb liefern der unversionierte und der `/v1/`-Pfad immer dieselben Tabellen. Der `/v1/`-Pfad nutzt dieselben Response-Schlüssel wie die Category-Endpunkte (`total`); der unversionierte Pfad behält `total_rows`.
+Raw-Endpunkte sind generisch pro Kunde (keine tabellenweise Inhaltsprüfung), deshalb liefern `/v1/raw/` und `/raw/` immer dieselben Tabellen. Der `/v1/`-Pfad nutzt dieselben Response-Schlüssel wie die Category-Endpunkte (`total`); `/raw/` nutzt `total_rows`.
 
 ### Pagination
 
@@ -27,7 +27,7 @@ Fehler folgen [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versionierung
 
-`/v1/` ersetzt die unversionierten Category- und Raw-Pfade, die abgeschaltet werden. Die Migrationsschritte stehen unter [Versionierung](/de/concepts/versioning).
+Breaking Changes landen nie auf einem veröffentlichten Pfad. Siehe [Versionierung](/de/concepts/versioning).
 
 ## Endpunkt-Gruppen
 
