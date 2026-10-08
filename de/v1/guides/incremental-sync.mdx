@@ -4,7 +4,7 @@ description: "Eine lokale Kopie der Trassets-Daten aktuell halten — über /cha
 sidebarTitle: "Incremental Sync"
 ---
 
-<p><mark>Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufen. Jeder Sync lädt die Tabellen vollständig neu, es gibt also kein Delta auf Zeilenebene: Die Einheit der Änderung ist die Tabelle. Frage über [`/changes`](/de/guides/delta-sync) ab, welche Tabellen seit deinem letzten Lauf neu geladen wurden, und rufe genau diese Tabellen erneut ab — vollständig.</mark></p>
+Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufen. Jeder Sync lädt die Tabellen vollständig neu, es gibt also kein Delta auf Zeilenebene: Die Einheit der Änderung ist die Tabelle. Frage über [`/changes`](/de/guides/delta-sync) ab, welche Tabellen seit deinem letzten Lauf neu geladen wurden, und rufe genau diese Tabellen erneut ab — vollständig.
 
 <Warning>
   Speichere `next_cursor` nicht zwischen Läufen. Nach einem Neuladen können sich Zeilen ändern, wegfallen oder ihre Position verschieben. Wer bei einem alten Cursor fortsetzt, behält unbemerkt veraltete Daten.

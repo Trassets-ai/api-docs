@@ -6,7 +6,7 @@ description: "Overview of the /v1/ endpoints: base URL, authentication, response
 
 The `/v1/` endpoints are the versioned interface to the same real-estate data. Base URL: `https://api.trassets.ai`. Send your API key in the `X-API-Key` header on every request. All responses are JSON.
 
-<p><mark>Every `/v1/{category}/{api_table}` response is a JSON object with the rows in `data` and the pagination fields next to it. See [Response Structure](/v1/response-shape-conventions) for the object, array, and code/label patterns the rows follow.</mark></p>
+Every `/v1/{category}/{api_table}` response is a JSON object with the rows in `data` and the pagination fields next to it. See [Response Structure](/v1/response-shape-conventions) for the object, array, and code/label patterns the rows follow.
 
 ## Endpoint types
 
@@ -19,7 +19,7 @@ Raw endpoints are generic per customer (no per-table content review), so both th
 
 ### Pagination
 
-<p><mark>Cursor-only, with the pagination fields in the body instead of headers. Coming from the unversioned API: `X-Total-Count` → `total`, `X-Has-More` and `X-Next-Cursor` → `next_cursor` (`null` = no further page), `X-Next-Offset` → none, `/v1/` has no `offset`. Details: [Pagination](/v1/concepts/pagination).</mark></p>
+Cursor-only, with the pagination fields in the body instead of headers. Coming from the unversioned API: `X-Total-Count` → `total`, `X-Has-More` and `X-Next-Cursor` → `next_cursor` (`null` = no further page), `X-Next-Offset` → none, `/v1/` has no `offset`. Details: [Pagination](/v1/concepts/pagination).
 
 ## Error format
 

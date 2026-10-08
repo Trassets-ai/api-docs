@@ -6,7 +6,7 @@ description: "Data API offers two endpoint types: normalized category endpoints 
 
 The Data API exposes your real-estate data through two distinct endpoint types. Each type is optimized for a different integration pattern: category endpoints serve normalized, business-ready data that you can query directly, while raw endpoints expose full source tables for bulk replication and data warehousing.
 
-<p><mark>Both types use cursor pagination: the rows are in `data`, and `next_cursor` in the response body points to the next page. Raw endpoints differ in a few details (`offset`, `total`, ordering); see [Pagination](/v1/concepts/pagination).</mark></p>
+Both types use cursor pagination: the rows are in `data`, and `next_cursor` in the response body points to the next page. Raw endpoints differ in a few details (`offset`, `total`, ordering); see [Pagination](/v1/concepts/pagination).
 
 ## Category Endpoints
 
@@ -36,7 +36,7 @@ curl -G "https://api.trassets.ai/v1/raw/sollart" \
   -d "limit=5000"
 ```
 
-<p><mark>To continue paginating, pass the `next_cursor` value from the previous response as the `cursor` parameter on the next request. Repeat until `next_cursor` is `null`, then compare the number of rows with `total` (see [Order and stability](/v1/concepts/pagination#order-and-stability)).</mark></p>
+To continue paginating, pass the `next_cursor` value from the previous response as the `cursor` parameter on the next request. Repeat until `next_cursor` is `null`, then compare the number of rows with `total` (see [Order and stability](/v1/concepts/pagination#order-and-stability)).
 
 ## Comparison
 
