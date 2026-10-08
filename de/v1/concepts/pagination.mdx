@@ -4,7 +4,7 @@ sidebarTitle: "Pagination"
 description: "Alle Listen-Endpunkte unter /v1/ nutzen Cursor-Pagination: eine Seite mit limit abrufen und next_cursor aus dem Response-Body folgen, bis er null ist."
 ---
 
-Jeder Listen-Endpunkt unter `/v1/` — Category wie Raw — nutzt dieselbe Cursor-Pagination. Die Pagination-Felder stehen im Response-Body. Es gibt keine Pagination-Header und keinen `offset`-Parameter; ein Request mit `offset` liefert `400 Bad Request`.
+Jeder Listen-Endpunkt unter `/v1/` — Category wie Raw — nutzt Cursor-Pagination. Die Pagination-Felder stehen im Response-Body. Es gibt keine Pagination-Header und keinen `offset`-Parameter: Category-Endpunkte beantworten einen Request mit `offset` mit `400 Bad Request`, Raw-Endpunkte ignorieren ihn und liefern die erste Seite. Sende kein `offset`.
 
 ## Request
 
@@ -38,11 +38,11 @@ Behalte innerhalb eines Laufs auf jeder Seite dieselben Filterparameter bei.
 </ResponseField>
 
 <ResponseField name="next_cursor" type="string | null">
-  Opaker Cursor für die nächste Seite. `null` auf der letzten Seite.
+  Opaker Cursor für die nächste Seite. `null`, wenn keine Zeilen mehr folgen. Auf Raw-Endpunkten trägt jede volle Seite einen Cursor, der letzte Request kann deshalb ein leeres `data`-Array liefern.
 </ResponseField>
 
 <ResponseField name="total" type="integer">
-  Zeilen, die ab der Cursor-Position zur Abfrage passen. Auf der ersten Seite: alle passenden Zeilen.
+  Category-Endpunkte: Zeilen, die ab der Cursor-Position zur Abfrage passen; auf der ersten Seite alle passenden Zeilen. Raw-Endpunkte: Zeilenzahl der Tabelle beim letzten Sync, auf jeder Seite gleich.
 </ResponseField>
 
 Raw-Endpunkte (`/v1/raw/{table_name}`) ergänzen den Body um `table_name` und senden einen `X-Snapshot-At`-Header mit dem Zeitstempel des letzten erfolgreichen Syncs der Tabelle.
@@ -66,8 +66,10 @@ Wiederhole das, bis `next_cursor` `null` ist. Eine vollständige Python-Schleife
 
 ## Reihenfolge und Stabilität
 
-Die Zeilen sind nach der Sortierspalte der Tabelle (oder dem Primärschlüssel) sortiert, `NULL`-Werte zuletzt, bei Gleichstand entscheidet die interne Zeilenposition — Zeilen mit gleichem Wert werden weder übersprungen noch doppelt geliefert. Tabellen ohne Sortierspalte und Primärschlüssel werden allein nach Zeilenposition paginiert.
+**Category-Endpunkte:** Die Zeilen sind nach der Sortierspalte der Tabelle (oder dem Primärschlüssel) sortiert, `NULL`-Werte zuletzt, bei Gleichstand entscheidet die interne Zeilenposition — Zeilen mit gleichem Wert werden weder übersprungen noch doppelt geliefert. Tabellen ohne Sortierspalte und Primärschlüssel werden allein nach Zeilenposition paginiert.
+
+**Raw-Endpunkte:** Die Zeilen sind nach der Schlüsselspalte der Tabelle sortiert, danach nach Zeilenposition; Tabellen ohne Schlüsselspalte werden allein nach Zeilenposition paginiert. Enthält die Schlüsselspalte `NULL`-Werte, können diese Zeilen ab der zweiten Seite fehlen. Vergleiche nach einem vollständigen Export die Zahl der exportierten Zeilen mit `total`.
 
 <Warning>
-  Ein Cursor gilt nur innerhalb eines Sync-Laufs. Die Tabellen werden täglich neu geladen (siehe [Sync-Zyklus](/de/concepts/sync-cycle)); danach können sich Zeilenpositionen verschieben. Speichere `next_cursor` nicht zwischen Läufen — starte jeden Lauf mit der ersten Seite. Ein veränderter oder veralteter Cursor liefert `400 Bad Request`; starte dann ebenfalls bei der ersten Seite.
+  Ein Cursor gilt nur innerhalb eines Sync-Laufs. Die Tabellen werden bei jedem Sync neu geladen, ohne festen Zeitplan (siehe [Sync-Zyklus](/de/concepts/sync-cycle)); danach verschieben sich Zeilenpositionen. Ein Cursor von vor dem Neuladen wird weiter akzeptiert, die folgenden Seiten können aber Zeilen überspringen oder doppelt liefern. Speichere `next_cursor` nicht zwischen Läufen — starte jeden Lauf mit der ersten Seite. Vergleiche auf Raw-Endpunkten `X-Snapshot-At` über die Seiten eines Laufs; ändert er sich, starte neu. Ein veränderter Cursor oder einer aus einem älteren Format liefert `400 Bad Request`; starte dann ebenfalls bei der ersten Seite.
 </Warning>
