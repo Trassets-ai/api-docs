@@ -12,7 +12,7 @@ Maintain a local copy of your data without fetching every table on each run. Eve
 
 <Steps>
   <Step title="Find the reloaded tables">
-    Call `/changes` with the `since` value from your last run. Use the highest `last_sync_at` from that run's response; on the very first run, use a timestamp up to 120 days back. Each category table entry carries `category` and `api_table_name`; fetch it from `/v1/{category}/{api_table_name}`.
+    Call `/changes` with the `since` value from your last run. Use the highest `last_sync_at` from that run's response; on the very first run, use a timestamp up to 120 days back. Each entry carries the `endpoint_url` to fetch.
 
     ```bash
     curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
@@ -62,13 +62,6 @@ Maintain a local copy of your data without fetching every table on each run. Eve
             params["cursor"] = body["next_cursor"]
 
 
-    def table_path(entry: dict) -> str:
-        """Category tables live under /v1/; raw tables keep their endpoint_url."""
-        if entry.get("category"):
-            return f"/v1/{entry['category']}/{entry['api_table_name']}"
-        return entry["endpoint_url"]
-
-
     def sync(since: str) -> tuple[dict[str, list[dict]], str]:
         """Re-fetch every table reloaded after `since`.
 
@@ -80,7 +73,7 @@ Maintain a local copy of your data without fetching every table on each run. Eve
         resp.raise_for_status()
         changed = resp.json()
 
-        tables = {t["table_name"]: fetch_table(table_path(t)) for t in changed}
+        tables = {t["table_name"]: fetch_table(t["endpoint_url"]) for t in changed}
         if not changed:
             return tables, since
         # last_sync_at is UTC without a suffix; the API expects it with "Z"

@@ -15,11 +15,11 @@ Every `/v1/{category}/{api_table}` response is a JSON object with the rows in `d
 | Category endpoints | `/v1/{category}/{api_table}` | Cursor-based (`limit` / `cursor`, `next_cursor` in body) | Business queries, dashboards, incremental fetches |
 | Raw endpoints | `/v1/raw/{table_name}` (or `/raw/{table_name}`) | Cursor-based (`cursor` from `next_cursor` in body) | Bulk sync, full exports, data warehousing |
 
-Raw endpoints are generic per customer (no per-table content review), so both the unversioned and `/v1/` path always expose the same tables. The `/v1/` path uses the same response keys as the category endpoints (`total`); the unversioned path keeps `total_rows`.
+Raw endpoints are generic per customer (no per-table content review), so `/v1/raw/` and `/raw/` always expose the same tables. The `/v1/` path uses the same response keys as the category endpoints (`total`); `/raw/` uses `total_rows`.
 
 ### Pagination
 
-Cursor-only, with the pagination fields in the body instead of headers. Coming from the unversioned API: `X-Total-Count` → `total`, `X-Has-More` and `X-Next-Cursor` → `next_cursor` (`null` = no further page), `X-Next-Offset` → none, `/v1/` has no `offset`. Details: [Pagination](/v1/concepts/pagination).
+<mark>Cursor-only, with the pagination fields in the body: `total` and `next_cursor` (`null` = no further page). There is no `offset`.</mark> Details: [Pagination](/v1/concepts/pagination).
 
 ## Error format
 
@@ -27,7 +27,7 @@ Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versioning
 
-`/v1/` replaces the unversioned category and raw paths, which will be switched off. See [Versioning](/concepts/versioning) for the migration steps.
+Breaking changes never land on a published path. See [Versioning](/concepts/versioning).
 
 ## Endpoint groups
 
