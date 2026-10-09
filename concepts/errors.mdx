@@ -38,7 +38,7 @@ Example error response for an invalid API key:
 | **401** | Missing API key | Send the `X-API-Key` header with every request. |
 | **403** | Key rejected or access tier missing | The key is unknown or disabled, or it has no permission for this endpoint or table, or it is restricted to properties and the table has no `property_id` column. Check the `detail` field. Contact Trassets support to change your access tier. |
 | **404** | Unknown endpoint | Verify the URL path and the category or table name. |
-| **409** | Snapshot changed | The table was re-synced while you paginated. Restart from the first page without `cursor`. See [Pagination](/concepts/pagination). |
+| **409** | Snapshot changed | The table was re-synced while you paginated. Restart from the first page without `cursor`. See [Pagination](/v1/concepts/pagination). |
 | **422** | Validation error | A query parameter did not pass validation. Check the `detail` field for the exact parameter and constraint. |
 | **429** | Rate limit exceeded | You have exceeded the 500 requests per hour limit. Back off and retry after the current window resets. |
 | **500** | Internal error | A server-side error occurred. Retry the request after a short delay, and contact support if it persists. |

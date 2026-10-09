@@ -19,7 +19,7 @@ Raw endpoints are generic per customer (no per-table content review), so `/v1/ra
 
 ### Pagination
 
-Cursor-only, with the pagination fields in the body instead of headers. Coming from the unversioned API: `X-Total-Count` → `total`, `X-Has-More` and `X-Next-Cursor` → `next_cursor` (`null` = no further page), `X-Next-Offset` → none, `/v1/` has no `offset`. Details: [Pagination](/v1/concepts/pagination).
+<mark>Cursor-only, with the pagination fields in the body: `total` and `next_cursor` (`null` = no further page). There is no `offset`.</mark> Details: [Pagination](/v1/concepts/pagination).
 
 ## Error format
 

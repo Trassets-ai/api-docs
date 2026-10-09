@@ -19,7 +19,7 @@ Raw-Endpunkte sind generisch pro Kunde (keine tabellenweise Inhaltsprüfung), de
 
 ### Pagination
 
-Nur Cursor, die Pagination-Felder stehen im Body statt in Headern. Wer von der unversionierten API kommt: `X-Total-Count` → `total`, `X-Has-More` und `X-Next-Cursor` → `next_cursor` (`null` = keine weitere Seite), `X-Next-Offset` → entfällt, `/v1/` kennt kein `offset`. Details: [Pagination](/de/v1/concepts/pagination).
+<mark>Nur Cursor, die Pagination-Felder stehen im Body: `total` und `next_cursor` (`null` = keine weitere Seite). Ein `offset` gibt es nicht.</mark> Details: [Pagination](/de/v1/concepts/pagination).
 
 ## Fehlerformat
 
