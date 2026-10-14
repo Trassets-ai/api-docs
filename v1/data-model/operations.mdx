@@ -4,7 +4,7 @@ sidebarTitle: "Operations"
 description: "Field reference for the notifications and projects tables under /v1/operations/."
 ---
 
-The two tables below join to each other and to the Property domain. See the
+The two tables below join to the Property domain. See the
 [Data Model Overview](/v1/data-model/overview) for the complete cross-domain diagram.
 
 ```mermaid
@@ -16,8 +16,6 @@ graph LR
 
   properties["Property.properties"]
   technical_objects["Property.technical_objects"]
-
-  notifications -->|report_id| projects
 
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
@@ -33,8 +31,7 @@ graph LR
 </ResponseField>
 
 <ResponseField name="report_id" type="integer" required>
-  Unique identifier for the notification. `projects` references this as `report_id` — a
-  verified foreign key.
+  Unique identifier for the notification.
 </ResponseField>
 
 <ResponseField name="technical_object_id" type="integer">
@@ -141,27 +138,10 @@ graph LR
   Unique identifier for the project. Not the same value as `project_number` below.
 </ResponseField>
 
-<ResponseField name="report_id" type="integer">
-  Notification the project originated from, if any. Verified foreign key to
-  `notifications.report_id`.
+<ResponseField name="project_account_id" type="integer">
+  Project account the project is booked on. Orders reference it as
+  `project_reference_id` — use this field to find all orders of a project.
 </ResponseField>
-
-<ResponseField name="to_hdr_id" type="integer">
-  Internal technical-object reference.
-</ResponseField>
-
-<ResponseField name="request_hdr_id" type="integer">
-  Internal reference to the originating request.
-</ResponseField>
-
-<ResponseField name="creditor_id" type="string">
-  Primary creditor for the project.
-</ResponseField>
-
-<ResponseField name="offer_id" type="integer">
-  Internal reference to a related offer.
-</ResponseField>
-
 
 <ResponseField name="hierarchy" type="string[]">
   Where the project sits in the accounting chart of accounts, as an ordered list from
@@ -307,18 +287,6 @@ graph LR
   Individual responsible for the project.
 </ResponseField>
 
-<ResponseField name="to_name" type="string">
-  Name of the related technical object.
-</ResponseField>
-
-<ResponseField name="request_number" type="string">
-  Business number of the originating request.
-</ResponseField>
-
-<ResponseField name="offer_number" type="string">
-  Business number of the related offer.
-</ResponseField>
-
 <ResponseField name="budget_text" type="string">
   Budget description.
 </ResponseField>
@@ -335,7 +303,3 @@ graph LR
   Business/display project number. Not the same identifier as `project_id` above.
 </ResponseField>
 
-<ResponseField name="report_number" type="string">
-  Business/display number of the originating notification. Not the same identifier as
-  `report_id` above.
-</ResponseField>

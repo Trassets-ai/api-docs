@@ -108,7 +108,6 @@ graph LR
   property_structure -.->|account_id = account_number| accounts
   properties -.->|property_id| accounts
   notifications -.->|technical_object_id| technical_objects
-  notifications -->|report_id| projects
   technical_objects -.->|service_contract_id| service_contracts
   booking_header -.->|property_id + person_id| tenants
   tenants -.->|floor_area_person_id| contract_debits
@@ -137,7 +136,6 @@ graph LR
 | `account_number` (bei `contract_debits`/`contract_debit_diffs`) | Das Konto, auf das eine Zeile bucht. Bei `contract_debits` ein Sachkonto, bei `contract_debit_diffs` dagegen ein Personenkonto — gleicher Spaltenname, andere Kontoart. Entspricht `accounts.account_number`, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `contract_debits`/`contract_debit_diffs`-Zeilen |
 | `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_headers` und `booking_positions`. | 1 Kreditor → viele Zeilen über Domänen hinweg |
 | `technical_object_id` | Vorhanden auf `notifications`, löst sich gegen `technical_objects.technical_object_id` auf. | 1 technisches Objekt → viele Meldungen |
-| `report_id` | Verknüpft ein Projekt mit der Meldung, aus der es entstanden ist, falls zutreffend. | 1 Meldung → 0..N Projekte |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
 | `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_headers` ein String, bei `booking_positions` eine Zahl — `booking_positions` nicht direkt über `person_id` mit einem Mieter verknüpfen, sondern über `booking_header_id` gehen. Buchungen sind einem Mieter nur auf Objektebene zuordenbar, nicht bis zur einzelnen Fläche — hält derselbe Mieter mehrere Flächen im selben Objekt, lassen sich seine Buchungen nicht nach Fläche trennen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
 | `floor_area_person_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits`, `contract_ends` und `index_rent` teilen denselben Wert und denselben Typ (String) — direkt darüber verknüpfen, ohne `property_id` und ohne Cast. | 1 Mietverhältnis → viele Soll-/Ende-/Index-Zeilen |

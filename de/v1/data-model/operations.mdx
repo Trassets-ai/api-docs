@@ -4,7 +4,7 @@ sidebarTitle: "Operations"
 description: "Feldreferenz für die Tabellen notifications und projects unter /v1/operations/."
 ---
 
-Die beiden Tabellen unten verknüpfen sich untereinander und mit der Property-Domäne. Das
+Die beiden Tabellen unten verknüpfen sich mit der Property-Domäne. Das
 vollständige Cross-Domain-Diagramm steht in der
 [Datenmodell-Übersicht](/de/v1/data-model/overview).
 
@@ -17,8 +17,6 @@ graph LR
 
   properties["Property.properties"]
   technical_objects["Property.technical_objects"]
-
-  notifications -->|report_id| projects
 
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
@@ -34,8 +32,7 @@ graph LR
 </ResponseField>
 
 <ResponseField name="report_id" type="integer" required>
-  Eindeutige Meldungs-ID. `projects` referenziert dies als `report_id` — ein verifizierter
-  Fremdschlüssel.
+  Eindeutige Meldungs-ID.
 </ResponseField>
 
 <ResponseField name="technical_object_id" type="integer">
@@ -143,27 +140,10 @@ graph LR
   Eindeutige Projekt-ID. Nicht derselbe Wert wie `project_number` weiter unten.
 </ResponseField>
 
-<ResponseField name="report_id" type="integer">
-  Meldung, aus der das Projekt entstanden ist, falls zutreffend. Verifizierter
-  Fremdschlüssel zu `notifications.report_id`.
+<ResponseField name="project_account_id" type="integer">
+  Projektkonto, auf dem das Projekt gebucht wird. Aufträge verweisen darauf über
+  `project_reference_id` — darüber findest du alle Aufträge eines Projekts.
 </ResponseField>
-
-<ResponseField name="to_hdr_id" type="integer">
-  Interne Referenz auf das technische Objekt.
-</ResponseField>
-
-<ResponseField name="request_hdr_id" type="integer">
-  Interne Referenz auf die ursprüngliche Anfrage.
-</ResponseField>
-
-<ResponseField name="creditor_id" type="string">
-  Hauptkreditor für das Projekt.
-</ResponseField>
-
-<ResponseField name="offer_id" type="integer">
-  Interne Referenz auf ein zugehöriges Angebot.
-</ResponseField>
-
 
 <ResponseField name="hierarchy" type="string[]">
   Wo das Projekt im Kontenbaum der Buchhaltung "aufgehängt" ist, als geordnete Liste von
@@ -310,18 +290,6 @@ graph LR
   Für das Projekt zuständige Person.
 </ResponseField>
 
-<ResponseField name="to_name" type="string">
-  Bezeichnung des zugehörigen technischen Objekts.
-</ResponseField>
-
-<ResponseField name="request_number" type="string">
-  Geschäftsnummer der ursprünglichen Anfrage.
-</ResponseField>
-
-<ResponseField name="offer_number" type="string">
-  Geschäftsnummer des zugehörigen Angebots.
-</ResponseField>
-
 <ResponseField name="budget_text" type="string">
   Budgetbeschreibung.
 </ResponseField>
@@ -338,7 +306,3 @@ graph LR
   Geschäfts-/Anzeige-Projektnummer. Nicht dieselbe ID wie `project_id` oben.
 </ResponseField>
 
-<ResponseField name="report_number" type="string">
-  Geschäfts-/Anzeigenummer der ursprünglichen Meldung. Nicht dieselbe ID wie `report_id`
-  oben.
-</ResponseField>

@@ -106,7 +106,6 @@ graph LR
   property_structure -.->|account_id = account_number| accounts
   properties -.->|property_id| accounts
   notifications -.->|technical_object_id| technical_objects
-  notifications -->|report_id| projects
   technical_objects -.->|service_contract_id| service_contracts
   booking_header -.->|property_id + person_id| tenants
   tenants -.->|floor_area_person_id| contract_debits
@@ -135,7 +134,6 @@ graph LR
 | `account_number` (on `contract_debits`/`contract_debit_diffs`) | The account a debit line posts to. On `contract_debits` this is a general ledger account; on `contract_debit_diffs` it's a tenant account instead — same column name, different account type. Matches `accounts.account_number`, not `accounts.account_id`. | 1 `accounts` row → many `contract_debits`/`contract_debit_diffs` rows |
 | `creditor_id` | Identifies a creditor. Referenced by `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_headers`, and `booking_positions`. | 1 creditor → many rows across domains |
 | `technical_object_id` | Present on `notifications`, resolves against `technical_objects.technical_object_id`. | 1 technical object → many notifications |
-| `report_id` | Links a project back to the notification it originated from, if any. | 1 notification → 0..N projects |
 | `service_contract_id` | Links a technical object to the service contract covering it. References `service_contracts.contract_id`. | 1 contract → many technical objects |
 | `person_id` | Links a booking to the tenant it applies to. Only valid combined with `property_id`, since the numbering restarts per property. A string on `tenants`, `booking_headers`, and `booking_positions`. Bookings link to a tenant only at the property level, not down to the individual unit — if the same tenant holds multiple units in one property, their bookings can't be separated by unit. | 1 person → 1..N tenancies per property |
 | `floor_area_person_id` | Identifies a tenancy. Shared by `tenants`, `contract_debits`, `contract_ends`, and `index_rent` as the same underlying value and the same type (string) — join across them directly, without `property_id` and without a cast. | 1 tenancy → many debit/end/index rows |
