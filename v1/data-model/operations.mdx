@@ -1,10 +1,10 @@
 ---
 title: "Operations"
 sidebarTitle: "Operations"
-description: "Field reference for the notifications and projects tables under /v1/operations/."
+description: "Field reference for the notifications, projects and requests tables under /v1/operations/."
 ---
 
-The two tables below join to each other and to the Property domain. See the
+The three tables below join to the Property domain; `requests` also links to `projects`. See the
 [Data Model Overview](/v1/data-model/overview) for the complete cross-domain diagram.
 
 ```mermaid
@@ -12,15 +12,16 @@ graph LR
   subgraph Operations
     notifications["notifications"]
     projects["projects"]
+    requests["requests"]
   end
 
   properties["Property.properties"]
   technical_objects["Property.technical_objects"]
 
-  notifications -->|report_id| projects
-
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
+  properties -.->|property_id| requests
+  requests -.->|project_account_id| projects
   notifications -.->|technical_object_id| technical_objects
 ```
 
@@ -33,8 +34,7 @@ graph LR
 </ResponseField>
 
 <ResponseField name="report_id" type="integer" required>
-  Unique identifier for the notification. `projects` references this as `report_id` — a
-  verified foreign key.
+  Unique identifier for the notification.
 </ResponseField>
 
 <ResponseField name="technical_object_id" type="integer">
@@ -46,13 +46,17 @@ graph LR
   number, separators dropped. Not a person ID — it doesn't join to `Stakeholder.tenants.person_id`.
 </ResponseField>
 
-<ResponseField name="cost_center_id" type="string">
-  Cost centre the report is booked against. Two flat fields for now — a pending sync will
-  consolidate them into a nested `cost_center` object, matching `projects.cost_center`.
-</ResponseField>
-
-<ResponseField name="cost_center_id_name" type="string">
-  Cost-centre name for `cost_center_id`.
+<ResponseField name="cost_center" type="object">
+  Cost centre the report is booked against, as a structured object — same shape as
+  `projects.cost_center`.
+  <Expandable title="properties">
+    <ResponseField name="code" type="string">
+      Cost-centre code.
+    </ResponseField>
+    <ResponseField name="label" type="string">
+      Cost-centre name.
+    </ResponseField>
+  </Expandable>
 </ResponseField>
 
 <ResponseField name="to_do_period" type="object">
@@ -79,11 +83,6 @@ graph LR
   Who filed the report: tenant, creditor, owner, user, or partner.
 </ResponseField>
 
-<ResponseField name="reporter_person" type="string">
-  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
-  Details of the reporting person.
-</ResponseField>
-
 <ResponseField name="report_number" type="string">
   Report number.
 </ResponseField>
@@ -108,9 +107,8 @@ graph LR
   Priority level.
 </ResponseField>
 
-<ResponseField name="Status" type="string">
-  Current status of the report. Capitalized in the live response (`Status`, not
-  `status`) — a pending sync will lowercase it to match the rest of the schema.
+<ResponseField name="status" type="string">
+  Current status of the report.
 </ResponseField>
 
 <ResponseField name="status_date" type="date">
@@ -131,7 +129,17 @@ graph LR
 
 ## projects
 
-`GET /v1/operations/projects` — capital projects and larger maintenance initiatives.
+`GET /v1/operations/projects` — capital projects and larger maintenance initiatives, one row
+per project.
+
+<Note>
+  The table returns every project of the property management, whatever its status — also
+  projects that are only planned, applied for, already settled, or carried out by the
+  owner. Filter on `status` if you only need some of them. Fields that pointed to a single
+  offer, order or notification (`offer_id`, `creditor_id`, `report_id` and their numbers)
+  are no longer part of `projects`: a project can have many of each. Use
+  `project_account_id` to find the requests of a project.
+</Note>
 
 <ResponseField name="property_id" type="string" required>
   Unique property identifier.
@@ -141,27 +149,10 @@ graph LR
   Unique identifier for the project. Not the same value as `project_number` below.
 </ResponseField>
 
-<ResponseField name="report_id" type="integer">
-  Notification the project originated from, if any. Verified foreign key to
-  `notifications.report_id`.
+<ResponseField name="project_account_id" type="integer">
+  Project account the project is booked on. `requests.project_account_id` points here —
+  use it to find the requests belonging to a project.
 </ResponseField>
-
-<ResponseField name="to_hdr_id" type="integer">
-  Internal technical-object reference.
-</ResponseField>
-
-<ResponseField name="request_hdr_id" type="integer">
-  Internal reference to the originating request.
-</ResponseField>
-
-<ResponseField name="creditor_id" type="string">
-  Primary creditor for the project.
-</ResponseField>
-
-<ResponseField name="offer_id" type="integer">
-  Internal reference to a related offer.
-</ResponseField>
-
 
 <ResponseField name="hierarchy" type="string[]">
   Where the project sits in the accounting chart of accounts, as an ordered list from
@@ -216,7 +207,7 @@ graph LR
 </ResponseField>
 
 <ResponseField name="ledger_account_number" type="string">
-  Despite the name, not a ledger-account identifier — the same value as `cost_center_id`
+  Despite the name, not a ledger-account identifier — the same value as `cost_center.code`
   under a different field name (both derive from the same source column). Use
   `ledger_account` for the actual general ledger account number(s).
 </ResponseField>
@@ -226,7 +217,8 @@ graph LR
 </ResponseField>
 
 <ResponseField name="status" type="string">
-  Current project status.
+  Current project status, as a text label defined by the property manager (for example
+  `in Planung`, `genehmigt`, `abgerechnet`). Labels differ between customers.
 </ResponseField>
 
 <ResponseField name="comments" type="object[]">
@@ -307,18 +299,6 @@ graph LR
   Individual responsible for the project.
 </ResponseField>
 
-<ResponseField name="to_name" type="string">
-  Name of the related technical object.
-</ResponseField>
-
-<ResponseField name="request_number" type="string">
-  Business number of the originating request.
-</ResponseField>
-
-<ResponseField name="offer_number" type="string">
-  Business number of the related offer.
-</ResponseField>
-
 <ResponseField name="budget_text" type="string">
   Budget description.
 </ResponseField>
@@ -335,7 +315,68 @@ graph LR
   Business/display project number. Not the same identifier as `project_id` above.
 </ResponseField>
 
-<ResponseField name="report_number" type="string">
-  Business/display number of the originating notification. Not the same identifier as
-  `report_id` above.
+## requests
+
+`GET /v1/operations/requests` — requests for quotation from the maintenance process, one row
+per request, also when no offer has come in yet.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="request_id" type="integer" required>
+  Unique identifier for the request. Not the same value as `request_number` below.
+</ResponseField>
+
+<ResponseField name="project_account_id" type="integer">
+  Project account the request belongs to, if any. Joins to `projects.project_account_id`.
+  Empty for requests outside a project; a few values have no matching project.
+</ResponseField>
+
+<ResponseField name="cost_center" type="object">
+  Cost centre the request is booked against, same shape as `projects.cost_center`.
+  <Expandable title="properties">
+    <ResponseField name="code" type="string">
+      Cost-centre code.
+    </ResponseField>
+    <ResponseField name="label" type="string">
+      Cost-centre name.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="string">
+  Unit the request concerns, if it concerns a single unit.
+</ResponseField>
+
+<ResponseField name="request_period" type="object">
+  Period the requested work covers.
+  <Expandable title="properties">
+    <ResponseField name="start" type="date">
+      Start date.
+    </ResponseField>
+    <ResponseField name="end" type="date">
+      End date.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="request_name" type="string">
+  Subject / title of the request.
+</ResponseField>
+
+<ResponseField name="request_type" type="string">
+  Type of request.
+</ResponseField>
+
+<ResponseField name="status_text" type="string">
+  Current status of the request.
+</ResponseField>
+
+<ResponseField name="priority_text" type="string">
+  Priority level.
+</ResponseField>
+
+<ResponseField name="request_number" type="string">
+  Business/display request number. Not the same identifier as `request_id` above.
 </ResponseField>
