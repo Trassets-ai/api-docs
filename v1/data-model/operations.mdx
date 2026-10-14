@@ -41,9 +41,9 @@ graph LR
   Technical object the report concerns.
 </ResponseField>
 
-<ResponseField name="person_id" type="integer">
-  Person who filed the report. Uses a different identifier space than
-  `Stakeholder.tenants.person_id` — don't treat the two as the same entity.
+<ResponseField name="reporter_key" type="integer">
+  Key for whoever filed the report: property, unit and reporter number combined into one
+  number, separators dropped. Not a person ID — it doesn't join to `Stakeholder.tenants.person_id`.
 </ResponseField>
 
 <ResponseField name="cost_center_id" type="string">
