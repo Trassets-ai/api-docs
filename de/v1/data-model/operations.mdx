@@ -1,10 +1,10 @@
 ---
 title: "Operations"
 sidebarTitle: "Operations"
-description: "Feldreferenz für die Tabellen notifications und projects unter /v1/operations/."
+description: "Feldreferenz für die Tabellen notifications, projects und requests unter /v1/operations/."
 ---
 
-Die beiden Tabellen unten verknüpfen sich mit der Property-Domäne. Das
+Die drei Tabellen unten verknüpfen sich mit der Property-Domäne; `requests` verweist zusätzlich auf `projects`. Das
 vollständige Cross-Domain-Diagramm steht in der
 [Datenmodell-Übersicht](/de/v1/data-model/overview).
 
@@ -13,6 +13,7 @@ graph LR
   subgraph Operations
     notifications["notifications"]
     projects["projects"]
+    requests["requests"]
   end
 
   properties["Property.properties"]
@@ -20,6 +21,8 @@ graph LR
 
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
+  properties -.->|property_id| requests
+  requests -.->|project_account_id| projects
   notifications -.->|technical_object_id| technical_objects
 ```
 
@@ -39,19 +42,22 @@ graph LR
   Technisches Objekt, auf das sich die Meldung bezieht.
 </ResponseField>
 
-<ResponseField name="person_id" type="integer">
-  Person, die die Meldung erstellt hat. Nutzt einen anderen ID-Raum als
-  `Stakeholder.tenants.person_id` — nicht als dieselbe Entität behandeln.
+<ResponseField name="reporter_key" type="integer">
+  Schlüssel für den Melder: Objekt, Einheit und Meldernummer zu einer Zahl zusammengesetzt,
+  ohne Trennzeichen. Keine Personen-ID — verknüpft sich nicht mit `Stakeholder.tenants.person_id`.
 </ResponseField>
 
-<ResponseField name="cost_center_id" type="string">
-  Kostenstelle, gegen die die Meldung gebucht wird. Vorerst zwei flache Felder — ein
-  ausstehender Sync konsolidiert sie zu einem verschachtelten `cost_center`-Objekt, analog
-  zu `projects.cost_center`.
-</ResponseField>
-
-<ResponseField name="cost_center_id_name" type="string">
-  Kostenstellen-Bezeichnung zu `cost_center_id`.
+<ResponseField name="cost_center" type="object">
+  Kostenstelle, gegen die die Meldung gebucht wird, als strukturiertes Objekt — gleicher
+  Aufbau wie `projects.cost_center`.
+  <Expandable title="properties">
+    <ResponseField name="code" type="string">
+      Kostenstellen-Code.
+    </ResponseField>
+    <ResponseField name="label" type="string">
+      Kostenstellen-Bezeichnung.
+    </ResponseField>
+  </Expandable>
 </ResponseField>
 
 <ResponseField name="to_do_period" type="object">
@@ -78,11 +84,6 @@ graph LR
   Wer die Meldung erstellt hat: Mieter, Kreditor, Eigentümer, Benutzer oder Partner.
 </ResponseField>
 
-<ResponseField name="reporter_person" type="string">
-  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
-  Angaben zur meldenden Person.
-</ResponseField>
-
 <ResponseField name="report_number" type="string">
   Meldungsnummer.
 </ResponseField>
@@ -107,9 +108,8 @@ graph LR
   Prioritätsstufe.
 </ResponseField>
 
-<ResponseField name="Status" type="string">
-  Aktueller Status der Meldung. In der Live-Antwort großgeschrieben (`Status`, nicht
-  `status`) — ein ausstehender Sync schreibt es künftig klein, passend zum Rest des Schemas.
+<ResponseField name="status" type="string">
+  Aktueller Status der Meldung.
 </ResponseField>
 
 <ResponseField name="status_date" type="date">
@@ -130,7 +130,17 @@ graph LR
 
 ## projects
 
-`GET /v1/operations/projects` — Investitionsprojekte und größere Wartungsvorhaben.
+`GET /v1/operations/projects` — Investitionsprojekte und größere Wartungsvorhaben, eine Zeile
+je Projekt.
+
+<Note>
+  Die Tabelle liefert alle Projekte der Verwaltung, unabhängig vom Status — auch Projekte,
+  die erst geplant oder beantragt, schon abgerechnet oder vom Eigentümer selbst ausgeführt
+  sind. Wer nur einen Teil braucht, filtert auf `status`. Felder, die auf ein einzelnes
+  Angebot, einen Auftrag oder eine Meldung zeigten (`offer_id`, `creditor_id`, `report_id`
+  und die zugehörigen Nummern), gehören nicht mehr zu `projects`: Ein Projekt kann von
+  allem mehrere haben. Die Anfragen eines Projekts findet man über `project_account_id`.
+</Note>
 
 <ResponseField name="property_id" type="string" required>
   Eindeutige Objekt-ID.
@@ -141,8 +151,8 @@ graph LR
 </ResponseField>
 
 <ResponseField name="project_account_id" type="integer">
-  Projektkonto, auf dem das Projekt gebucht wird. Aufträge verweisen darauf über
-  `project_reference_id` — darüber findest du alle Aufträge eines Projekts.
+  Projektkonto, auf dem das Projekt gebucht wird. `requests.project_account_id` verweist
+  hierauf — darüber findet man die Anfragen eines Projekts.
 </ResponseField>
 
 <ResponseField name="hierarchy" type="string[]">
@@ -198,7 +208,7 @@ graph LR
 </ResponseField>
 
 <ResponseField name="ledger_account_number" type="string">
-  Trotz des Namens keine sachkontobezogene ID — identischer Wert wie `cost_center_id`, nur
+  Trotz des Namens keine sachkontobezogene ID — identischer Wert wie `cost_center.code`, nur
   unter anderem Feldnamen (beide stammen aus derselben Rohspalte). Für die
   tatsächliche(n) Sachkontonummer(n) `ledger_account` verwenden.
 </ResponseField>
@@ -208,7 +218,8 @@ graph LR
 </ResponseField>
 
 <ResponseField name="status" type="string">
-  Aktueller Projektstatus.
+  Aktueller Projektstatus als Textbezeichnung der Verwaltung (zum Beispiel `in Planung`,
+  `genehmigt`, `abgerechnet`). Die Bezeichnungen unterscheiden sich je Kunde.
 </ResponseField>
 
 <ResponseField name="comments" type="object[]">
@@ -306,3 +317,69 @@ graph LR
   Geschäfts-/Anzeige-Projektnummer. Nicht dieselbe ID wie `project_id` oben.
 </ResponseField>
 
+## requests
+
+`GET /v1/operations/requests` — Angebotsanfragen aus dem Instandhaltungsprozess, eine Zeile je
+Anfrage, auch wenn noch kein Angebot eingegangen ist.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="request_id" type="integer" required>
+  Eindeutige Anfrage-ID. Nicht derselbe Wert wie `request_number` unten.
+</ResponseField>
+
+<ResponseField name="project_account_id" type="integer">
+  Projektkonto, zu dem die Anfrage gehört, falls vorhanden. Verknüpft mit
+  `projects.project_account_id`. Leer bei Anfragen ohne Projekt; einzelne Werte haben
+  kein passendes Projekt.
+</ResponseField>
+
+<ResponseField name="cost_center" type="object">
+  Kostenstelle, gegen die die Anfrage gebucht wird, gleicher Aufbau wie `projects.cost_center`.
+  <Expandable title="properties">
+    <ResponseField name="code" type="string">
+      Kostenstellen-Code.
+    </ResponseField>
+    <ResponseField name="label" type="string">
+      Kostenstellen-Bezeichnung.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="string">
+  Einheit, die die Anfrage betrifft, falls sie eine einzelne Einheit betrifft.
+</ResponseField>
+
+<ResponseField name="request_period" type="object">
+  Zeitraum der angefragten Leistung.
+  <Expandable title="properties">
+    <ResponseField name="start" type="date">
+      Beginn.
+    </ResponseField>
+    <ResponseField name="end" type="date">
+      Ende.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="request_name" type="string">
+  Betreff / Titel der Anfrage.
+</ResponseField>
+
+<ResponseField name="request_type" type="string">
+  Art der Anfrage.
+</ResponseField>
+
+<ResponseField name="status_text" type="string">
+  Aktueller Status der Anfrage.
+</ResponseField>
+
+<ResponseField name="priority_text" type="string">
+  Priorität.
+</ResponseField>
+
+<ResponseField name="request_number" type="string">
+  Fachliche Anfragenummer. Nicht dieselbe Kennung wie `request_id` oben.
+</ResponseField>
