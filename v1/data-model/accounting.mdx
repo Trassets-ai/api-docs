@@ -51,9 +51,6 @@ creditor, tenant, or cost-centre account, so those are already exposed directly 
 `booking_headers` (`creditor_id`, `person_id`, `property_structure_account_id`) rather than
 requiring a join through `accounts`.
 
-`booking_positions` also carries a `person_id`. To link a posting to a tenant, go through
-`booking_positions.booking_header_id` to `booking_headers.person_id` instead.
-
 Every transaction belongs to one property. An account can have a budget (`budgets`) for a
 given month. A cost centre is always tied to part of the property structure
 (`property_structure`). Debits (`Contracts.contract_debits`) always reference a general
@@ -244,8 +241,8 @@ belongs to exactly one booking header via `booking_header_id`.
   Creditor linked to the posting. References `Stakeholder.creditors`.
 </ResponseField>
 
-<ResponseField name="person_id" type="integer">
-  Tenant or contact person linked to the posting.
+<ResponseField name="person_id" type="string">
+  Tenant or contact person linked to the posting. Same value as `booking_headers.person_id`.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
