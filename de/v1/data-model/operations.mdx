@@ -664,8 +664,9 @@ Anfrage, auch wenn noch kein Angebot eingegangen ist.
   </Expandable>
 </ResponseField>
 
-<ResponseField name="floor_area_id" type="string">
-  Einheit, die die Anfrage betrifft, falls sie eine einzelne Einheit betrifft.
+<ResponseField name="floor_area_id" type="integer">
+  Einheit, die die Anfrage betrifft, falls sie eine einzelne Einheit betrifft. Verknüpft sich mit
+  `Property.property_structure.floor_area_id`.
 </ResponseField>
 
 <ResponseField name="request_period" type="object">

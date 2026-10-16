@@ -656,8 +656,9 @@ per request, also when no offer has come in yet.
   </Expandable>
 </ResponseField>
 
-<ResponseField name="floor_area_id" type="string">
-  Unit the request concerns, if it concerns a single unit.
+<ResponseField name="floor_area_id" type="integer">
+  Unit the request concerns, if it concerns a single unit. Joins to
+  `Property.property_structure.floor_area_id`.
 </ResponseField>
 
 <ResponseField name="request_period" type="object">
