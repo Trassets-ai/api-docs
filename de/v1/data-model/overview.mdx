@@ -22,7 +22,7 @@ Endpunkt steht in der [API-Referenz](/de/v1/api-reference/introduction).
   </Card>
 
   <Card title="Operations" icon="clipboard-list">
-    `notifications`, `projects` und `requests`
+    `notifications`, `offers`, `orders`, `projects` und `requests`
   </Card>
 
   <Card title="Property" icon="building">
@@ -73,6 +73,8 @@ graph LR
   subgraph Operations
     notifications["notifications"]
     projects["projects"]
+    offers["offers"]
+    orders["orders"]
     requests["requests"]
   end
 
@@ -87,7 +89,7 @@ graph LR
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
   properties -.->|property_id| requests
-  requests -.->|project_account_id| projects
+  projects -.->|project_account_id| requests
   properties -->|property_id| technical_objects
   properties -->|property_id| property_creditor_services
   properties -->|property_id| property_structure
@@ -110,7 +112,7 @@ graph LR
   contract_debit_diffs -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   properties -.->|property_id| accounts
-  notifications -.->|technical_object_id| technical_objects
+  technical_objects -.->|technical_object_id| notifications
   technical_objects -.->|service_contract_id| service_contracts
   booking_header -.->|property_id + person_id| tenants
   tenants -.->|floor_area_person_id| contract_debits
@@ -127,6 +129,18 @@ graph LR
   creditor -.->|creditor_id| service_contracts
   creditor -.->|creditor_id| booking_header
   creditor -.->|creditor_id| booking_positions
+  properties -.->|property_id| offers
+  properties -.->|property_id| orders
+  notifications -.->|report_id| orders
+  technical_objects -.->|"technical_object_id (teilweise)"| orders
+  creditor -.->|creditor_id| orders
+  creditor -.->|creditor_id| offers
+  requests -.->|request_id| offers
+  orders -.->|order_id| offers
+  projects -.->|project_account_id| offers
+  projects -.->|"project_account_id = project_reference_id"| orders
+  property_structure -.->|floor_area_id| requests
+  property_structure -.->|floor_area_id| offers
 ```
 
 ### Verknüpfungsschlüssel im Detail
@@ -137,13 +151,16 @@ graph LR
 | `booking_header_id` | Gruppiert Buchungspositionen unter einem Buchungskopf. | 1 `booking_headers` → viele `booking_positions` |
 | `account_id` | Interne Konto-ID bei `accounts`, `booking_positions` und `budgets` — darüber verknüpfbar. `index_rent.account_id` und `contract_debits.debit_type.code` bedeuten etwas anderes: den Sollart-Code — nicht mit `accounts` verknüpfen. Bei `property_structure` bedeutet es wieder etwas anderes: einen Kostenstellen-Geschäftscode, der `accounts.account_number` der zugehörigen Kostenstellen-Zeile entspricht, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
 | `account_number` (bei `contract_debits`/`contract_debit_diffs`) | Das Konto, auf das eine Zeile bucht. Bei `contract_debits` ein Sachkonto, bei `contract_debit_diffs` dagegen ein Personenkonto — gleicher Spaltenname, andere Kontoart. Entspricht `accounts.account_number`, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `contract_debits`/`contract_debit_diffs`-Zeilen |
-| `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_headers` und `booking_positions`. | 1 Kreditor → viele Zeilen über Domänen hinweg |
-| `project_account_id` | Verknüpft eine Anfrage mit ihrem Projekt. Vorhanden auf `projects` (eins je Projekt) und `requests`; leer bei Anfragen ohne Projekt. | 1 Projekt → 0..N Anfragen |
-| `technical_object_id` | Vorhanden auf `notifications`, löst sich gegen `technical_objects.technical_object_id` auf. | 1 technisches Objekt → viele Meldungen |
+| `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_headers`, `booking_positions`, `orders` und `offers`. | 1 Kreditor → viele Zeilen über Domänen hinweg |
+| `project_account_id` | Verknüpft eine Anfrage, ein Angebot oder einen Auftrag mit dem Projektkonto. Vorhanden auf `projects` (eins je Projekt), `requests` und `offers`; auf `orders` heißt derselbe Wert `project_reference_id`. Leer außerhalb eines Projekts; bei `offers` haben einzelne Werte kein passendes Projekt. | 1 Projekt → 0..N Anfragen/Angebote/Aufträge |
+| `technical_object_id` | Vorhanden auf `notifications` und `orders`, löst sich gegen `technical_objects.technical_object_id` auf. Bei `orders` hat nicht jeder Wert ein passendes technisches Objekt. | 1 technisches Objekt → viele Meldungen/Aufträge |
+| `report_id` | Verknüpft einen Auftrag mit der Meldung, aus der er entstanden ist. | 1 Meldung → 0..N Aufträge |
+| `request_id` | Verknüpft ein Angebot mit der Angebotsanfrage, auf die es antwortet. | 1 Anfrage → 0..N Angebote |
+| `order_id` (auf `offers`) | Der Auftrag, der auf Basis eines Angebots vergeben wurde. | 1 Auftrag → 0..1 Angebot |
 | `service_contract_id` | Verknüpft ein technisches Objekt mit dem Wartungsvertrag, der es abdeckt. Referenziert `service_contracts.contract_id`. | 1 Vertrag → viele technische Objekte |
 | `person_id` | Verknüpft eine Buchung mit dem Mieter, auf den sie sich bezieht. Nur gemeinsam mit `property_id` gültig, da die Nummerierung pro Objekt neu beginnt. Bei `tenants`/`booking_headers` ein String, bei `booking_positions` eine Zahl — `booking_positions` nicht direkt über `person_id` mit einem Mieter verknüpfen, sondern über `booking_header_id` gehen. Buchungen sind einem Mieter nur auf Objektebene zuordenbar, nicht bis zur einzelnen Fläche — hält derselbe Mieter mehrere Flächen im selben Objekt, lassen sich seine Buchungen nicht nach Fläche trennen. | 1 Person → 1..N Mietverhältnisse pro Objekt |
 | `floor_area_person_id` | Identifiziert ein Mietverhältnis. `tenants`, `contract_debits`, `contract_ends` und `index_rent` teilen denselben Wert und denselben Typ (String) — direkt darüber verknüpfen, ohne `property_id` und ohne Cast. | 1 Mietverhältnis → viele Soll-/Ende-/Index-Zeilen |
-| `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits` und `contract_ends`. | 1 Einheit → viele Zeilen |
+| `floor_area_id` | Identifiziert eine Einheit in `property_structure`. Außerdem vorhanden auf `technical_objects`, `tenants`, `contract_debits`, `contract_ends`, `requests` und `offers`. | 1 Einheit → viele Zeilen |
 | `asset_id` | Verknüpft eine Abschreibungsbuchung mit dem Anlagegut, auf das sie abschreibt. Jede `depreciation`-Zeile löst sich gegen `assets` auf. | 1 Anlagegut → viele Buchungen |
 | `property_structure_account_id` | Fremdschlüssel auf `property_structure`, vorhanden auf `booking_headers`, `booking_positions` und `technical_objects`. Auf den beiden Buchungstabellen immer befüllt und dort der einzige Weg von einer Buchung zu einer Einheit; auf `technical_objects` der Fallback für Zeilen ohne `floor_area_id`. | 1 Einheit → viele Zeilen |
 
