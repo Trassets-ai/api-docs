@@ -38,6 +38,7 @@ graph LR
   creditor -.->|creditor_id| offers
   orders -.->|order_id| offers
   projects -.->|project_account_id| offers
+  projects -.->|"project_account_id = project_reference_id"| orders
   property_structure -.->|floor_area_id| requests
   property_structure -.->|floor_area_id| offers
 ```
@@ -248,12 +249,12 @@ stehen nur in `requests`.
 </ResponseField>
 
 <ResponseField name="offer_accepted" type="boolean">
-  Ob das Angebot angenommen wurde.
+  Ob das Angebot angenommen wurde. `null`, wenn nicht gesetzt.
 </ResponseField>
 
 <ResponseField name="order_accepted_offer" type="boolean">
   Ob das Angebot als Vergabeempfehlung markiert ist. Trotz des Namens keine Bestätigung,
-  dass ein Auftrag vergeben wurde; dafür `order_id` nutzen.
+  dass ein Auftrag vergeben wurde; dafür `order_id` nutzen. `null`, wenn nicht gesetzt.
 </ResponseField>
 
 ## orders
@@ -289,8 +290,8 @@ pro Auftrag.
 </ResponseField>
 
 <ResponseField name="project_reference_id" type="integer">
-  Projektkonto, auf das der Auftrag gebucht wird, falls vorhanden. Kein Join-Schlüssel: Es passt
-  nicht zu `projects.project_id`.
+  Projektkonto, auf das der Auftrag gebucht wird, falls vorhanden. Verknüpft mit
+  `projects.project_account_id`, nicht mit `projects.project_id`.
 </ResponseField>
 
 <ResponseField name="cost_center_id" type="string">

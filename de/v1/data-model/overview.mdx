@@ -89,7 +89,7 @@ graph LR
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
   properties -.->|property_id| requests
-  requests -.->|project_account_id| projects
+  projects -.->|project_account_id| requests
   properties -->|property_id| technical_objects
   properties -->|property_id| property_creditor_services
   properties -->|property_id| property_structure
@@ -112,7 +112,7 @@ graph LR
   contract_debit_diffs -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
   properties -.->|property_id| accounts
-  notifications -.->|technical_object_id| technical_objects
+  technical_objects -.->|technical_object_id| notifications
   technical_objects -.->|service_contract_id| service_contracts
   booking_header -.->|property_id + person_id| tenants
   tenants -.->|floor_area_person_id| contract_debits
@@ -138,6 +138,7 @@ graph LR
   requests -.->|request_id| offers
   orders -.->|order_id| offers
   projects -.->|project_account_id| offers
+  projects -.->|"project_account_id = project_reference_id"| orders
   property_structure -.->|floor_area_id| requests
   property_structure -.->|floor_area_id| offers
 ```
@@ -151,7 +152,7 @@ graph LR
 | `account_id` | Interne Konto-ID bei `accounts`, `booking_positions` und `budgets` — darüber verknüpfbar. `index_rent.account_id` und `contract_debits.debit_type.code` bedeuten etwas anderes: den Sollart-Code — nicht mit `accounts` verknüpfen. Bei `property_structure` bedeutet es wieder etwas anderes: einen Kostenstellen-Geschäftscode, der `accounts.account_number` der zugehörigen Kostenstellen-Zeile entspricht, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `booking_positions`/`budgets`-Zeilen |
 | `account_number` (bei `contract_debits`/`contract_debit_diffs`) | Das Konto, auf das eine Zeile bucht. Bei `contract_debits` ein Sachkonto, bei `contract_debit_diffs` dagegen ein Personenkonto — gleicher Spaltenname, andere Kontoart. Entspricht `accounts.account_number`, nicht `accounts.account_id`. | 1 `accounts`-Zeile → viele `contract_debits`/`contract_debit_diffs`-Zeilen |
 | `creditor_id` | Identifiziert einen Kreditor. Referenziert von `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_headers`, `booking_positions`, `orders` und `offers`. | 1 Kreditor → viele Zeilen über Domänen hinweg |
-| `project_account_id` | Verknüpft eine Anfrage mit ihrem Projekt. Vorhanden auf `projects` (eins je Projekt), `requests` und `offers`; leer bei Anfragen ohne Projekt. | 1 Projekt → 0..N Anfragen |
+| `project_account_id` | Verknüpft eine Anfrage, ein Angebot oder einen Auftrag mit dem Projektkonto. Vorhanden auf `projects` (eins je Projekt), `requests` und `offers`; auf `orders` heißt derselbe Wert `project_reference_id`. Leer außerhalb eines Projekts; bei `offers` haben einzelne Werte kein passendes Projekt. | 1 Projekt → 0..N Anfragen/Angebote/Aufträge |
 | `technical_object_id` | Vorhanden auf `notifications` und `orders`, löst sich gegen `technical_objects.technical_object_id` auf. Bei `orders` hat nicht jeder Wert ein passendes technisches Objekt. | 1 technisches Objekt → viele Meldungen/Aufträge |
 | `report_id` | Verknüpft einen Auftrag mit der Meldung, aus der er entstanden ist. | 1 Meldung → 0..N Aufträge |
 | `request_id` | Verknüpft ein Angebot mit der Angebotsanfrage, auf die es antwortet. | 1 Anfrage → 0..N Angebote |

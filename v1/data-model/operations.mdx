@@ -36,6 +36,7 @@ graph LR
   creditor -.->|creditor_id| offers
   orders -.->|order_id| offers
   projects -.->|project_account_id| offers
+  projects -.->|"project_account_id = project_reference_id"| orders
   property_structure -.->|floor_area_id| requests
   property_structure -.->|floor_area_id| offers
 ```
@@ -243,12 +244,12 @@ are only in `requests`.
 </ResponseField>
 
 <ResponseField name="offer_accepted" type="boolean">
-  Whether the offer was accepted.
+  Whether the offer was accepted. `null` when not set.
 </ResponseField>
 
 <ResponseField name="order_accepted_offer" type="boolean">
   Whether the offer is marked as the award recommendation. Despite the name, this is not
-  a confirmation that an order was placed; use `order_id` for that.
+  a confirmation that an order was placed; use `order_id` for that. `null` when not set.
 </ResponseField>
 
 ## orders
@@ -283,8 +284,8 @@ order.
 </ResponseField>
 
 <ResponseField name="project_reference_id" type="integer">
-  Project account the order is booked to, if any. Not a join key: it doesn't match
-  `projects.project_id`.
+  Project account the order is booked to, if any. Joins to `projects.project_account_id`, not
+  to `projects.project_id`.
 </ResponseField>
 
 <ResponseField name="cost_center_id" type="string">
