@@ -1,10 +1,11 @@
 ---
 title: "Operations"
 sidebarTitle: "Operations"
-description: "Feldreferenz für die Tabellen notifications, projects und requests unter /v1/operations/."
+description: "Feldreferenz für die Tabellen notifications, orders, projects und requests unter /v1/operations/."
 ---
 
-Die drei Tabellen unten verknüpfen sich mit der Property-Domäne; `requests` verweist zusätzlich auf `projects`. Das
+Die vier Tabellen unten verknüpfen sich mit der Property-Domäne; `orders` verweist zusätzlich auf `notifications`
+und auf Kreditoren aus Stakeholder, `requests` auf `projects`. Das
 vollständige Cross-Domain-Diagramm steht in der
 [Datenmodell-Übersicht](/de/v1/data-model/overview).
 
@@ -12,18 +13,24 @@ vollständige Cross-Domain-Diagramm steht in der
 graph LR
   subgraph Operations
     notifications["notifications"]
+    orders["orders"]
     projects["projects"]
     requests["requests"]
   end
 
   properties["Property.properties"]
   technical_objects["Property.technical_objects"]
+  creditor["Stakeholder.creditors"]
 
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
   properties -.->|property_id| requests
   requests -.->|project_account_id| projects
   notifications -.->|technical_object_id| technical_objects
+  properties -.->|property_id| orders
+  notifications -.->|report_id| orders
+  creditor -.->|creditor_id| orders
+  orders -.->|"technical_object_id (teilweise)"| technical_objects
 ```
 
 ## notifications
@@ -89,6 +96,7 @@ graph LR
 </ResponseField>
 
 <ResponseField name="user_creation" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Ersteller der Meldung.
 </ResponseField>
 
@@ -101,6 +109,7 @@ graph LR
 </ResponseField>
 
 <ResponseField name="responsible_user" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Für die Bearbeitung zuständige Person.
 </ResponseField>
 
@@ -125,7 +134,309 @@ graph LR
 </ResponseField>
 
 <ResponseField name="comment" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Freitextkommentar.
+</ResponseField>
+
+## orders
+
+`GET /v1/operations/orders` — Instandhaltungs- und Reparaturaufträge an Dienstleister, eine Zeile
+pro Auftrag.
+
+<Note>
+  Alle Felder auf Positionsebene (`position_amount`, `position_description`, `quantity`, `unit`,
+  `price`, `vat_rate_position`, `position_*_amount`, `position_obligo_net`, `invoice_status`)
+  stammen **nur aus der ersten Position** des Auftrags. Für Aufträge mit mehreren Positionen
+  liefern die Felder auf Auftragsebene (`total_amount`, `order_*_amount`, `order_obligo_net`)
+  die Summen.
+</Note>
+
+<ResponseField name="order_id" type="integer" required>
+  Eindeutige ID des Auftrags. Nicht derselbe Wert wie `order_number` unten.
+</ResponseField>
+
+<ResponseField name="person_id" type="string">
+  Zusammengesetzter Schlüssel aus Objekt, Fläche und Personennummer, ohne Trennzeichen. Er
+  bezeichnet den Nutzer der Fläche, die der Auftrag betrifft, verknüpft sich aber nicht mit
+  `Stakeholder.tenants.person_id`.
+</ResponseField>
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID. Verknüpft mit `Property.properties.property_id`.
+</ResponseField>
+
+<ResponseField name="offer_reference_id" type="integer">
+  Angebotsnummer, auf die sich der Auftrag bezieht, als Zahl. Kein Join-Schlüssel: Sie passt
+  nicht zu `offers.offer_id`.
+</ResponseField>
+
+<ResponseField name="project_reference_id" type="integer">
+  Projektkonto, auf das der Auftrag gebucht wird, falls vorhanden. Kein Join-Schlüssel: Es passt
+  nicht zu `projects.project_id`.
+</ResponseField>
+
+<ResponseField name="cost_center_id" type="string">
+  Kostenstelle des Auftrags: Objektnummer plus Fläche, Geschoss oder Gebäude (zum Beispiel
+  `1101/20022`) oder nur die Objektnummer.
+</ResponseField>
+
+<ResponseField name="technical_object_id" type="integer">
+  Technisches Objekt, das der Auftrag betrifft. Verknüpft mit
+  `Property.technical_objects.technical_object_id`, aber nicht jeder Wert hat ein passendes
+  technisches Objekt.
+</ResponseField>
+
+<ResponseField name="report_id" type="integer">
+  Meldung, aus der der Auftrag entstanden ist, falls vorhanden. Verknüpft mit
+  `notifications.report_id`.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string">
+  Dienstleister, an den der Auftrag vergeben wurde. Verknüpft mit
+  `Stakeholder.creditors.creditor_id`.
+</ResponseField>
+
+<ResponseField name="total_amount" type="object">
+  Gesamtkosten des Auftrags über alle Positionen.
+  <Expandable title="properties">
+    <ResponseField name="net" type="number">
+      Nettobetrag.
+    </ResponseField>
+    <ResponseField name="gross" type="number">
+      Bruttobetrag inklusive Umsatzsteuer.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="position_amount" type="object">
+  Kosten der ersten Position.
+  <Expandable title="properties">
+    <ResponseField name="net" type="number">
+      Nettobetrag.
+    </ResponseField>
+    <ResponseField name="gross" type="number">
+      Bruttobetrag inklusive Umsatzsteuer.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="ledger_account" type="object">
+  Sachkonto, auf das die Auftragskosten gebucht werden.
+  <Expandable title="properties">
+    <ResponseField name="code" type="string">
+      Buchungskreis und Kontonummer, verbunden mit `+` (zum Beispiel `1101+641005`).
+    </ResponseField>
+    <ResponseField name="label" type="string">
+      Kontobezeichnung, z. B. „Laufende Reparaturen Wohnung“.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="runtime_period" type="object">
+  Zeitraum, in dem die Arbeiten ausgeführt werden sollen.
+  <Expandable title="properties">
+    <ResponseField name="start" type="date">
+      Beginn.
+    </ResponseField>
+    <ResponseField name="end" type="date">
+      Ende.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="order_number" type="string">
+  Fachliche Auftragsnummer zur Anzeige, z. B. `2018/00001`. Nicht dieselbe Kennung wie `order_id`.
+</ResponseField>
+
+<ResponseField name="order_name" type="string">
+  Betreff des Auftrags.
+</ResponseField>
+
+<ResponseField name="offer_number" type="string">
+  Angebotsnummer wie am Auftrag erfasst, wenn der Auftrag auf einem Angebot beruht.
+</ResponseField>
+
+<ResponseField name="order_type" type="string">
+  Auftragsart, z. B. „Laufende Instandhaltung“.
+</ResponseField>
+
+<ResponseField name="object_description" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Bezeichnung des Objekts, zu dem der Auftrag gehört.
+</ResponseField>
+
+<ResponseField name="creditor_name" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Name des Dienstleisters.
+</ResponseField>
+
+<ResponseField name="project_nr" type="string">
+  Projektkonto, auf das der Auftrag gebucht wird, als Buchungskreis und Kontonummer verbunden mit
+  `+`. Leer bei Aufträgen außerhalb eines Projekts.
+</ResponseField>
+
+<ResponseField name="cost_center_id_name" type="string">
+  `cost_center_id` und Kostenstellenbezeichnung als ein Anzeigetext. Nur zur Anzeige, nicht zum
+  Verknüpfen.
+</ResponseField>
+
+<ResponseField name="vat_code" type="integer">
+  Umsatzsteuer-Code der ersten Position.
+</ResponseField>
+
+<ResponseField name="vat_rate" type="number">
+  Umsatzsteuersatz in Prozent, der am Stichtag des Auftrags für `vat_code` galt.
+</ResponseField>
+
+<ResponseField name="vat_code_type" type="string">
+  Zweistellige Art des Umsatzsteuer-Codes aus dem ERP, z. B. `VN`.
+</ResponseField>
+
+<ResponseField name="position_description" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Freitextbeschreibung der ersten Position.
+</ResponseField>
+
+<ResponseField name="order_recorder_name" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Nicht befüllt, immer ein leerer String.
+</ResponseField>
+
+<ResponseField name="order_recorder_mail" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Nicht befüllt, immer ein leerer String.
+</ResponseField>
+
+<ResponseField name="order_processor_name" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Nicht befüllt, immer ein leerer String.
+</ResponseField>
+
+<ResponseField name="order_processor_mail" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Nicht befüllt, immer ein leerer String.
+</ResponseField>
+
+<ResponseField name="order_responsible_name" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Nicht befüllt, immer ein leerer String.
+</ResponseField>
+
+<ResponseField name="order_responsible_mail" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Nicht befüllt, immer ein leerer String.
+</ResponseField>
+
+<ResponseField name="report_number" type="string">
+  Anzeigenummer der Meldung aus `report_id`.
+</ResponseField>
+
+<ResponseField name="to_number" type="string">
+  Anzeigenummer des technischen Objekts aus `technical_object_id`.
+</ResponseField>
+
+<ResponseField name="to_number_internal" type="string">
+  Interne Nummer des technischen Objekts.
+</ResponseField>
+
+<ResponseField name="to_description" type="string">
+  Bezeichnung des technischen Objekts.
+</ResponseField>
+
+<ResponseField name="note1" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Freitext-Hinweis zum Auftrag.
+</ResponseField>
+
+<ResponseField name="damage_date" type="date">
+  Datum des Schadens, bei Reparaturaufträgen.
+</ResponseField>
+
+<ResponseField name="handyman_portal_transfer" type="boolean">
+  Ob Aufträge dieser Art an das Handwerkerportal übergeben werden.
+</ResponseField>
+
+<ResponseField name="status_type_description" type="string">
+  Bearbeitungsstand: `Neu`, `In Genehmigung`, `Genehmigt`, `In Bearbeitung`, `Erledigt` oder
+  `Storniert`.
+</ResponseField>
+
+<ResponseField name="priority_description" type="string">
+  Priorität.
+</ResponseField>
+
+<ResponseField name="reporter_type_description" type="string">
+  Wer den Fall gemeldet hat: `Personen` (eine Person, etwa ein Mieter), `Kreditor` (ein
+  Dienstleister) oder `Benutzer` (ein Benutzer der Verwaltungssoftware).
+</ResponseField>
+
+<ResponseField name="reporter_info" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Freitext-Angaben zum Melder, oft Name und Telefonnummer.
+</ResponseField>
+
+<ResponseField name="reporter_person_full_name" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Vollständiger Name des Melders, wenn er eine bekannte Person ist, sonst derselbe Text wie
+  `reporter_info`.
+</ResponseField>
+
+<ResponseField name="quantity" type="number">
+  Menge der ersten Position.
+</ResponseField>
+
+<ResponseField name="unit" type="number">
+  Einheitenfeld der ersten Position, als Zahl geliefert.
+</ResponseField>
+
+<ResponseField name="price" type="number">
+  Einzelpreis der ersten Position.
+</ResponseField>
+
+<ResponseField name="vat_rate_position" type="number">
+  Umsatzsteuersatz in Prozent, wie an der ersten Position erfasst.
+</ResponseField>
+
+<ResponseField name="invoice_status" type="string">
+  Zahlungsstand der ersten Position, abgeleitet aus ihren Beträgen: `Bezahlt` (vollständig
+  bezahlt), `Gebucht`, `Erfasst` (Rechnung erfasst), `Obligo` (beauftragt, noch nicht
+  abgerechnet) oder `Offen`.
+</ResponseField>
+
+<ResponseField name="position_obligo_net" type="number">
+  Netto-Obligo der ersten Position.
+</ResponseField>
+
+<ResponseField name="position_recorded_amount" type="number">
+  Erfasster Rechnungsbetrag der ersten Position.
+</ResponseField>
+
+<ResponseField name="position_booked_amount" type="number">
+  Gebuchter Betrag der ersten Position.
+</ResponseField>
+
+<ResponseField name="position_paid_amount" type="number">
+  Bezahlter Betrag der ersten Position.
+</ResponseField>
+
+<ResponseField name="order_obligo_net" type="number">
+  Netto-Obligo des gesamten Auftrags.
+</ResponseField>
+
+<ResponseField name="order_recorded_amount" type="number">
+  Erfasster Rechnungsbetrag des gesamten Auftrags.
+</ResponseField>
+
+<ResponseField name="order_booked_amount" type="number">
+  Gebuchter Betrag des gesamten Auftrags.
+</ResponseField>
+
+<ResponseField name="order_paid_amount" type="number">
+  Bezahlter Betrag des gesamten Auftrags.
+</ResponseField>
+
+<ResponseField name="dms_link" type="string">
+  Link auf die Dokumente des Auftrags im Dokumentenmanagementsystem, falls eingerichtet.
 </ResponseField>
 
 ## projects
@@ -223,6 +534,7 @@ je Projekt.
 </ResponseField>
 
 <ResponseField name="comments" type="object[]">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Kommentare und Hinweise als Liste von Objekten. Fasst vier vormals getrennte Felder
   zusammen — `comment` (ein Statuskommentar) und `comment_1`/`comment_2`/`comment_3`
   (Hinweise) — leere Einträge werden weggelassen. Jeder Eintrag behält seine Herkunft über
@@ -298,6 +610,7 @@ je Projekt.
 </ResponseField>
 
 <ResponseField name="responsible_user" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Für das Projekt zuständige Person.
 </ResponseField>
 
@@ -306,6 +619,7 @@ je Projekt.
 </ResponseField>
 
 <ResponseField name="budget_comment" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Kommentar zum Budget.
 </ResponseField>
 
