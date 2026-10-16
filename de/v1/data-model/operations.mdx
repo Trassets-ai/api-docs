@@ -197,7 +197,9 @@ pro Auftrag.
 </ResponseField>
 
 <ResponseField name="total_amount" type="object">
-  Gesamtkosten des Auftrags über alle Positionen.
+  Beauftragter Wert des Auftrags aus seinen bepreisten Positionen. `0`, wenn der Auftrag ohne
+  Preise vergeben wurde; die tatsächlichen Kosten stehen dann nur in `order_recorded_amount`,
+  `order_booked_amount` und `order_paid_amount`.
   <Expandable title="properties">
     <ResponseField name="net" type="number">
       Nettobetrag.
@@ -209,7 +211,7 @@ pro Auftrag.
 </ResponseField>
 
 <ResponseField name="position_amount" type="object">
-  Kosten der ersten Position.
+  Beauftragter Wert der ersten Position. `0`, wenn die Position keinen Preis hat.
   <Expandable title="properties">
     <ResponseField name="net" type="number">
       Nettobetrag.

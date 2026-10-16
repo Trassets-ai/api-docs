@@ -192,7 +192,9 @@ order.
 </ResponseField>
 
 <ResponseField name="total_amount" type="object">
-  Total cost of the order across all positions.
+  Ordered value of the order from its priced positions. `0` when the order was placed without
+  prices; actual costs then only show in `order_recorded_amount`, `order_booked_amount` and
+  `order_paid_amount`.
   <Expandable title="properties">
     <ResponseField name="net" type="number">
       Net amount.
@@ -204,7 +206,7 @@ order.
 </ResponseField>
 
 <ResponseField name="position_amount" type="object">
-  Cost of the first position.
+  Ordered value of the first position. `0` when the position has no price.
   <Expandable title="properties">
     <ResponseField name="net" type="number">
       Net amount.
