@@ -4,9 +4,7 @@ sidebarTitle: "Operations"
 description: "Field reference for the notifications, offers, orders, projects and requests tables under /v1/operations/."
 ---
 
-The five tables below join to the Property domain; `offers` also links to `requests`, `orders`
-and Stakeholder creditors, `orders` to `notifications` and Stakeholder creditors, `requests` to
-`projects`. See the
+The five tables below join to the Property domain and to each other as shown in the diagram. See the
 [Data Model Overview](/v1/data-model/overview) for the complete cross-domain diagram.
 
 ```mermaid
@@ -27,17 +25,17 @@ graph LR
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
   properties -.->|property_id| requests
-  requests -.->|project_account_id| projects
-  notifications -.->|technical_object_id| technical_objects
+  projects -.->|project_account_id| requests
+  technical_objects -.->|technical_object_id| notifications
   properties -.->|property_id| orders
   notifications -.->|report_id| orders
   creditor -.->|creditor_id| orders
-  orders -.->|"technical_object_id (partial)"| technical_objects
+  technical_objects -.->|"technical_object_id (partial)"| orders
   properties -.->|property_id| offers
   requests -.->|request_id| offers
   creditor -.->|creditor_id| offers
   orders -.->|order_id| offers
-  offers -.->|project_account_id| projects
+  projects -.->|project_account_id| offers
   property_structure -.->|floor_area_id| requests
   property_structure -.->|floor_area_id| offers
 ```
@@ -176,8 +174,8 @@ are only in `requests`.
 </ResponseField>
 
 <ResponseField name="contract_id" type="integer">
-  Contract reference recorded on the offer, rarely populated. Not a join key: it doesn't
-  match `Contracts.service_contracts.contract_id`.
+  Contract reference recorded on the offer. Not a join key: it doesn't match
+  `Contracts.service_contracts.contract_id`.
 </ResponseField>
 
 <ResponseField name="order_id" type="integer">
@@ -219,12 +217,11 @@ are only in `requests`.
 </ResponseField>
 
 <ResponseField name="offer_name" type="string">
-  Subject of the request. Identical for all offers on the same request.
+  Subject of the request the offer answers.
 </ResponseField>
 
 <ResponseField name="offer_type" type="string">
-  Type of request, for example `Anfrage Instandhaltung`. Identical for all offers on the
-  same request.
+  Type of request, for example `Anfrage Instandhaltung`.
 </ResponseField>
 
 <ResponseField name="offer_value" type="number">
@@ -549,7 +546,8 @@ order.
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">
-  Link to the order's documents in the document management system, if configured.
+  Link to the documents in the customer's document management system. Without a connected DMS
+  the field holds a placeholder text instead of a URL; check for a URL before rendering a link.
 </ResponseField>
 
 ## projects
@@ -650,7 +648,8 @@ per project.
   Requires the [`personal` grant](/v1/authentication#personal-data-grants).
   Comments and notes, as a list of objects. Combines what were four separate fields —
   `comment` (a status comment) and `comment_1`/`comment_2`/`comment_3` (notes) — into one
-  array; empty entries are omitted. Each entry keeps its origin via `type`.
+  array. Entries without text are included with an empty `text`. Each entry keeps its origin
+  via `type`.
   <Expandable title="properties">
     <ResponseField name="type" type="string">
       Where the entry came from: `status`, `hint_1`, `hint_2`, or `hint_3`.
@@ -736,7 +735,8 @@ per project.
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">
-  Link to the linked document in the DMS.
+  Link to the documents in the customer's document management system. Without a connected DMS
+  the field holds a placeholder text instead of a URL; check for a URL before rendering a link.
 </ResponseField>
 
 <ResponseField name="project_number" type="string">

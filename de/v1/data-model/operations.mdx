@@ -4,9 +4,8 @@ sidebarTitle: "Operations"
 description: "Feldreferenz für die Tabellen notifications, offers, orders, projects und requests unter /v1/operations/."
 ---
 
-Die fünf Tabellen unten verknüpfen sich mit der Property-Domäne; `offers` verweist zusätzlich auf
-`requests`, `orders` und Kreditoren aus Stakeholder, `orders` auf `notifications` und Kreditoren,
-`requests` auf `projects`. Das
+Die fünf Tabellen unten verknüpfen sich mit der Property-Domäne und untereinander wie im Diagramm
+gezeigt. Das
 vollständige Cross-Domain-Diagramm steht in der
 [Datenmodell-Übersicht](/de/v1/data-model/overview).
 
@@ -28,17 +27,17 @@ graph LR
   properties -.->|property_id| notifications
   properties -.->|property_id| projects
   properties -.->|property_id| requests
-  requests -.->|project_account_id| projects
-  notifications -.->|technical_object_id| technical_objects
+  projects -.->|project_account_id| requests
+  technical_objects -.->|technical_object_id| notifications
   properties -.->|property_id| orders
   notifications -.->|report_id| orders
   creditor -.->|creditor_id| orders
-  orders -.->|"technical_object_id (teilweise)"| technical_objects
+  technical_objects -.->|"technical_object_id (teilweise)"| orders
   properties -.->|property_id| offers
   requests -.->|request_id| offers
   creditor -.->|creditor_id| offers
   orders -.->|order_id| offers
-  offers -.->|project_account_id| projects
+  projects -.->|project_account_id| offers
   property_structure -.->|floor_area_id| requests
   property_structure -.->|floor_area_id| offers
 ```
@@ -177,7 +176,7 @@ stehen nur in `requests`.
 </ResponseField>
 
 <ResponseField name="contract_id" type="integer">
-  Vertragsbezug am Angebot, selten befüllt. Kein Join-Schlüssel: Er passt nicht zu
+  Vertragsbezug am Angebot. Kein Join-Schlüssel: Er passt nicht zu
   `Contracts.service_contracts.contract_id`.
 </ResponseField>
 
@@ -223,11 +222,11 @@ stehen nur in `requests`.
 </ResponseField>
 
 <ResponseField name="offer_name" type="string">
-  Betreff der Anfrage. Für alle Angebote derselben Anfrage gleich.
+  Betreff der Anfrage, auf die das Angebot antwortet.
 </ResponseField>
 
 <ResponseField name="offer_type" type="string">
-  Art der Anfrage, z. B. `Anfrage Instandhaltung`. Für alle Angebote derselben Anfrage gleich.
+  Art der Anfrage, z. B. `Anfrage Instandhaltung`.
 </ResponseField>
 
 <ResponseField name="offer_value" type="number">
@@ -557,7 +556,8 @@ pro Auftrag.
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">
-  Link auf die Dokumente des Auftrags im Dokumentenmanagementsystem, falls eingerichtet.
+  Link auf die Dokumente im Dokumentenmanagementsystem des Kunden. Ohne angebundenes DMS steht
+  hier ein Platzhaltertext statt einer URL; vor dem Verlinken auf eine URL prüfen.
 </ResponseField>
 
 ## projects
@@ -658,8 +658,8 @@ je Projekt.
   Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Kommentare und Hinweise als Liste von Objekten. Fasst vier vormals getrennte Felder
   zusammen — `comment` (ein Statuskommentar) und `comment_1`/`comment_2`/`comment_3`
-  (Hinweise) — leere Einträge werden weggelassen. Jeder Eintrag behält seine Herkunft über
-  `type`.
+  (Hinweise). Einträge ohne Text sind mit leerem `text` enthalten. Jeder Eintrag behält seine
+  Herkunft über `type`.
   <Expandable title="properties">
     <ResponseField name="type" type="string">
       Herkunft des Eintrags: `status`, `hint_1`, `hint_2` oder `hint_3`.
@@ -745,7 +745,8 @@ je Projekt.
 </ResponseField>
 
 <ResponseField name="dms_link" type="string">
-  Link zum verknüpften Dokument im DMS.
+  Link auf die Dokumente im Dokumentenmanagementsystem des Kunden. Ohne angebundenes DMS steht
+  hier ein Platzhaltertext statt einer URL; vor dem Verlinken auf eine URL prüfen.
 </ResponseField>
 
 <ResponseField name="project_number" type="string">
