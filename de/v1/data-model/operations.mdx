@@ -1,11 +1,12 @@
 ---
 title: "Operations"
 sidebarTitle: "Operations"
-description: "Feldreferenz für die Tabellen notifications, orders, projects und requests unter /v1/operations/."
+description: "Feldreferenz für die Tabellen notifications, offers, orders, projects und requests unter /v1/operations/."
 ---
 
-Die vier Tabellen unten verknüpfen sich mit der Property-Domäne; `orders` verweist zusätzlich auf `notifications`
-und auf Kreditoren aus Stakeholder, `requests` auf `projects`. Das
+Die fünf Tabellen unten verknüpfen sich mit der Property-Domäne; `offers` verweist zusätzlich auf
+`requests`, `orders` und Kreditoren aus Stakeholder, `orders` auf `notifications` und Kreditoren,
+`requests` auf `projects`. Das
 vollständige Cross-Domain-Diagramm steht in der
 [Datenmodell-Übersicht](/de/v1/data-model/overview).
 
@@ -13,6 +14,7 @@ vollständige Cross-Domain-Diagramm steht in der
 graph LR
   subgraph Operations
     notifications["notifications"]
+    offers["offers"]
     orders["orders"]
     projects["projects"]
     requests["requests"]
@@ -20,6 +22,7 @@ graph LR
 
   properties["Property.properties"]
   technical_objects["Property.technical_objects"]
+  property_structure["Property.property_structure"]
   creditor["Stakeholder.creditors"]
 
   properties -.->|property_id| notifications
@@ -31,6 +34,13 @@ graph LR
   notifications -.->|report_id| orders
   creditor -.->|creditor_id| orders
   orders -.->|"technical_object_id (teilweise)"| technical_objects
+  properties -.->|property_id| offers
+  requests -.->|request_id| offers
+  creditor -.->|creditor_id| offers
+  orders -.->|order_id| offers
+  offers -.->|project_account_id| projects
+  property_structure -.->|floor_area_id| requests
+  property_structure -.->|floor_area_id| offers
 ```
 
 ## notifications
@@ -136,6 +146,115 @@ graph LR
 <ResponseField name="comment" type="string">
   Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
   Freitextkommentar.
+</ResponseField>
+
+## offers
+
+`GET /v1/operations/offers` — Angebote, die Dienstleister auf eine Angebotsanfrage abgegeben
+haben, eine Zeile je Angebot. Eine Anfrage kann mehrere Angebote haben; Anfragen ohne Angebot
+stehen nur in `requests`.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="offer_id" type="integer" required>
+  Eindeutige Angebots-ID. Nicht derselbe Wert wie `offer_nr` unten.
+</ResponseField>
+
+<ResponseField name="cost_center_id" type="string">
+  Kostenstelle der Anfrage: Objektnummer plus Fläche, Geschoss oder Gebäude (zum Beispiel
+  `1106/10023`) oder nur die Objektnummer.
+</ResponseField>
+
+<ResponseField name="floor_area_id" type="integer">
+  Einheit, die die Anfrage betrifft, falls sie eine einzelne Einheit betrifft. Verknüpft sich mit
+  `Property.property_structure.floor_area_id`.
+</ResponseField>
+
+<ResponseField name="request_id" type="integer" required>
+  Angebotsanfrage, auf die das Angebot antwortet. Verknüpft mit `requests.request_id`.
+</ResponseField>
+
+<ResponseField name="contract_id" type="integer">
+  Vertragsbezug am Angebot, selten befüllt. Kein Join-Schlüssel: Er passt nicht zu
+  `Contracts.service_contracts.contract_id`.
+</ResponseField>
+
+<ResponseField name="order_id" type="integer">
+  Auftrag, der auf Basis dieses Angebots vergeben wurde, falls vorhanden. Verknüpft mit
+  `orders.order_id`.
+</ResponseField>
+
+<ResponseField name="project_account_id" type="integer">
+  Projektkonto, zu dem die Anfrage gehört, falls vorhanden. Verknüpft mit
+  `projects.project_account_id`; einzelne Werte haben kein passendes Projekt.
+</ResponseField>
+
+<ResponseField name="creditor_id" type="string">
+  Dienstleister, der das Angebot abgegeben hat. Verknüpft mit
+  `Stakeholder.creditors.creditor_id`.
+</ResponseField>
+
+<ResponseField name="offer_period" type="object">
+  Zeitraum der angefragten Arbeiten, aus der Anfrage übernommen (wie
+  `requests.request_period`).
+  <Expandable title="properties">
+    <ResponseField name="start" type="date">
+      Beginn.
+    </ResponseField>
+    <ResponseField name="end" type="date">
+      Ende.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cost_center_id_name" type="string">
+  `cost_center_id` und Kostenstellenbezeichnung als ein Anzeigetext. Nur zur Anzeige, nicht zum
+  Verknüpfen.
+</ResponseField>
+
+<ResponseField name="request_nr" type="string">
+  Anzeigenummer der Anfrage, wie `requests.request_number`.
+</ResponseField>
+
+<ResponseField name="offer_nr" type="string">
+  Angebotsnummer wie im ERP erfasst, falls vorhanden. Nicht dieselbe Kennung wie `offer_id`.
+</ResponseField>
+
+<ResponseField name="offer_name" type="string">
+  Betreff der Anfrage. Für alle Angebote derselben Anfrage gleich.
+</ResponseField>
+
+<ResponseField name="offer_type" type="string">
+  Art der Anfrage, z. B. `Anfrage Instandhaltung`. Für alle Angebote derselben Anfrage gleich.
+</ResponseField>
+
+<ResponseField name="offer_value" type="number">
+  Angebotspreis. `0`, wenn kein Preis erfasst wurde.
+</ResponseField>
+
+<ResponseField name="status_text" type="string">
+  Status der Anfrage als numerischer Statuscode aus dem ERP, z. B. `21` oder `23`. Eine
+  Klartext-Bezeichnung gibt es nicht. Gleicher Wert wie `requests.status_text`.
+</ResponseField>
+
+<ResponseField name="priority_text" type="string">
+  Priorität der Anfrage als Nummer und Bezeichnung, z. B. `3 | Mittel`.
+</ResponseField>
+
+<ResponseField name="comment" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Freitext-Bemerkung zum Angebot.
+</ResponseField>
+
+<ResponseField name="offer_accepted" type="boolean">
+  Ob das Angebot angenommen wurde.
+</ResponseField>
+
+<ResponseField name="order_accepted_offer" type="boolean">
+  Ob das Angebot als Vergabeempfehlung markiert ist. Trotz des Namens keine Bestätigung,
+  dass ein Auftrag vergeben wurde; dafür `order_id` nutzen.
 </ResponseField>
 
 ## orders
@@ -690,7 +809,8 @@ Anfrage, auch wenn noch kein Angebot eingegangen ist.
 </ResponseField>
 
 <ResponseField name="status_text" type="string">
-  Aktueller Status der Anfrage.
+  Status der Anfrage als numerischer Statuscode aus dem ERP, z. B. `21` oder `23`. Eine
+  Klartext-Bezeichnung gibt es nicht.
 </ResponseField>
 
 <ResponseField name="priority_text" type="string">
