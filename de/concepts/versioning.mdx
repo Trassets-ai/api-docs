@@ -27,7 +27,7 @@ https://api.trassets.ai/raw/sollart
 `GET /catalog` und `GET /changes` tragen kein Versionspräfix und sind von der Abschaltung **nicht** betroffen.
 
 <Warning>
-  Sobald eine Tabelle eine `/v1/`-Route hat, landen Breaking Changes unter einem neuen Präfix wie `/v2/`, nicht auf dem veröffentlichten Pfad. Für die unversionierten Basis-Pfade gilt diese Zusage nicht.
+  `/v1/` ist noch eine **Preview**: Bis es als stabil erklärt ist, können Breaking Changes auch auf einem veröffentlichten `/v1/`-Pfad landen (zum Beispiel wurde `/v1/operations/projects` auf eine Zeile je Projekt umgestellt). Prüfe nach jedem Release die Feldreferenz. Für die unversionierten Basis-Pfade gilt ebenfalls keine Zusage.
 </Warning>
 
 ## Auf /v1/ migrieren
@@ -37,7 +37,5 @@ Stelle jede genutzte Tabelle um, bevor die unversionierten Pfade abgeschaltet we
 1. Prüfen, ob `/v1/{category}/{api_table}` für die genutzte Tabelle existiert.
 2. Falls ja: umstellen — die Response-Struktur weicht vom Basis-Pfad ab (siehe [Response-Struktur](/de/v1/response-shape-conventions) und [Pagination](/de/v1/concepts/pagination)).
 3. Raw-Tabellen: von `/raw/{table_name}` auf `/v1/raw/{table_name}` umstellen — gleiche Daten, Response-Schlüssel `total` statt `total_rows`.
-
-`/v1/operations/offers` und `/v1/operations/orders` sind angekündigt und folgen in einem späteren Release.
 
 `/catalog` und `/changes` brauchen keine Änderung.

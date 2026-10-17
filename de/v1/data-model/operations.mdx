@@ -56,7 +56,9 @@ graph LR
 </ResponseField>
 
 <ResponseField name="technical_object_id" type="integer">
-  Technisches Objekt, auf das sich die Meldung bezieht.
+  Technisches Objekt, auf das sich die Meldung bezieht. Verknüpft mit
+  `Property.technical_objects.technical_object_id`, aber nicht jeder Wert hat ein passendes
+  technisches Objekt.
 </ResponseField>
 
 <ResponseField name="reporter_key" type="integer">
@@ -101,6 +103,12 @@ graph LR
   Wer die Meldung erstellt hat: Mieter, Kreditor, Eigentümer, Benutzer oder Partner.
 </ResponseField>
 
+<ResponseField name="reporter_person" type="string">
+  Nur mit dem [Grant `personal`](/de/v1/authentication#grants-für-personenbezogene-daten) sichtbar.
+  Wer die Meldung erstellt hat, als Freitext – meist Referenznummer und Name, zum Beispiel
+  `1111+200011 | Name`.
+</ResponseField>
+
 <ResponseField name="report_number" type="string">
   Meldungsnummer.
 </ResponseField>
@@ -115,7 +123,8 @@ graph LR
 </ResponseField>
 
 <ResponseField name="responsible_team" type="string">
-  Für die Bearbeitung zuständiges Team.
+  Für die Bearbeitung zuständiges Team als numerische Team-ID (zum Beispiel `1`). Anders als
+  bei `projects.responsible_team` gibt es keinen Teamnamen.
 </ResponseField>
 
 <ResponseField name="responsible_user" type="string">
@@ -124,7 +133,8 @@ graph LR
 </ResponseField>
 
 <ResponseField name="priority_text" type="string">
-  Prioritätsstufe.
+  Trotz des Namens keine Priorität: Die Bezeichnung stammt aus derselben Liste wie `status`
+  (zum Beispiel `Neu`, `In Bearbeitung`, `Erledigt`). Bei manchen Kunden leer.
 </ResponseField>
 
 <ResponseField name="status" type="string">
@@ -197,8 +207,8 @@ stehen nur in `requests`.
 </ResponseField>
 
 <ResponseField name="offer_period" type="object">
-  Zeitraum der angefragten Arbeiten, aus der Anfrage übernommen (wie
-  `requests.request_period`).
+  Gültigkeitszeitraum der Anfrage, aus der Anfrage übernommen (wie `requests.request_period`).
+  Nicht der Ausführungszeitraum – dafür siehe `orders.runtime_period`.
   <Expandable title="properties">
     <ResponseField name="start" type="date">
       Beginn.
@@ -572,7 +582,8 @@ je Projekt.
   sind. Wer nur einen Teil braucht, filtert auf `status`. Felder, die auf ein einzelnes
   Angebot, einen Auftrag oder eine Meldung zeigten (`offer_id`, `creditor_id`, `report_id`
   und die zugehörigen Nummern), gehören nicht mehr zu `projects`: Ein Projekt kann von
-  allem mehrere haben. Die Anfragen eines Projekts findet man über `project_account_id`.
+  allem mehrere haben. Anfragen, Angebote und Aufträge eines Projekts findet man über
+  `project_account_id`.
 </Note>
 
 <ResponseField name="property_id" type="string" required>
@@ -584,8 +595,9 @@ je Projekt.
 </ResponseField>
 
 <ResponseField name="project_account_id" type="integer">
-  Projektkonto, auf dem das Projekt gebucht wird. `requests.project_account_id` verweist
-  hierauf — darüber findet man die Anfragen eines Projekts.
+  Projektkonto, auf dem das Projekt gebucht wird. `requests.project_account_id`,
+  `offers.project_account_id` und `orders.project_reference_id` verweisen hierauf — darüber
+  findet man Anfragen, Angebote und Aufträge eines Projekts.
 </ResponseField>
 
 <ResponseField name="hierarchy" type="string[]">
@@ -651,8 +663,8 @@ je Projekt.
 </ResponseField>
 
 <ResponseField name="status" type="string">
-  Aktueller Projektstatus als Textbezeichnung der Verwaltung (zum Beispiel `in Planung`,
-  `genehmigt`, `abgerechnet`). Die Bezeichnungen unterscheiden sich je Kunde.
+  Aktueller Projektstatus als Textbezeichnung der Verwaltung (zum Beispiel `beantragt`,
+  `in Planung`, `genehmigt`). Die Bezeichnungen unterscheiden sich je Kunde.
 </ResponseField>
 
 <ResponseField name="comments" type="object[]">
@@ -791,7 +803,8 @@ Anfrage, auch wenn noch kein Angebot eingegangen ist.
 </ResponseField>
 
 <ResponseField name="request_period" type="object">
-  Zeitraum der angefragten Leistung.
+  Gültigkeitszeitraum der Anfrage. Nicht der Ausführungszeitraum – dafür siehe
+  `orders.runtime_period`.
   <Expandable title="properties">
     <ResponseField name="start" type="date">
       Beginn.
@@ -816,7 +829,7 @@ Anfrage, auch wenn noch kein Angebot eingegangen ist.
 </ResponseField>
 
 <ResponseField name="priority_text" type="string">
-  Priorität.
+  Priorität der Anfrage als Nummer und Bezeichnung, z. B. `3 | Mittel`.
 </ResponseField>
 
 <ResponseField name="request_number" type="string">

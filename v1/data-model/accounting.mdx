@@ -325,6 +325,11 @@ belongs to exactly one booking header via `booking_header_id`.
   Debit/credit indicator. Not reliably derivable from the sign of `amount.net`.
 </ResponseField>
 
+<ResponseField name="HNDL" type="number">
+  Amount signed by the debit/credit indicator. Its business meaning is not confirmed yet —
+  use `amount` instead.
+</ResponseField>
+
 
 ## budgets
 

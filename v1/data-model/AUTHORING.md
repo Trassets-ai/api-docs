@@ -70,10 +70,13 @@ Zusammenhänge werden mit dem Reviewer geklärt, nicht selbst angenommen.
 1. **Scope prüfen** — nur Tabellen mit `api_model.categories.v1_reviewed = true`
    aufnehmen (Live-Stand siehe `v1/data-model-handoff.md`). Keine Seite/Sektion
    für nicht reviewte Tabellen, auch nicht als "coming soon".
-2. **Live-Schema als Quelle** — Felder und Typen aus `DESCRIBE` gegen
-   `<kunde>.api_v1.*` bzw. `https://api.trassets.ai/openapi-v1.json` ziehen,
-   nicht aus dem ADR oder Namensmustern ableiten (beides schon mehrfach durch
-   Live-Check widerlegt).
+2. **Live-Schema als Quelle** — Feldliste aus `DESCRIBE` gegen
+   `<kunde>.api_v1.*` ziehen, nicht aus dem ADR oder Namensmustern ableiten
+   (beides schon mehrfach durch Live-Check widerlegt).
+   `https://api.trassets.ai/openapi-v1.json` taugt nur für Typen, **nicht** als
+   Feldliste: Die Spec blendet jede als personenbezogen klassifizierte Spalte aus
+   (`_PERSONAL_COLUMNS` in trassets-data-api `core/rds.py`). Diese Felder sind
+   live für Keys mit `personal`-Grant und brauchen den Grant-Hinweis.
 3. **Diagramm** — jede gezeichnete Kante live verifizieren (Match-Rate-Skript),
    Text und Diagramm gegenlesen (Kategorie A).
 4. **Jedes Feld** — `<ResponseField>` mit Erklärung, die für einen externen

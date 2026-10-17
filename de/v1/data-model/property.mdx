@@ -29,6 +29,13 @@ graph LR
   contract_debit_diffs["Contracts.contract_debit_diffs"]
   assets["Depreciation.assets"]
   tenants["Stakeholder.tenants"]
+  contract_debits["Contracts.contract_debits"]
+  contract_ends["Contracts.contract_ends"]
+  index_rent["Contracts.index_rent"]
+  depreciation["Depreciation.depreciation"]
+  offers["Operations.offers"]
+  orders["Operations.orders"]
+  requests["Operations.requests"]
   owner["Stakeholder.owners"]
   employees["Stakeholder.employees"]
   creditor["Stakeholder.creditors"]
@@ -50,13 +57,23 @@ graph LR
   properties -.->|property_id| assets
   properties -.->|property_id| accounts
   property_structure -.->|account_id = account_number| accounts
-  notifications -.->|technical_object_id| technical_objects
+  technical_objects -.->|technical_object_id| notifications
   technical_objects -.->|service_contract_id| service_contracts
   tenants -.->|floor_area_id| property_structure
   booking_header -.->|property_structure_account_id| property_structure
   booking_positions -.->|property_structure_account_id| property_structure
   creditor -.->|creditor_id| technical_objects
   creditor -.->|creditor_id| property_creditor_services
+  properties -.->|property_id| contract_debits
+  properties -.->|property_id| contract_ends
+  properties -.->|property_id| index_rent
+  properties -.->|property_id| depreciation
+  properties -.->|property_id| offers
+  properties -.->|property_id| orders
+  properties -.->|property_id| requests
+  property_structure -.->|floor_area_id| requests
+  property_structure -.->|floor_area_id| offers
+  technical_objects -.->|"technical_object_id (partial)"| orders
 ```
 
 ## properties

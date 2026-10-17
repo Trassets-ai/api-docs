@@ -1,15 +1,16 @@
 ---
-title: "Operations Data Model: Notifications, Offers, Orders, and Projects"
+title: "Operations Data Model: Notifications, Requests, Offers, Orders, and Projects"
 sidebarTitle: "Operations"
-description: "Understand the Operations domain in the Data API: maintenance notifications, offers, work orders, and capital projects."
+description: "Understand the Operations domain in the Data API: maintenance notifications, requests for quotation, offers, work orders, and capital projects."
 ---
 
 The Operations domain covers the maintenance and procurement workflow: a tenant or
-technician reports an issue (`notifications`), a creditor submits a price (`offers`), work
+technician reports an issue (`notifications`), a request for quotation goes out (`requests`),
+a creditor submits a price (`offers`), work
 is commissioned (`orders`), and larger initiatives are tracked as `projects`.
 
 <Note>
-  `orders` and `projects` each expose 60+ fields in the live schema (invoicing amounts,
+  `orders` and `projects` each expose around 60 fields in the live schema (invoicing amounts,
   hierarchy levels, contact details, and more). This page documents the key identifying
   and join fields only — see the **API Reference** tab for the complete, auto-generated
   field list.
@@ -39,8 +40,8 @@ is commissioned (`orders`), and larger initiatives are tracked as `projects`.
   Type of report.
 </ResponseField>
 
-<ResponseField name="status" type="string">
-  Current status of the notification.
+<ResponseField name="Status" type="string">
+  Current status of the notification. Note the capital `S` in the field name.
 </ResponseField>
 
 <ResponseField name="priority_text" type="string">
@@ -147,18 +148,6 @@ is commissioned (`orders`), and larger initiatives are tracked as `projects`.
   Unique property identifier.
 </ResponseField>
 
-<ResponseField name="creditor_id" type="integer">
-  Primary creditor for the project.
-</ResponseField>
-
-<ResponseField name="offer_hdr_id" type="integer">
-  Related offer, if applicable.
-</ResponseField>
-
-<ResponseField name="to_hdr_id" type="integer">
-  Related technical object, if applicable.
-</ResponseField>
-
 <ResponseField name="project_id" type="string">
   Project number.
 </ResponseField>
@@ -192,3 +181,41 @@ is commissioned (`orders`), and larger initiatives are tracked as `projects`.
   hierarchy — most integrations only need `hierarchy_1`/`hierarchy_2` for top-level
   grouping.
 </Tip>
+
+## requests
+
+`GET /operations/requests` — requests for quotation from the maintenance process, one row per
+request, also when no offer has come in yet.
+
+<ResponseField name="request_id" type="integer" required>
+  Unique request identifier. Not the same value as `request_nr`.
+</ResponseField>
+
+<ResponseField name="property_id" type="integer" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="project_account_id" type="integer">
+  Project account the request belongs to, if any. Empty for requests outside a project.
+</ResponseField>
+
+<ResponseField name="request_nr" type="string">
+  Display number of the request.
+</ResponseField>
+
+<ResponseField name="request_name" type="string">
+  Subject / title of the request.
+</ResponseField>
+
+<ResponseField name="status_text" type="string">
+  Status as a numeric status code from the ERP, for example `21`. No plain-text label is
+  available.
+</ResponseField>
+
+<ResponseField name="request_start_date" type="date">
+  Start of the request's validity period.
+</ResponseField>
+
+<ResponseField name="request_end_date" type="date">
+  End of the request's validity period.
+</ResponseField>
