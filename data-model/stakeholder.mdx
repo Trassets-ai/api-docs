@@ -15,7 +15,7 @@ endpoint without a `property_id` column — a creditor is a standalone entity th
 multiple properties; the relationship is expressed through `creditor_id` on other
 domains (`Property.property_creditor_services`, `Contracts.service_contracts`,
 `Property.technical_objects`, `Accounting.booking_header`/`booking_positions`,
-`Operations.offers`/`orders`/`projects`), not the other way around.
+`Operations.offers`/`orders`), not the other way around.
 
 <ResponseField name="creditor_id" type="integer" required>
   Unique creditor identifier.

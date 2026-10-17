@@ -33,7 +33,8 @@ seine Erklärung auf der jeweiligen Domain-Seite.
 <ResponseField name="dms_link" type="string">
   Link zu einem im Dokumentenmanagementsystem (DMS) hinterlegten Dokument. Kommt vor auf
   `booking_headers`, `projects`, `properties`, `property_structure`, `creditors`, `orders`
-  und `tenants`. `null`, wenn kein Dokument hinterlegt ist — nicht jede Zeile hat eines.
+  und `tenants`. Ohne angebundenes DMS oder wenn sich der Link nicht bilden lässt, steht ein
+  Platzhaltertext statt einer URL im Feld — vor dem Rendern als Link auf eine URL prüfen.
 </ResponseField>
 
 <ResponseField name="comment / *_comment" type="string">

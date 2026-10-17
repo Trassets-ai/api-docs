@@ -54,7 +54,8 @@ graph LR
 </ResponseField>
 
 <ResponseField name="technical_object_id" type="integer">
-  Technical object the report concerns.
+  Technical object the report concerns. Joins to `Property.technical_objects.technical_object_id`,
+  but not every value has a matching technical object.
 </ResponseField>
 
 <ResponseField name="reporter_key" type="integer">
@@ -99,6 +100,12 @@ graph LR
   Who filed the report: tenant, creditor, owner, user, or partner.
 </ResponseField>
 
+<ResponseField name="reporter_person" type="string">
+  Requires the [`personal` grant](/v1/authentication#personal-data-grants).
+  Who filed the report, as free text — usually a reference number and a name, for example
+  `1111+200011 | Name`.
+</ResponseField>
+
 <ResponseField name="report_number" type="string">
   Report number.
 </ResponseField>
@@ -113,7 +120,8 @@ graph LR
 </ResponseField>
 
 <ResponseField name="responsible_team" type="string">
-  Team responsible for handling the report.
+  Team responsible for handling the report, as a numeric team ID (for example `1`). No team
+  name is available, unlike `projects.responsible_team`.
 </ResponseField>
 
 <ResponseField name="responsible_user" type="string">
@@ -122,7 +130,8 @@ graph LR
 </ResponseField>
 
 <ResponseField name="priority_text" type="string">
-  Priority level.
+  Despite the name, not a priority: the label comes from the same list as `status` (for
+  example `Neu`, `In Bearbeitung`, `Erledigt`). Empty for some customers.
 </ResponseField>
 
 <ResponseField name="status" type="string">
@@ -193,8 +202,8 @@ are only in `requests`.
 </ResponseField>
 
 <ResponseField name="offer_period" type="object">
-  Period the requested work covers, taken from the request (same as
-  `requests.request_period`).
+  Validity period of the request, taken from the request (same as `requests.request_period`).
+  Not the period the work is carried out in — for that see `orders.runtime_period`.
   <Expandable title="properties">
     <ResponseField name="start" type="date">
       Start date.
@@ -562,7 +571,7 @@ per project.
   owner. Filter on `status` if you only need some of them. Fields that pointed to a single
   offer, order or notification (`offer_id`, `creditor_id`, `report_id` and their numbers)
   are no longer part of `projects`: a project can have many of each. Use
-  `project_account_id` to find the requests of a project.
+  `project_account_id` to find the requests, offers and orders of a project.
 </Note>
 
 <ResponseField name="property_id" type="string" required>
@@ -574,8 +583,9 @@ per project.
 </ResponseField>
 
 <ResponseField name="project_account_id" type="integer">
-  Project account the project is booked on. `requests.project_account_id` points here —
-  use it to find the requests belonging to a project.
+  Project account the project is booked on. `requests.project_account_id`,
+  `offers.project_account_id` and `orders.project_reference_id` point here — use it to find
+  the requests, offers and orders belonging to a project.
 </ResponseField>
 
 <ResponseField name="hierarchy" type="string[]">
@@ -642,7 +652,7 @@ per project.
 
 <ResponseField name="status" type="string">
   Current project status, as a text label defined by the property manager (for example
-  `in Planung`, `genehmigt`, `abgerechnet`). Labels differ between customers.
+  `beantragt`, `in Planung`, `genehmigt`). Labels differ between customers.
 </ResponseField>
 
 <ResponseField name="comments" type="object[]">
@@ -780,7 +790,8 @@ per request, also when no offer has come in yet.
 </ResponseField>
 
 <ResponseField name="request_period" type="object">
-  Period the requested work covers.
+  Validity period of the request. Not the period the work is carried out in — for that see
+  `orders.runtime_period`.
   <Expandable title="properties">
     <ResponseField name="start" type="date">
       Start date.
@@ -805,7 +816,7 @@ per request, also when no offer has come in yet.
 </ResponseField>
 
 <ResponseField name="priority_text" type="string">
-  Priority level.
+  Priority of the request as number and label, for example `3 | Mittel`.
 </ResponseField>
 
 <ResponseField name="request_number" type="string">

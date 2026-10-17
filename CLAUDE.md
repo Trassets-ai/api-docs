@@ -14,7 +14,7 @@ mint dev            # local preview at http://localhost:3000, run from repo root
 mint update          # fix a dev server that won't start / stale CLI
 ```
 
-No build, lint, or test step. Changes deploy automatically on push to the default branch (GitHub app connected to the Mintlify dashboard). A page 404s locally only if `mint dev` isn't run from the folder containing `docs.json`.
+No build or test step; CI only checks that the EN and DE navigation match (`.github/workflows/nav-check.yml`, `scripts/check_nav.py`). Changes deploy automatically on push to the default branch (GitHub app connected to the Mintlify dashboard). A page 404s locally only if `mint dev` isn't run from the folder containing `docs.json`.
 
 ## Structure
 
@@ -28,6 +28,6 @@ No build, lint, or test step. Changes deploy automatically on push to the defaul
 ## Content conventions
 
 - Frontmatter on every page: `title`, `sidebarTitle`, `description`. Match the existing phrasing style (`description` is a full sentence summarizing the page for search/AI surfaces).
-- Field names, endpoint paths, and example payloads must reflect the **live** API — not aspirational/planned features. History here includes real incidents of invented fields and stale category names making it into docs (see `api-reference/introduction.mdx`'s note on the removed "Meters"/"Market Data" categories, and commit `f4f50af`); when documenting fields or endpoints, verify against `GET /catalog` or the OpenAPI spec rather than inferring from naming patterns.
+- Field names, endpoint paths, and example payloads must reflect the **live** API — not aspirational/planned features. History here includes real incidents of invented fields and stale category names making it into docs (see `api-reference/introduction.mdx`'s note on the removed "Meters"/"Market Data" categories, and commit `f4f50af`); when documenting fields or endpoints, verify against `GET /catalog` or the OpenAPI spec rather than inferring from naming patterns. The v1 spec hides columns classified as personal data, so take v1 field lists from `DESCRIBE <kunde>.api_v1.<table>` (see `v1/data-model/AUTHORING.md`).
 - Cross-references use root-relative paths (e.g. `/data-model/field-glossary`); German pages link into `/de/...` equivalents.
 - Commit messages are in German, often tagged with an Asana task ID (`Asana <gid>`) or PR number.

@@ -51,10 +51,6 @@ Kreditor-, Personen- oder Kostenstellenkonto enthält, hat `booking_headers` `cr
 `person_id` und `property_structure_account_id` bereits als eigene Felder — eine
 Verknüpfung über `accounts` ist dafür nicht nötig.
 
-Auch `booking_positions` führt ein `person_id`-Feld. Um eine Position einem Mieter
-zuzuordnen, führt der Weg über `booking_positions.booking_header_id` zu
-`booking_headers.person_id`.
-
 Jeder Buchungsvorgang gehört zu genau einem Objekt. Zu einem Konto kann es ein Budget
 (`budgets`) für einen bestimmten Monat geben. Eine Kostenstelle ist immer mit einem Teil
 der Objektstruktur (`property_structure`) verbunden. Sollstellungen
@@ -250,8 +246,9 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
   Mit der Buchung verknüpfter Kreditor. Referenziert `Stakeholder.creditors`.
 </ResponseField>
 
-<ResponseField name="person_id" type="integer">
-  Mit der Buchung verknüpfter Mieter oder Ansprechpartner.
+<ResponseField name="person_id" type="string">
+  Mit der Buchung verknüpfter Mieter oder Ansprechpartner. Gleicher Wert wie
+  `booking_headers.person_id`.
 </ResponseField>
 
 <ResponseField name="property_structure_account_id" type="string">
@@ -333,6 +330,11 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
 
 <ResponseField name="debit_credit" type="string">
   Soll/Haben-Kennzeichen. Nicht verlässlich aus dem Vorzeichen von `amount.net` ableitbar.
+</ResponseField>
+
+<ResponseField name="HNDL" type="number">
+  Betrag mit Vorzeichen nach Soll/Haben-Kennzeichen. Die fachliche Bedeutung ist noch nicht
+  geklärt — stattdessen `amount` verwenden.
 </ResponseField>
 
 
