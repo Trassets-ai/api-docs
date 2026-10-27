@@ -4,7 +4,7 @@ sidebarTitle: "Übersicht"
 description: "Die unter /v1/ verfügbaren Tabellen und wie sie verknüpft werden."
 ---
 
-`/v1/` umfasst sechs Datendomänen, unten nach Tabelle aufgeschlüsselt. Die Feldreferenz je
+`/v1/` umfasst sechs Datendomänen und dazu vorberechnete Objekt-Kennzahlen, unten nach Tabelle aufgeschlüsselt. Die Feldreferenz je
 Endpunkt steht in der [API-Referenz](/de/v1/api-reference/introduction).
 
 <CardGroup cols={2}>
@@ -19,6 +19,10 @@ Endpunkt steht in der [API-Referenz](/de/v1/api-reference/introduction).
 
   <Card title="Depreciation" icon="chart-line-down">
     `assets` und `depreciation`
+  </Card>
+
+  <Card title="KPI" icon="gauge" href="/de/v1/data-model/kpi">
+    `property_kpis` und `property_kpis_by_floor_area_type`, aggregiert aus den anderen Domänen
   </Card>
 
   <Card title="Operations" icon="clipboard-list">
