@@ -1,10 +1,10 @@
 ---
 title: "API-Versionierungsrichtlinie für die Data API"
 sidebarTitle: "Versionierung"
-description: "Alle Tabellen-Endpunkte der Data API liegen unter /v1/, auch die Raw-Tabellen. Nur /catalog und /changes tragen kein Versionspräfix."
+description: "Alle Endpunkte der Data API liegen unter /v1/, auch Raw-Tabellen, Catalog und Delta Sync. Unversionierte Pfade liefern 404."
 ---
 
-Alle Tabellen-Endpunkte der Data API liegen unter `/v1/`, z. B.:
+Alle Endpunkte der Data API liegen unter `/v1/`, z. B.:
 
 ```text
 https://api.trassets.ai/v1/accounting/budgets
@@ -17,10 +17,8 @@ Jede `/v1/`-Route folgt den Regeln der [Response-Struktur](/de/v1/response-shape
   `/v1/` ist noch eine **Preview**: Bis es als stabil erklärt ist, können Breaking Changes auch auf einem veröffentlichten `/v1/`-Pfad landen (zum Beispiel wurde `/v1/operations/projects` auf eine Zeile je Projekt umgestellt). Prüfe nach jedem Release die Feldreferenz.
 </Warning>
 
-## Endpunkte ohne Versionspräfix
-
-`GET /catalog` und `GET /changes` gibt es einmal für die ganze API, ohne Präfix. Die `endpoint_url`, die `/changes` liefert, beginnt immer mit `/v1/` — auch bei Raw-Tabellen (`/v1/raw/...`).
-
 ## Unversionierte Pfade sind abgeschaltet
 
-Die früheren Category- und Raw-Pfade ohne Versionspräfix (z. B. `/accounting/accounts` oder `/raw/sollart`) sind abgeschaltet und liefern `404` — ohne Redirect. Nutze stattdessen den `/v1/`-Pfad.
+Alle Endpunkte liegen unter `/v1/` — Category-Tabellen, Raw-Tabellen, `GET /v1/catalog` und `GET /v1/changes`. Die `endpoint_url`, die `/v1/changes` liefert, beginnt immer mit `/v1/`, auch bei Raw-Tabellen (`/v1/raw/...`).
+
+Unversionierte Pfade (z. B. `/accounting/accounts`, `/raw/sollart`, `/catalog` oder `/changes`) liefern `404` — ohne Redirect. Nutze stattdessen den `/v1/`-Pfad.

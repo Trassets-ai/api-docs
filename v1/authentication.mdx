@@ -28,8 +28,8 @@ Every key has a type, `raw` or `transformed`. The type decides whether the key m
 | Category endpoints (`/v1/{category}/{table}`) | all data; personal columns only with the matching grant | all data, within the key's configured restrictions; personal columns only with the matching grant |
 | `GET /v1/raw/{table_name}` | 200 with both personal data grants, otherwise 403 | 403 |
 | `GET /v1/raw/tables` | list of tables | empty list |
-| `GET /catalog` | all categories and tables | only the categories and tables the key may access |
-| `GET /changes` | all changed tables | only changed tables within the key's categories and tables; `?category=X` outside them returns 403 |
+| `GET /v1/catalog` | all categories and tables | only the categories and tables the key may access |
+| `GET /v1/changes` | all changed tables | only changed tables within the key's categories and tables; `?category=X` outside them returns 403 |
 
 A `raw` key cannot carry restrictions. Reading a raw table additionally needs both personal data grants, `personal` and `personal_financial`, because raw tables cannot be split by column; `/v1/raw/tables` lists the tables either way. A `transformed` key gets no raw data and no tables without a category.
 
@@ -43,7 +43,7 @@ Grants apply to every key, `raw` or `transformed`, and override a column filter 
 
 ### Property restrictions
 
-A `transformed` key can additionally be limited to a list of property IDs. Category endpoints then return only rows of those properties, and a table that has no `property_id` column (for example `/v1/stakeholder/creditors`) returns 403 for such a key. `/catalog` and `/changes` are not filtered by property; they list tables, not rows. An administrator sets the property list in the portal; a key without a list sees all properties.
+A `transformed` key can additionally be limited to a list of property IDs. Category endpoints then return only rows of those properties, and a table that has no `property_id` column (for example `/v1/stakeholder/creditors`) returns 403 for such a key. `/v1/catalog` and `/v1/changes` are not filtered by property; they list tables, not rows. An administrator sets the property list in the portal; a key without a list sees all properties.
 
 ## Key storage and security
 

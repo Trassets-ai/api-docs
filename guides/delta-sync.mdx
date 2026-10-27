@@ -1,25 +1,25 @@
 ---
 title: "Use delta sync to detect changed tables efficiently"
-description: "Poll /changes with the since parameter and ETags to avoid unnecessary fetches and discover which tables have new data since your last sync."
+description: "Poll /v1/changes with the since parameter and ETags to avoid unnecessary fetches and discover which tables have new data since your last sync."
 sidebarTitle: "Delta Sync"
 ---
 
-Discover which tables have been updated since your last sync without fetching every endpoint. The Data API `GET /changes` endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
+Discover which tables have been updated since your last sync without fetching every endpoint. The Data API `GET /v1/changes` endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
 
 <Tip>
-  Poll `/changes` every 15–60 minutes. The underlying sync runs as a daily batch, so polling more often will not surface newer data — it only spends more of your 500 req/h budget. Combine this with the `since`/ETag pattern below so unchanged polls stay cheap.
+  Poll `/v1/changes` every 15–60 minutes. The underlying sync runs as a daily batch, so polling more often will not surface newer data — it only spends more of your 500 req/h budget. Combine this with the `since`/ETag pattern below so unchanged polls stay cheap.
 </Tip>
 
 <Note>
-  With a `transformed` key, `/changes` lists only tables within the key's categories and tables; tables without a category are never listed, and `?category=X` outside the key's scope returns 403. A `raw` key sees all tables — see [Key types](/v1/authentication#key-types).
+  With a `transformed` key, `/v1/changes` lists only tables within the key's categories and tables; tables without a category are never listed, and `?category=X` outside the key's scope returns 403. A `raw` key sees all tables — see [Key types](/v1/authentication#key-types).
 </Note>
 
 <Steps>
   <Step title="Poll for changed tables">
-    Send a `GET` request to `/changes` with an ISO-8601 `since` timestamp (UTC, e.g. `…Z`). An offset such as `+02:00` is converted to UTC; in a query string write the `+` as `%2B`, otherwise it is read as a space and the request fails with 400. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL. A table listed here has to be fetched **in full** again — `/changes` reports changed tables, not changed rows. `endpoint_url` points to the path to fetch: `/v1/{category}/{table}` for category tables, `/v1/raw/{table}` for raw tables. Raw tables that are blocked for your account are not listed. Add an optional `category` parameter (e.g. `category=property`) to only return tables belonging to that category.
+    Send a `GET` request to `/v1/changes` with an ISO-8601 `since` timestamp (UTC, e.g. `…Z`). An offset such as `+02:00` is converted to UTC; in a query string write the `+` as `%2B`, otherwise it is read as a space and the request fails with 400. The response lists every table whose `last_sync_at` is after that timestamp, including the corresponding endpoint URL. A table listed here has to be fetched **in full** again — `/v1/changes` reports changed tables, not changed rows. `endpoint_url` points to the path to fetch: `/v1/{category}/{table}` for category tables, `/v1/raw/{table}` for raw tables. Raw tables that are blocked for your account are not listed. Add an optional `category` parameter (e.g. `category=property`) to only return tables belonging to that category.
 
     ```bash
-    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -43,13 +43,13 @@ Discover which tables have been updated since your last sync without fetching ev
     ```
   </Step>
   <Step title="Fetch only changed tables">
-    For each item returned by `/changes`, request the corresponding endpoint only. Skip any table that is absent from the response. This avoids unnecessary data transfer and preserves your 500 req/h rate limit budget.
+    For each item returned by `/v1/changes`, request the corresponding endpoint only. Skip any table that is absent from the response. This avoids unnecessary data transfer and preserves your 500 req/h rate limit budget.
   </Step>
   <Step title="Use conditional GET on subsequent polls">
-    Store the `ETag` header from the first successful `/changes` response. On your next poll, send it back as `If-None-Match`.
+    Store the `ETag` header from the first successful `/v1/changes` response. On your next poll, send it back as `If-None-Match`.
 
     ```bash
-    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
       -H "X-API-Key: $TRASSETS_API_KEY" \
       -H "If-None-Match: \"abc123\""
     ```
@@ -57,9 +57,9 @@ Discover which tables have been updated since your last sync without fetching ev
     The `ETag` depends on `since` and `category` as well, so keep the `ETag` together with the `since` it was issued for. If no tables have changed since the ETag was issued, the API returns `304 Not Modified` with an empty body and skips the database query. The request still counts toward your rate limit.
   </Step>
   <Step title="Advance the since parameter">
-    After a successful sync, store the highest `last_sync_at` from the `/changes` response and use it as the `since` value for the next poll. This creates a sliding window so each run evaluates only the interval since the previous run. If the response is empty, keep the old `since`.
+    After a successful sync, store the highest `last_sync_at` from the `/v1/changes` response and use it as the `since` value for the next poll. This creates a sliding window so each run evaluates only the interval since the previous run. If the response is empty, keep the old `since`.
 
-    Do not use your own clock here. Client and server clocks drift, and a table that finished syncing shortly before your timestamp would never appear in a later `/changes` response.
+    Do not use your own clock here. Client and server clocks drift, and a table that finished syncing shortly before your timestamp would never appear in a later `/v1/changes` response.
   </Step>
   <Step title="Full Python example">
     A complete poller that tracks the `since` timestamp and `ETag` between runs, and only
@@ -77,7 +77,7 @@ Discover which tables have been updated since your last sync without fetching ev
 
 
     def poll_changes(since: str, etag: str | None = None):
-        """Poll /changes and return (changed_tables, new_etag, new_since).
+        """Poll /v1/changes and return (changed_tables, new_etag, new_since).
 
         changed_tables is an empty list on a 304 Not Modified response, and
         new_since stays unchanged then.
@@ -87,7 +87,7 @@ Discover which tables have been updated since your last sync without fetching ev
             headers["If-None-Match"] = etag
 
         resp = requests.get(
-            f"{BASE_URL}/changes", headers=headers, params={"since": since}, timeout=30
+            f"{BASE_URL}/v1/changes", headers=headers, params={"since": since}, timeout=30
         )
 
         if resp.status_code == 304:

@@ -1,10 +1,10 @@
 ---
 title: "API Versioning Policy for the Data API"
 sidebarTitle: "Versioning"
-description: "All table endpoints of the Data API live under /v1/, including the raw tables. Only /catalog and /changes carry no version prefix."
+description: "All endpoints of the Data API live under /v1/, including the raw tables, the catalog, and delta sync. Unversioned paths return 404."
 ---
 
-All table endpoints of the Data API live under `/v1/`, e.g.:
+All endpoints of the Data API live under `/v1/`, e.g.:
 
 ```text
 https://api.trassets.ai/v1/accounting/budgets
@@ -17,10 +17,8 @@ Every `/v1/` route follows the [response structure](/v1/response-shape-conventio
   `/v1/` is still a **preview**: until it is declared stable, breaking changes can land on a published `/v1/` path (for example, `/v1/operations/projects` changed to one row per project). Check the field reference after each release.
 </Warning>
 
-## Endpoints without a version prefix
-
-`GET /catalog` and `GET /changes` exist once for the whole API and carry no prefix. The `endpoint_url` that `/changes` returns always starts with `/v1/` — for raw tables, too (`/v1/raw/...`).
-
 ## Unversioned paths are switched off
 
-The former category and raw paths without a version prefix (e.g. `/accounting/accounts` or `/raw/sollart`) are switched off and return `404` — there is no redirect. Use the `/v1/` path instead.
+All endpoints live under `/v1/` — category tables, raw tables, `GET /v1/catalog`, and `GET /v1/changes`. The `endpoint_url` that `/v1/changes` returns always starts with `/v1/`, for raw tables too (`/v1/raw/...`).
+
+Unversioned paths (e.g. `/accounting/accounts`, `/raw/sollart`, `/catalog`, or `/changes`) return `404` — there is no redirect. Use the `/v1/` path instead.

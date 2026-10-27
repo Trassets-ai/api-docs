@@ -1,10 +1,10 @@
 ---
 title: "Incrementally sync real-estate data with Trassets"
-description: "Keep a local copy of Trassets data up to date by asking /changes which tables were reloaded and re-fetching only those tables in full."
+description: "Keep a local copy of Trassets data up to date by asking /v1/changes which tables were reloaded and re-fetching only those tables in full."
 sidebarTitle: "Incremental Sync"
 ---
 
-Maintain a local copy of your data without fetching every table on each run. Every sync reloads the tables in full, so there is no row-level delta: the unit of change is the table. Ask [`/changes`](/guides/delta-sync) which tables were reloaded since your last run, then fetch exactly those tables again, completely.
+Maintain a local copy of your data without fetching every table on each run. Every sync reloads the tables in full, so there is no row-level delta: the unit of change is the table. Ask [`/v1/changes`](/guides/delta-sync) which tables were reloaded since your last run, then fetch exactly those tables again, completely.
 
 <Warning>
   Do not store `next_cursor` between runs. After a reload, rows can change, disappear or shift position, so resuming at an old cursor silently keeps stale data.
@@ -12,10 +12,10 @@ Maintain a local copy of your data without fetching every table on each run. Eve
 
 <Steps>
   <Step title="Find the reloaded tables">
-    Call `/changes` with the `since` value from your last run. Use the highest `last_sync_at` from that run's response; on the very first run, use a timestamp up to 120 days back. Each entry carries the `endpoint_url` to fetch.
+    Call `/v1/changes` with the `since` value from your last run. Use the highest `last_sync_at` from that run's response; on the very first run, use a timestamp up to 120 days back. Each entry carries the `endpoint_url` to fetch.
 
     ```bash
-    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -68,7 +68,7 @@ Maintain a local copy of your data without fetching every table on each run. Eve
         Returns the rows per table and the `since` value for the next run.
         """
         resp = requests.get(
-            f"{BASE_URL}/changes", headers=HEADERS, params={"since": since}, timeout=30
+            f"{BASE_URL}/v1/changes", headers=HEADERS, params={"since": since}, timeout=30
         )
         resp.raise_for_status()
         changed = resp.json()

@@ -38,5 +38,5 @@ Wenn du dennoch eine 429-Antwort erhältst, nutze den `Retry-After`-Header, stat
 Bei lang laufenden Sync-Jobs verteile die Requests gleichmäßig über die Stunde, statt sie am Anfang zu bündeln. Ein Job, der beispielsweise alle 7 Sekunden einen Request stellt, bleibt sicher unter dem Limit von 500 Requests.
 
 <Tip>
-  Nutze den [Delta-Sync-Endpunkt](/de/guides/delta-sync) (`GET /changes`), um auf geänderte Tabellen zu pollen, statt wiederholt jeden Endpunkt abzufragen. So kannst du Endpunkte überspringen, die sich seit deinem letzten Sync nicht geändert haben, und reduzierst dein gesamtes Request-Volumen.
+  Nutze den [Delta-Sync-Endpunkt](/de/guides/delta-sync) (`GET /v1/changes`), um auf geänderte Tabellen zu pollen, statt wiederholt jeden Endpunkt abzufragen. So kannst du Endpunkte überspringen, die sich seit deinem letzten Sync nicht geändert haben, und reduzierst dein gesamtes Request-Volumen.
 </Tip>

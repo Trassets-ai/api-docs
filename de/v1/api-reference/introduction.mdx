@@ -1,7 +1,7 @@
 ---
 title: "Data API v1 Referenz: Endpunkt-Übersicht"
 sidebarTitle: "Introduction"
-description: "Überblick über die /v1/-Endpunkte: Basis-URL, Authentifizierung, Response-Header, Fehler und die Endpunkt-Gruppen ohne Versions-Präfix."
+description: "Überblick über die /v1/-Endpunkte: Basis-URL, Authentifizierung, Response-Header, Fehler und die Endpunkt-Gruppen."
 ---
 
 Die `/v1/`-Endpunkte sind die versionierte Schnittstelle auf dieselben Immobiliendaten. Basis-URL: `https://api.trassets.ai`. Sende deinen API-Key im `X-API-Key`-Header bei jedem Request. Alle Antworten sind JSON.
@@ -27,7 +27,7 @@ Fehler folgen [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versionierung
 
-Alle Tabellen-Endpunkte liegen unter `/v1/`; die früheren Pfade ohne Versionspräfix liefern `404`. Siehe [Versionierung](/de/concepts/versioning).
+Alle Endpunkte liegen unter `/v1/`; unversionierte Pfade liefern `404`. Siehe [Versionierung](/de/concepts/versioning).
 
 ## Endpunkt-Gruppen
 
@@ -59,11 +59,11 @@ Alle Tabellen-Endpunkte liegen unter `/v1/`; die früheren Pfade ohne Versionspr
 
 Die [Datenmodell-Übersicht](/de/v1/data-model/overview) listet alle `/v1/`-Tabellen und wie sie zusammenhängen.
 
-## Endpunkt-Gruppen ohne Versions-Präfix
+## Catalog und Delta Sync
 
-Zwei Endpunkt-Gruppen existieren einmal für die gesamte API und tragen kein `/v1/`-Präfix. Catalog und Delta Sync stehen in der Seitenleiste unterhalb der Kategorien.
+Zwei Endpunkt-Gruppen gelten für alle Kategorien.
 
-| Gruppe | Endpunkt | Was unter `/v1/` zu erwarten ist |
+| Gruppe | Endpunkt | Zweck |
 | --- | --- | --- |
-| Catalog | `GET /catalog` | Listet alle Kategorien und Tabellen, die die API bereitstellt. Für das `/v1/`-Inventar die [Datenmodell-Übersicht](/de/v1/data-model/overview) nutzen. |
-| Delta Sync | `GET /changes` | Liefert Sync-Zeitstempel pro Tabelle. Benötigt den Parameter `since` (ISO-8601 UTC). |
+| Catalog | `GET /v1/catalog` | Listet alle Kategorien und Tabellen, die die API bereitstellt. Für das `/v1/`-Inventar die [Datenmodell-Übersicht](/de/v1/data-model/overview) nutzen. |
+| Delta Sync | `GET /v1/changes` | Liefert Sync-Zeitstempel pro Tabelle. Benötigt den Parameter `since` (ISO-8601 UTC). |

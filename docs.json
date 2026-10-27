@@ -80,14 +80,6 @@
                       "directory": "v1/api-reference",
                       "overlays": ["overlays/add-servers.yaml"]
                     }
-                  },
-                  {
-                    "group": "Catalog",
-                    "pages": ["v1/api-reference/unversioned/catalog"]
-                  },
-                  {
-                    "group": "Delta Sync",
-                    "pages": ["v1/api-reference/unversioned/changes"]
                   }
                 ]
               }
@@ -160,14 +152,6 @@
                       "directory": "v1/api-reference",
                       "overlays": ["overlays/add-servers.yaml"]
                     }
-                  },
-                  {
-                    "group": "Catalog",
-                    "pages": ["de/v1/api-reference/unversioned/catalog"]
-                  },
-                  {
-                    "group": "Delta Sync",
-                    "pages": ["de/v1/api-reference/unversioned/changes"]
                   }
                 ]
               }
@@ -203,6 +187,8 @@
     { "source": "/v1/overview", "destination": "/en" },
     { "source": "/v1/api-reference/unversioned/raw-tables", "destination": "/v1/api-reference/introduction" },
     { "source": "/v1/api-reference/unversioned/raw-table", "destination": "/v1/api-reference/introduction" },
+    { "source": "/v1/api-reference/unversioned/:slug*", "destination": "/v1/api-reference/introduction" },
+    { "source": "/de/v1/api-reference/unversioned/:slug*", "destination": "/de/v1/api-reference/introduction" },
     { "source": "/introduction", "destination": "/en" },
     { "source": "/de/index", "destination": "/" },
     { "source": "/quickstart", "destination": "/v1/quickstart" },
