@@ -1,7 +1,7 @@
 ---
 title: "Sync Cycle: How Data Gets Into the API"
 sidebarTitle: "Sync Cycle"
-description: "Understand the upstream sync behind the Data API: TRUNCATE+Reload semantics, last_sync_at, and what GET /changes actually detects."
+description: "Understand the upstream sync behind the Data API: TRUNCATE+Reload semantics, last_sync_at, and what GET /v1/changes actually detects."
 ---
 
 The Data API is a read-only interface over data that is synced in from an
@@ -22,7 +22,7 @@ incremental update at the table level. This has two direct consequences for inte
 
 1. **No partial sync.** A table is either fully replaced by the latest sync, or it isn't
    touched at all. There is no mechanism to sync "only the rows that changed" within a
-   single table — `GET /changes` (below) tells you which *tables* changed, not which *rows*.
+   single table — `GET /v1/changes` (below) tells you which *tables* changed, not which *rows*.
 2. **Schema changes are always breaking for cumulative tables.** For tables that
    accumulate history across reloads (for example `contract_ends`), a schema change cannot
    be applied additively — TRUNCATE + Reload always replaces the entire table content, so
@@ -36,14 +36,14 @@ incremental update at the table level. This has two direct consequences for inte
 `NULL` until the first successful sync, and a failed or in-progress sync does not advance
 it. This means:
 
-- A table with no successful sync yet will never appear in `GET /changes`, regardless of
+- A table with no successful sync yet will never appear in `GET /v1/changes`, regardless of
   how recently a sync was attempted.
 - `last_sync_at` reflects **table-level** completion, not the modification time of any
   individual row inside that table.
 
-## What `GET /changes` actually checks
+## What `GET /v1/changes` actually checks
 
-`GET /changes?since=<timestamp>` returns a table only if it has completed a successful sync
+`GET /v1/changes?since=<timestamp>` returns a table only if it has completed a successful sync
 with `last_sync_at > since` — a **strict** greater-than comparison, not `>=`.
 
 The `ETag` response header is derived from the maximum `last_sync_at` across all of a customer's
@@ -62,11 +62,11 @@ pattern).
 
 ## Practical implications for your integration
 
-- **Poll `/changes`, don't guess a schedule.** Because there is no documented, enforced
-  sync interval, build your integration to react to what `/changes` reports rather than
+- **Poll `/v1/changes`, don't guess a schedule.** Because there is no documented, enforced
+  sync interval, build your integration to react to what `/v1/changes` reports rather than
   assuming data updates at a fixed time of day.
 - **A changed table means "re-fetch everything for this table," not "here are the diffs."**
-  Row-level change detection does not exist yet — when a table appears in `/changes`, the
+  Row-level change detection does not exist yet — when a table appears in `/v1/changes`, the
   safest action is a full re-fetch of that category or raw endpoint.
 - **Treat `last_sync_at` as a freshness signal, not a change log.** It tells you the table
   was successfully reloaded at that time; it does not tell you which rows differ from the

@@ -1,25 +1,25 @@
 ---
 title: "Delta Sync nutzen, um geänderte Tabellen effizient zu erkennen"
-description: "/changes mit dem Parameter since und ETags abfragen, um unnötige Abrufe zu vermeiden und zu erkennen, welche Tabellen seit dem letzten Sync neue Daten haben."
+description: "/v1/changes mit dem Parameter since und ETags abfragen, um unnötige Abrufe zu vermeiden und zu erkennen, welche Tabellen seit dem letzten Sync neue Daten haben."
 sidebarTitle: "Delta Sync"
 ---
 
-Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne jeden Endpunkt abzurufen. Der Endpunkt `GET /changes` der Data API liefert Metadaten für geänderte Tabellen und unterstützt bedingte Requests über ETag, um Polling zu überspringen, wenn nichts Neues vorliegt.
+Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne jeden Endpunkt abzurufen. Der Endpunkt `GET /v1/changes` der Data API liefert Metadaten für geänderte Tabellen und unterstützt bedingte Requests über ETag, um Polling zu überspringen, wenn nichts Neues vorliegt.
 
 <Tip>
-  Frage `/changes` alle 15–60 Minuten ab. Der zugrunde liegende Sync läuft als täglicher Batch — häufigeres Abfragen liefert keine neueren Daten, sondern verbraucht nur mehr von deinem 500-Requests/h-Budget. Kombiniere das mit dem `since`/ETag-Muster weiter unten, damit unveränderte Abfragen günstig bleiben.
+  Frage `/v1/changes` alle 15–60 Minuten ab. Der zugrunde liegende Sync läuft als täglicher Batch — häufigeres Abfragen liefert keine neueren Daten, sondern verbraucht nur mehr von deinem 500-Requests/h-Budget. Kombiniere das mit dem `since`/ETag-Muster weiter unten, damit unveränderte Abfragen günstig bleiben.
 </Tip>
 
 <Note>
-  Mit einem `transformed`-Key listet `/changes` nur Tabellen innerhalb der Kategorien und Tabellen des Keys; Tabellen ohne Kategorie erscheinen nie, und `?category=X` außerhalb des Keys liefert 403. Ein `raw`-Key sieht alle Tabellen — siehe [Key-Typen](/de/v1/authentication#key-typen).
+  Mit einem `transformed`-Key listet `/v1/changes` nur Tabellen innerhalb der Kategorien und Tabellen des Keys; Tabellen ohne Kategorie erscheinen nie, und `?category=X` außerhalb des Keys liefert 403. Ein `raw`-Key sieht alle Tabellen — siehe [Key-Typen](/de/v1/authentication#key-typen).
 </Note>
 
 <Steps>
   <Step title="Geänderte Tabellen abfragen">
-    Sende einen `GET`-Request an `/changes` mit einem ISO-8601-Zeitstempel `since` (UTC, z. B. `…Z`). Ein Offset wie `+02:00` wird nach UTC umgerechnet; schreibe das `+` in der Query-String als `%2B`, sonst wird es als Leerzeichen gelesen und die Anfrage scheitert mit 400. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL. Eine hier gelistete Tabelle musst du **vollständig** neu abrufen — `/changes` meldet geänderte Tabellen, keine geänderten Zeilen. `endpoint_url` zeigt auf den abzurufenden Pfad: `/v1/{category}/{table}` für Category-Tabellen, `/v1/raw/{table}` für Raw-Tabellen. Für dein Konto gesperrte Raw-Tabellen werden nicht gelistet. Mit dem optionalen Parameter `category` (z. B. `category=property`) werden nur Tabellen dieser Kategorie zurückgegeben.
+    Sende einen `GET`-Request an `/v1/changes` mit einem ISO-8601-Zeitstempel `since` (UTC, z. B. `…Z`). Ein Offset wie `+02:00` wird nach UTC umgerechnet; schreibe das `+` in der Query-String als `%2B`, sonst wird es als Leerzeichen gelesen und die Anfrage scheitert mit 400. Die Antwort listet jede Tabelle auf, deren `last_sync_at` nach diesem Zeitstempel liegt, inklusive der zugehörigen Endpunkt-URL. Eine hier gelistete Tabelle musst du **vollständig** neu abrufen — `/v1/changes` meldet geänderte Tabellen, keine geänderten Zeilen. `endpoint_url` zeigt auf den abzurufenden Pfad: `/v1/{category}/{table}` für Category-Tabellen, `/v1/raw/{table}` für Raw-Tabellen. Für dein Konto gesperrte Raw-Tabellen werden nicht gelistet. Mit dem optionalen Parameter `category` (z. B. `category=property`) werden nur Tabellen dieser Kategorie zurückgegeben.
 
     ```bash
-    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -43,13 +43,13 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
     ```
   </Step>
   <Step title="Nur geänderte Tabellen abrufen">
-    Rufe für jedes von `/changes` zurückgegebene Element nur den entsprechenden Endpunkt ab. Überspringe jede Tabelle, die nicht in der Antwort enthalten ist. So vermeidest du unnötigen Datentransfer und schonst dein Rate-Limit-Budget von 500 Req/h.
+    Rufe für jedes von `/v1/changes` zurückgegebene Element nur den entsprechenden Endpunkt ab. Überspringe jede Tabelle, die nicht in der Antwort enthalten ist. So vermeidest du unnötigen Datentransfer und schonst dein Rate-Limit-Budget von 500 Req/h.
   </Step>
   <Step title="Bedingtes GET bei nachfolgenden Abfragen nutzen">
-    Speichere den `ETag`-Header aus der ersten erfolgreichen `/changes`-Antwort. Sende ihn bei deiner nächsten Abfrage als `If-None-Match` zurück.
+    Speichere den `ETag`-Header aus der ersten erfolgreichen `/v1/changes`-Antwort. Sende ihn bei deiner nächsten Abfrage als `If-None-Match` zurück.
 
     ```bash
-    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
       -H "X-API-Key: $TRASSETS_API_KEY" \
       -H "If-None-Match: \"abc123\""
     ```
@@ -57,9 +57,9 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
     Der `ETag` hängt auch von `since` und `category` ab; bewahre ihn deshalb zusammen mit dem `since` auf, für das er ausgestellt wurde. Wenn sich seit der Ausstellung des ETag keine Tabellen geändert haben, liefert die API `304 Not Modified` mit leerem Body und überspringt die Datenbankabfrage. Der Request zählt trotzdem auf dein Rate-Limit.
   </Step>
   <Step title="Den Parameter since fortschreiben">
-    Speichere nach einem erfolgreichen Sync das höchste `last_sync_at` aus der `/changes`-Antwort und nutze es als Wert für `since` bei der nächsten Abfrage. So entsteht ein gleitendes Zeitfenster, sodass jeder Lauf nur das Intervall seit dem vorherigen Lauf bewertet. Ist die Antwort leer, bleibt das bisherige `since` bestehen.
+    Speichere nach einem erfolgreichen Sync das höchste `last_sync_at` aus der `/v1/changes`-Antwort und nutze es als Wert für `since` bei der nächsten Abfrage. So entsteht ein gleitendes Zeitfenster, sodass jeder Lauf nur das Intervall seit dem vorherigen Lauf bewertet. Ist die Antwort leer, bleibt das bisherige `since` bestehen.
 
-    Nimm dafür nicht deine eigene Uhr. Client- und Serveruhr weichen voneinander ab, und eine Tabelle, die kurz vor deinem Zeitstempel fertig synchronisiert wurde, würde in keiner späteren `/changes`-Antwort mehr auftauchen.
+    Nimm dafür nicht deine eigene Uhr. Client- und Serveruhr weichen voneinander ab, und eine Tabelle, die kurz vor deinem Zeitstempel fertig synchronisiert wurde, würde in keiner späteren `/v1/changes`-Antwort mehr auftauchen.
   </Step>
   <Step title="Vollständiges Python-Beispiel">
     Ein vollständiger Poller, der den Zeitstempel `since` und den `ETag` zwischen den Läufen
@@ -77,7 +77,7 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
 
 
     def poll_changes(since: str, etag: str | None = None):
-        """Poll /changes and return (changed_tables, new_etag, new_since).
+        """Poll /v1/changes and return (changed_tables, new_etag, new_since).
 
         changed_tables is an empty list on a 304 Not Modified response, and
         new_since stays unchanged then.
@@ -87,7 +87,7 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
             headers["If-None-Match"] = etag
 
         resp = requests.get(
-            f"{BASE_URL}/changes", headers=headers, params={"since": since}, timeout=30
+            f"{BASE_URL}/v1/changes", headers=headers, params={"since": since}, timeout=30
         )
 
         if resp.status_code == 304:

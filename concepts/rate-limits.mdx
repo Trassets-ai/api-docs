@@ -38,5 +38,5 @@ If you do receive a 429 response, use the `Retry-After` header instead of guessi
 For long-running sync jobs, spread requests evenly across the hour instead of bursting at the start. For example, a job that issues one request every 7 seconds will stay safely under the 500 request limit.
 
 <Tip>
-  Use the [Delta Sync endpoint](/guides/delta-sync) (`GET /changes`) to poll for changed tables instead of repeatedly querying every endpoint. This lets you skip endpoints that have not changed since your last sync, reducing your overall request volume.
+  Use the [Delta Sync endpoint](/guides/delta-sync) (`GET /v1/changes`) to poll for changed tables instead of repeatedly querying every endpoint. This lets you skip endpoints that have not changed since your last sync, reducing your overall request volume.
 </Tip>

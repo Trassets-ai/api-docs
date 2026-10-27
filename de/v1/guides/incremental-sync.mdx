@@ -1,10 +1,10 @@
 ---
 title: "Immobiliendaten mit Trassets inkrementell synchronisieren"
-description: "Eine lokale Kopie der Trassets-Daten aktuell halten — über /changes erfährst du, welche Tabellen neu geladen wurden, und rufst nur diese vollständig erneut ab."
+description: "Eine lokale Kopie der Trassets-Daten aktuell halten — über /v1/changes erfährst du, welche Tabellen neu geladen wurden, und rufst nur diese vollständig erneut ab."
 sidebarTitle: "Incremental Sync"
 ---
 
-Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufen. Jeder Sync lädt die Tabellen vollständig neu, es gibt also kein Delta auf Zeilenebene: Die Einheit der Änderung ist die Tabelle. Frage über [`/changes`](/de/guides/delta-sync) ab, welche Tabellen seit deinem letzten Lauf neu geladen wurden, und rufe genau diese Tabellen erneut ab — vollständig.
+Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufen. Jeder Sync lädt die Tabellen vollständig neu, es gibt also kein Delta auf Zeilenebene: Die Einheit der Änderung ist die Tabelle. Frage über [`/v1/changes`](/de/guides/delta-sync) ab, welche Tabellen seit deinem letzten Lauf neu geladen wurden, und rufe genau diese Tabellen erneut ab — vollständig.
 
 <Warning>
   Speichere `next_cursor` nicht zwischen Läufen. Nach einem Neuladen können sich Zeilen ändern, wegfallen oder ihre Position verschieben. Wer bei einem alten Cursor fortsetzt, behält unbemerkt veraltete Daten.
@@ -12,10 +12,10 @@ Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufe
 
 <Steps>
   <Step title="Die neu geladenen Tabellen finden">
-    Rufe `/changes` mit dem `since`-Wert aus deinem letzten Lauf auf. Nimm dafür das höchste `last_sync_at` aus der Antwort dieses Laufs; beim allerersten Lauf einen Zeitstempel bis zu 120 Tage zurück. Jeder Eintrag enthält die `endpoint_url`, die du abrufen musst.
+    Rufe `/v1/changes` mit dem `since`-Wert aus deinem letzten Lauf auf. Nimm dafür das höchste `last_sync_at` aus der Antwort dieses Laufs; beim allerersten Lauf einen Zeitstempel bis zu 120 Tage zurück. Jeder Eintrag enthält die `endpoint_url`, die du abrufen musst.
 
     ```bash
-    curl -s "https://api.trassets.ai/changes?since=2026-07-01T00:00:00Z" \
+    curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -68,7 +68,7 @@ Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufe
         Returns the rows per table and the `since` value for the next run.
         """
         resp = requests.get(
-            f"{BASE_URL}/changes", headers=HEADERS, params={"since": since}, timeout=30
+            f"{BASE_URL}/v1/changes", headers=HEADERS, params={"since": since}, timeout=30
         )
         resp.raise_for_status()
         changed = resp.json()
