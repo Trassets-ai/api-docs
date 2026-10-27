@@ -11,144 +11,6 @@
   "navigation": {
     "versions": [
       {
-        "version": "Current",
-        "tag": "Deprecated",
-        "languages": [
-      {
-        "language": "en",
-        "tabs": [
-          {
-            "tab": "Documentation",
-            "groups": [
-              {
-                "group": "Get Started",
-                "pages": [
-                  "authentication",
-                  "introduction",
-                  "quickstart"
-                ]
-              },
-              {
-                "group": "Core Concepts",
-                "pages": [
-                  "concepts/endpoint-types",
-                  "concepts/errors",
-                  "concepts/rate-limits",
-                  "concepts/filtering",
-                  "concepts/pagination"
-                ]
-              },
-              {
-                "group": "Guides",
-                "pages": [
-                  "guides/bulk-export",
-                  "guides/delta-sync",
-                  "guides/incremental-sync"
-                ]
-              },
-              {
-                "group": "Data Model",
-                "pages": [
-                  "data-model/accounting",
-                  "data-model/contracts",
-                  "data-model/depreciation",
-                  "data-model/field-glossary",
-                  "data-model/operations",
-                  "data-model/overview",
-                  "data-model/property",
-                  "data-model/stakeholder"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "API Reference",
-            "groups": [
-              {
-                "group": "Overview",
-                "pages": [
-                  "api-reference/introduction"
-                ]
-              },
-              {
-                "group": "Endpoints",
-                "openapi": {
-                  "source": "https://api.trassets.ai/openapi.json",
-                  "overlays": ["overlays/add-servers.yaml"]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "language": "de",
-        "default": true,
-        "tabs": [
-          {
-            "tab": "Dokumentation",
-            "groups": [
-              {
-                "group": "Erste Schritte",
-                "pages": [
-                  "de/authentication",
-                  "de/quickstart",
-                  "de/index"
-                ]
-              },
-              {
-                "group": "Kernkonzepte",
-                "pages": [
-                  "de/concepts/rate-limits",
-                  "de/concepts/filtering",
-                  "de/concepts/pagination",
-                  "de/concepts/sync-cycle"
-                ]
-              },
-              {
-                "group": "Anleitungen",
-                "pages": [
-                  "de/guides/bulk-export"
-                ]
-              },
-              {
-                "group": "Datenmodell",
-                "pages": [
-                  "de/data-model/accounting",
-                  "de/data-model/contracts",
-                  "de/data-model/depreciation",
-                  "de/data-model/field-glossary",
-                  "de/data-model/operations",
-                  "de/data-model/property",
-                  "de/data-model/stakeholder",
-                  "de/data-model/overview"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "API-Referenz",
-            "groups": [
-              {
-                "group": "Übersicht",
-                "pages": [
-                  "de/api-reference/introduction"
-                ]
-              },
-              {
-                "group": "Endpunkte",
-                "openapi": {
-                  "source": "https://api.trassets.ai/openapi.json",
-                  "overlays": ["overlays/add-servers.yaml"]
-                }
-              }
-            ]
-          }
-        ]
-      }
-        ]
-      },
-      {
         "version": "v1",
         "default": true,
         "languages": [
@@ -171,6 +33,7 @@
                     "pages": [
                       "v1/response-shape-conventions",
                       "v1/concepts/endpoint-types",
+                      "v1/concepts/filtering",
                       "v1/concepts/pagination",
                       "concepts/errors",
                       "concepts/rate-limits",
@@ -250,6 +113,7 @@
                     "pages": [
                       "de/v1/response-shape-conventions",
                       "de/v1/concepts/endpoint-types",
+                      "de/v1/concepts/filtering",
                       "de/v1/concepts/pagination",
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
@@ -338,6 +202,26 @@
     { "source": "/de/v1/overview", "destination": "/" },
     { "source": "/v1/overview", "destination": "/en" },
     { "source": "/v1/api-reference/unversioned/raw-tables", "destination": "/v1/api-reference/introduction" },
-    { "source": "/v1/api-reference/unversioned/raw-table", "destination": "/v1/api-reference/introduction" }
+    { "source": "/v1/api-reference/unversioned/raw-table", "destination": "/v1/api-reference/introduction" },
+    { "source": "/introduction", "destination": "/en" },
+    { "source": "/de/index", "destination": "/" },
+    { "source": "/quickstart", "destination": "/v1/quickstart" },
+    { "source": "/de/quickstart", "destination": "/de/v1/quickstart" },
+    { "source": "/authentication", "destination": "/v1/authentication" },
+    { "source": "/de/authentication", "destination": "/de/v1/authentication" },
+    { "source": "/concepts/endpoint-types", "destination": "/v1/concepts/endpoint-types" },
+    { "source": "/de/concepts/endpoint-types", "destination": "/de/v1/concepts/endpoint-types" },
+    { "source": "/concepts/filtering", "destination": "/v1/concepts/filtering" },
+    { "source": "/de/concepts/filtering", "destination": "/de/v1/concepts/filtering" },
+    { "source": "/concepts/pagination", "destination": "/v1/concepts/pagination" },
+    { "source": "/de/concepts/pagination", "destination": "/de/v1/concepts/pagination" },
+    { "source": "/guides/incremental-sync", "destination": "/v1/guides/incremental-sync" },
+    { "source": "/de/guides/incremental-sync", "destination": "/de/v1/guides/incremental-sync" },
+    { "source": "/api-reference/introduction", "destination": "/v1/api-reference/introduction" },
+    { "source": "/de/api-reference/introduction", "destination": "/de/v1/api-reference/introduction" },
+    { "source": "/data-model/:slug*", "destination": "/v1/data-model/:slug*" },
+    { "source": "/de/data-model/:slug*", "destination": "/de/v1/data-model/:slug*" },
+    { "source": "/api-reference/:slug*", "destination": "/v1/api-reference/introduction" },
+    { "source": "/de/api-reference/:slug*", "destination": "/de/v1/api-reference/introduction" }
   ]
 }
