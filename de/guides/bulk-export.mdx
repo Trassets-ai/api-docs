@@ -1,21 +1,21 @@
 ---
 title: "Eine vollständige Tabelle mit Raw-Endpunkten exportieren"
-description: "Alle Zeilen einer Quelltabelle über /raw/{table_name} exportieren — mit Cursor-basierter Pagination und konsistenten Snapshots für Warehousing oder Analytics."
+description: "Alle Zeilen einer Quelltabelle über /v1/raw/{table_name} exportieren — mit Cursor-basierter Pagination und konsistenten Snapshots für Warehousing oder Analytics."
 sidebarTitle: "Bulk Export"
 ---
 
 Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder deine Analytics-Pipeline. Raw-Endpunkte liefern ungefilterte Zeilen aus der zugrunde liegenden Datenbank mit Cursor-basierter Pagination und Headern für Snapshot-Konsistenz.
 
 <Note>
-  Raw-Endpunkte erfordern einen Key vom Typ `raw`; zum Lesen einer Tabelle (`GET /raw/{table_name}`) braucht er zusätzlich beide Grants für personenbezogene Daten, `personal` und `personal_financial`, sonst liefert der Aufruf 403. Ein `transformed`-Key bekommt auf `GET /raw/{table_name}` ein 403 und von `GET /raw/tables` eine leere Liste — siehe [Key-Typen](/de/authentication#key-typen). Raw-Tabellen, die für deine Umgebung nicht freigegeben sind, erscheinen weder in `/raw/tables` noch in `/changes`; ein direkter Aufruf liefert 404.
+  Raw-Endpunkte erfordern einen Key vom Typ `raw`; zum Lesen einer Tabelle (`GET /v1/raw/{table_name}`) braucht er zusätzlich beide Grants für personenbezogene Daten, `personal` und `personal_financial`, sonst liefert der Aufruf 403. Ein `transformed`-Key bekommt auf `GET /v1/raw/{table_name}` ein 403 und von `GET /v1/raw/tables` eine leere Liste — siehe [Key-Typen](/de/v1/authentication#key-typen). Raw-Tabellen, die für deine Umgebung nicht freigegeben sind, erscheinen weder in `/v1/raw/tables` noch in `/changes`; ein direkter Aufruf liefert 404.
 </Note>
 
 <Steps>
   <Step title="Verfügbare Tabellen auflisten">
-    Rufe `GET /raw/tables` auf, um herauszufinden, welche Tabellen verfügbar sind, ihre Primärschlüssel, Zeilenanzahlen und den Sync-Status.
+    Rufe `GET /v1/raw/tables` auf, um herauszufinden, welche Tabellen verfügbar sind, ihre Primärschlüssel, Zeilenanzahlen und den Sync-Status.
 
     ```bash
-    curl -s "https://api.trassets.ai/raw/tables" \
+    curl -s "https://api.trassets.ai/v1/raw/tables" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -37,7 +37,7 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
     Fordere die erste Seite der gewünschten Tabelle an. Setze `limit` bis zum Maximum von `10000`.
 
     ```bash
-    curl -s "https://api.trassets.ai/raw/sollart?limit=10000" \
+    curl -s "https://api.trassets.ai/v1/raw/sollart?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -51,7 +51,7 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
       "count": 1,
       "next_cursor": "eyJjb2wiOiAiSERSX0lEIiwgInZhbCI6IDF9",
       "table_name": "sollart",
-      "total_rows": 47
+      "total": 47
     }
     ```
   </Step>
@@ -65,10 +65,10 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
     
     while true; do
       if [ -z "$CURSOR" ]; then
-        RESP=$(curl -s "https://api.trassets.ai/raw/${TABLE}?limit=10000" \
+        RESP=$(curl -s "https://api.trassets.ai/v1/raw/${TABLE}?limit=10000" \
           -H "X-API-Key: $TRASSETS_API_KEY")
       else
-        RESP=$(curl -s "https://api.trassets.ai/raw/${TABLE}?limit=10000&cursor=${CURSOR}" \
+        RESP=$(curl -s "https://api.trassets.ai/v1/raw/${TABLE}?limit=10000&cursor=${CURSOR}" \
           -H "X-API-Key: $TRASSETS_API_KEY")
       fi
     
@@ -85,7 +85,7 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
     Prüfe bei jeder Seite den Response-Header `X-Snapshot-At`. Alle Zeilen innerhalb einer einzelnen Cursor-Sequenz sind zu diesem Zeitstempel konsistent. Wenn sich der Header zwischen den Seiten ändert, starte den Export neu, um eine einheitliche Snapshot-Sicht sicherzustellen.
 
     ```bash
-    curl -sI "https://api.trassets.ai/raw/sollart?limit=10000" \
+    curl -sI "https://api.trassets.ai/v1/raw/sollart?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY" | grep -i x-snapshot-at
     ```
   </Step>
@@ -115,7 +115,7 @@ Exportiere eine komplette Quelltabelle aus der Data API in dein Warehouse oder d
                 params["cursor"] = cursor
 
             resp = requests.get(
-                f"{BASE_URL}/raw/{table_name}", headers=HEADERS, params=params, timeout=60
+                f"{BASE_URL}/v1/raw/{table_name}", headers=HEADERS, params=params, timeout=60
             )
             resp.raise_for_status()
 

@@ -1,21 +1,21 @@
 ---
 title: "Bulk export a full table with Raw endpoints"
-description: "Use /raw/{table_name} to export all rows from a source table for warehousing or analytics using cursor-based pagination and consistent snapshots."
+description: "Use /v1/raw/{table_name} to export all rows from a source table for warehousing or analytics using cursor-based pagination and consistent snapshots."
 sidebarTitle: "Bulk Export"
 ---
 
 Export an entire source table from the Data API into your warehouse or analytics pipeline. Raw endpoints return unfiltered rows from the underlying database with cursor-based pagination and snapshot consistency headers.
 
 <Note>
-  Raw endpoints require a key of type `raw`; reading a table (`GET /raw/{table_name}`) additionally needs both personal data grants, `personal` and `personal_financial`, otherwise it returns 403. A `transformed` key gets 403 on `GET /raw/{table_name}` and an empty list from `GET /raw/tables` — see [Key types](/authentication#key-types). Raw tables that are not released for your environment appear neither in `/raw/tables` nor in `/changes`, and a direct call returns 404.
+  Raw endpoints require a key of type `raw`; reading a table (`GET /v1/raw/{table_name}`) additionally needs both personal data grants, `personal` and `personal_financial`, otherwise it returns 403. A `transformed` key gets 403 on `GET /v1/raw/{table_name}` and an empty list from `GET /v1/raw/tables` — see [Key types](/v1/authentication#key-types). Raw tables that are not released for your environment appear neither in `/v1/raw/tables` nor in `/changes`, and a direct call returns 404.
 </Note>
 
 <Steps>
   <Step title="List available tables">
-    Call `GET /raw/tables` to discover which tables are available, their primary keys, row counts, and sync status.
+    Call `GET /v1/raw/tables` to discover which tables are available, their primary keys, row counts, and sync status.
 
     ```bash
-    curl -s "https://api.trassets.ai/raw/tables" \
+    curl -s "https://api.trassets.ai/v1/raw/tables" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -37,7 +37,7 @@ Export an entire source table from the Data API into your warehouse or analytics
     Request the first page of the table you want. Set `limit` up to the maximum of `10000`.
 
     ```bash
-    curl -s "https://api.trassets.ai/raw/sollart?limit=10000" \
+    curl -s "https://api.trassets.ai/v1/raw/sollart?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
@@ -51,7 +51,7 @@ Export an entire source table from the Data API into your warehouse or analytics
       "count": 1,
       "next_cursor": "eyJjb2wiOiAiSERSX0lEIiwgInZhbCI6IDF9",
       "table_name": "sollart",
-      "total_rows": 47
+      "total": 47
     }
     ```
   </Step>
@@ -65,10 +65,10 @@ Export an entire source table from the Data API into your warehouse or analytics
     
     while true; do
       if [ -z "$CURSOR" ]; then
-        RESP=$(curl -s "https://api.trassets.ai/raw/${TABLE}?limit=10000" \
+        RESP=$(curl -s "https://api.trassets.ai/v1/raw/${TABLE}?limit=10000" \
           -H "X-API-Key: $TRASSETS_API_KEY")
       else
-        RESP=$(curl -s "https://api.trassets.ai/raw/${TABLE}?limit=10000&cursor=${CURSOR}" \
+        RESP=$(curl -s "https://api.trassets.ai/v1/raw/${TABLE}?limit=10000&cursor=${CURSOR}" \
           -H "X-API-Key: $TRASSETS_API_KEY")
       fi
     
@@ -85,7 +85,7 @@ Export an entire source table from the Data API into your warehouse or analytics
     Check the `X-Snapshot-At` response header on every page. All rows within a single cursor sequence are consistent as of that timestamp. If the header changes between pages, start the export over to ensure a single snapshot view.
 
     ```bash
-    curl -sI "https://api.trassets.ai/raw/sollart?limit=10000" \
+    curl -sI "https://api.trassets.ai/v1/raw/sollart?limit=10000" \
       -H "X-API-Key: $TRASSETS_API_KEY" | grep -i x-snapshot-at
     ```
   </Step>
@@ -115,7 +115,7 @@ Export an entire source table from the Data API into your warehouse or analytics
                 params["cursor"] = cursor
 
             resp = requests.get(
-                f"{BASE_URL}/raw/{table_name}", headers=HEADERS, params=params, timeout=60
+                f"{BASE_URL}/v1/raw/{table_name}", headers=HEADERS, params=params, timeout=60
             )
             resp.raise_for_status()
 

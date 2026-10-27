@@ -24,7 +24,7 @@ curl -G "https://api.trassets.ai/v1/property/properties" \
 
 ## Raw Endpoints
 
-Raw endpoints follow the path pattern `/v1/raw/{table_name}` and return full, unfiltered source tables exactly as they exist in the replication layer. The same tables are also available under `/raw/{table_name}`.
+Raw endpoints follow the path pattern `/v1/raw/{table_name}` and return full, unfiltered source tables exactly as they exist in the replication layer.
 
 Use these endpoints for bulk synchronization, full-table exports, and loading data into a data warehouse. The response includes an `X-Snapshot-At` header that tells you the sync timestamp for the current snapshot.
 

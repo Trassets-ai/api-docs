@@ -24,7 +24,7 @@ curl -G "https://api.trassets.ai/v1/property/properties" \
 
 ## Raw-Endpunkte
 
-Raw-Endpunkte folgen dem Pfadmuster `/v1/raw/{table_name}` und liefern vollständige, ungefilterte Quelltabellen genau so, wie sie in der Replikationsschicht vorliegen. Dieselben Tabellen sind auch unter `/raw/{table_name}` erreichbar.
+Raw-Endpunkte folgen dem Pfadmuster `/v1/raw/{table_name}` und liefern vollständige, ungefilterte Quelltabellen genau so, wie sie in der Replikationsschicht vorliegen.
 
 Nutze diese Endpunkte für Bulk-Synchronisation, vollständige Tabellenexporte und das Laden in ein Data Warehouse. Die Antwort enthält einen `X-Snapshot-At`-Header mit dem Sync-Zeitstempel des aktuellen Snapshots.
 

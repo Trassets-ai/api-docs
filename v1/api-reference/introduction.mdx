@@ -13,13 +13,13 @@ Every `/v1/{category}/{api_table}` response is a JSON object with the rows in `d
 | Type | Path pattern | Pagination | Use case |
 | --- | --- | --- | --- |
 | Category endpoints | `/v1/{category}/{api_table}` | Cursor-based (`limit` / `cursor`, `next_cursor` in body) | Business queries, dashboards, incremental fetches |
-| Raw endpoints | `/v1/raw/{table_name}` (or `/raw/{table_name}`) | Cursor-based (`cursor` from `next_cursor` in body) | Bulk sync, full exports, data warehousing |
+| Raw endpoints | `/v1/raw/{table_name}` | Cursor-based (`cursor` from `next_cursor` in body) | Bulk sync, full exports, data warehousing |
 
-Raw endpoints are generic per customer (no per-table content review), so both the unversioned and `/v1/` path always expose the same tables. The `/v1/` path uses the same response keys as the category endpoints (`total`); the unversioned path keeps `total_rows`.
+Raw endpoints are generic per customer (no per-table content review). They use the same response keys as the category endpoints (`total`).
 
 ### Pagination
 
-Cursor-only, with the pagination fields in the body instead of headers. Coming from the unversioned API: `X-Total-Count` → `total`, `X-Has-More` and `X-Next-Cursor` → `next_cursor` (`null` = no further page), `X-Next-Offset` → none, `/v1/` has no `offset`. Details: [Pagination](/v1/concepts/pagination).
+Cursor-only, with the pagination fields in the body: `total` and `next_cursor` (`null` = no further page). There is no `offset`; a request with `offset` returns `400 Bad Request`. Details: [Pagination](/v1/concepts/pagination).
 
 ## Error format
 
@@ -27,7 +27,7 @@ Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Versioning
 
-`/v1/` replaces the unversioned category and raw paths, which will be switched off. See [Versioning](/concepts/versioning) for the migration steps.
+All table endpoints live under `/v1/`; the former paths without a version prefix return `404`. See [Versioning](/concepts/versioning).
 
 ## Endpoint groups
 
@@ -61,10 +61,9 @@ Errors follow [RFC 7807](https://datatracker.ietf.org/doc/html/rfc7807) (`applic
 
 ## Endpoint groups without a version prefix
 
-Three endpoint groups exist once for the whole API and carry no `/v1/` prefix. Catalog and Delta Sync are listed in the sidebar below the categories.
+Two endpoint groups exist once for the whole API and carry no `/v1/` prefix. Catalog and Delta Sync are listed in the sidebar below the categories.
 
 | Group | Endpoint | What to expect under `/v1/` |
 | --- | --- | --- |
 | Catalog | `GET /catalog` | Lists all categories and tables exposed by the API. Use [Data Model Overview](/v1/data-model/overview) for the `/v1/` inventory. |
 | Delta Sync | `GET /changes` | Reports sync timestamps per table. Requires a `since` parameter (ISO-8601 UTC). |
-| Raw Data | `GET /raw/tables`, `GET /raw/{table_name}` | Source tables below the modelled layer. Same data as `/v1/raw/tables` / `/v1/raw/{table_name}`, documented in the **Endpoints** group. |
