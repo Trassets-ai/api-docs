@@ -12,7 +12,7 @@ Maintain a local copy of your data without fetching every table on each run. Eve
 
 <Steps>
   <Step title="Find the reloaded tables">
-    Call `/v1/changes` with the `since` value from your last run. Use the highest `last_sync_at` from that run's response; on the very first run, use a timestamp up to 120 days back. Each entry carries the `endpoint_url` to fetch.
+    Call [`/v1/changes`](/v1/api-reference/changes) with the `since` value from your last run. Use the highest `last_sync_at` from that run's response; on the very first run, use a timestamp up to 120 days back. Each entry carries the `endpoint_url` to fetch.
 
     ```bash
     curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \

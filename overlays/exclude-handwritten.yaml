@@ -1,0 +1,13 @@
+overlay: 1.0.0
+info:
+  title: Exclude endpoints that have hand-written pages
+  version: 1.0.0
+actions:
+  # /v1/catalog and /v1/changes are documented by hand in v1/api-reference/{catalog,changes}.mdx
+  # (+de). Without this, Mintlify would also generate a page for each from openapi-v1.json.
+  - target: "$.paths['/v1/catalog'].get"
+    update:
+      x-excluded: true
+  - target: "$.paths['/v1/changes'].get"
+    update:
+      x-excluded: true

@@ -70,7 +70,9 @@
                   {
                     "group": "Overview",
                     "pages": [
-                      "v1/api-reference/introduction"
+                      "v1/api-reference/introduction",
+                      "v1/api-reference/catalog",
+                      "v1/api-reference/changes"
                     ]
                   },
                   {
@@ -78,7 +80,7 @@
                     "openapi": {
                       "source": "https://api.trassets.ai/openapi-v1.json",
                       "directory": "v1/api-reference",
-                      "overlays": ["overlays/add-servers.yaml"]
+                      "overlays": ["overlays/add-servers.yaml", "overlays/exclude-handwritten.yaml"]
                     }
                   }
                 ]
@@ -142,7 +144,9 @@
                   {
                     "group": "Übersicht",
                     "pages": [
-                      "de/v1/api-reference/introduction"
+                      "de/v1/api-reference/introduction",
+                      "de/v1/api-reference/catalog",
+                      "de/v1/api-reference/changes"
                     ]
                   },
                   {
@@ -150,7 +154,7 @@
                     "openapi": {
                       "source": "https://api.trassets.ai/openapi-v1.json",
                       "directory": "v1/api-reference",
-                      "overlays": ["overlays/add-servers.yaml"]
+                      "overlays": ["overlays/add-servers.yaml", "overlays/exclude-handwritten.yaml"]
                     }
                   }
                 ]
@@ -187,8 +191,10 @@
     { "source": "/v1/overview", "destination": "/en" },
     { "source": "/v1/api-reference/unversioned/raw-tables", "destination": "/v1/api-reference/introduction" },
     { "source": "/v1/api-reference/unversioned/raw-table", "destination": "/v1/api-reference/introduction" },
-    { "source": "/v1/api-reference/unversioned/:slug*", "destination": "/v1/api-reference/introduction" },
-    { "source": "/de/v1/api-reference/unversioned/:slug*", "destination": "/de/v1/api-reference/introduction" },
+    { "source": "/v1/api-reference/unversioned/catalog", "destination": "/v1/api-reference/catalog" },
+    { "source": "/v1/api-reference/unversioned/changes", "destination": "/v1/api-reference/changes" },
+    { "source": "/de/v1/api-reference/unversioned/catalog", "destination": "/de/v1/api-reference/catalog" },
+    { "source": "/de/v1/api-reference/unversioned/changes", "destination": "/de/v1/api-reference/changes" },
     { "source": "/introduction", "destination": "/en" },
     { "source": "/de/index", "destination": "/" },
     { "source": "/quickstart", "destination": "/v1/quickstart" },

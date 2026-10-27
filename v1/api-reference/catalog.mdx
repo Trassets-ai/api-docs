@@ -1,0 +1,88 @@
+---
+title: "GET /v1/catalog: list categories and tables"
+sidebarTitle: "Catalog"
+description: "GET /v1/catalog lists the data categories and their tables that your API key can access, as the basis for building /v1/{category}/{api_table} URLs."
+---
+
+`GET /v1/catalog` returns the data categories and the tables in each category that your API key can access. Each pair of `category` and table name forms a category endpoint, `/v1/{category}/{api_table}`. For the fields of each table, see the [Data Model Overview](/v1/data-model/overview).
+
+## Request
+
+```text
+GET https://api.trassets.ai/v1/catalog
+```
+
+| Header | Required | Description |
+| --- | --- | --- |
+| `X-API-Key` | yes | Your API key. |
+
+The endpoint takes no query parameters and is not paginated.
+
+## Response
+
+`200 OK` with a JSON object:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `categories` | array | One entry per category that has at least one visible table. |
+| `categories[].category` | string | Category slug, e.g. `property`. First path segment after `/v1/`. |
+| `categories[].tables` | array of strings | Table names in this category, e.g. `properties`. Second path segment after the category. |
+
+Categories and tables are sorted alphabetically.
+
+```json
+{
+  "categories": [
+    {
+      "category": "contracts",
+      "tables": ["contract_debits", "contract_ends"]
+    },
+    {
+      "category": "property",
+      "tables": ["properties", "property_structure", "technical_objects"]
+    }
+  ]
+}
+```
+
+## Key types
+
+| Key type | What `/v1/catalog` lists |
+| --- | --- |
+| `raw` | All categories and tables. |
+| `transformed` | Only the categories and tables the key's access permissions allow. A category without any allowed table is omitted. |
+
+Raw tables are not part of the catalog; list them with `GET /v1/raw/tables`. See [Key types](/v1/authentication#key-types).
+
+## Errors
+
+Errors use the [problem JSON format](/concepts/errors).
+
+| Status | When |
+| --- | --- |
+| `401` | `X-API-Key` header missing (`API key required`) or key expired. |
+| `403` | Key unknown or disabled. |
+| `429` | Rate limit exceeded — 500 requests per hour, see [Rate Limits](/concepts/rate-limits). |
+
+## Examples
+
+```bash
+curl -s "https://api.trassets.ai/v1/catalog" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+```
+
+```python list_catalog.py
+import os
+
+import requests
+
+BASE_URL = "https://api.trassets.ai"
+HEADERS = {"X-API-Key": os.environ["TRASSETS_API_KEY"]}
+
+resp = requests.get(f"{BASE_URL}/v1/catalog", headers=HEADERS, timeout=30)
+resp.raise_for_status()
+
+for entry in resp.json()["categories"]:
+    for table in entry["tables"]:
+        print(f"/v1/{entry['category']}/{table}")
+```

@@ -4,7 +4,7 @@ description: "Poll /v1/changes with the since parameter and ETags to avoid unnec
 sidebarTitle: "Delta Sync"
 ---
 
-Discover which tables have been updated since your last sync without fetching every endpoint. The Data API `GET /v1/changes` endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
+Discover which tables have been updated since your last sync without fetching every endpoint. The Data API [`GET /v1/changes`](/v1/api-reference/changes) endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
 
 <Tip>
   Poll `/v1/changes` every 15–60 minutes. The underlying sync runs as a daily batch, so polling more often will not surface newer data — it only spends more of your 500 req/h budget. Combine this with the `since`/ETag pattern below so unchanged polls stay cheap.
@@ -37,6 +37,8 @@ Discover which tables have been updated since your last sync without fetching ev
       {
         "table_name": "sollart",
         "last_sync_at": "2026-07-07T06:05:00",
+        "category": null,
+        "api_table_name": null,
         "endpoint_url": "/v1/raw/sollart"
       }
     ]

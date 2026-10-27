@@ -12,7 +12,7 @@ Pflege eine lokale Kopie deiner Daten, ohne bei jedem Lauf jede Tabelle abzurufe
 
 <Steps>
   <Step title="Die neu geladenen Tabellen finden">
-    Rufe `/v1/changes` mit dem `since`-Wert aus deinem letzten Lauf auf. Nimm dafür das höchste `last_sync_at` aus der Antwort dieses Laufs; beim allerersten Lauf einen Zeitstempel bis zu 120 Tage zurück. Jeder Eintrag enthält die `endpoint_url`, die du abrufen musst.
+    Rufe [`/v1/changes`](/de/v1/api-reference/changes) mit dem `since`-Wert aus deinem letzten Lauf auf. Nimm dafür das höchste `last_sync_at` aus der Antwort dieses Laufs; beim allerersten Lauf einen Zeitstempel bis zu 120 Tage zurück. Jeder Eintrag enthält die `endpoint_url`, die du abrufen musst.
 
     ```bash
     curl -s "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z" \
