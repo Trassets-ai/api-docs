@@ -4,7 +4,7 @@ description: "/v1/changes mit dem Parameter since und ETags abfragen, um unnöti
 sidebarTitle: "Delta Sync"
 ---
 
-Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne jeden Endpunkt abzurufen. Der Endpunkt `GET /v1/changes` der Data API liefert Metadaten für geänderte Tabellen und unterstützt bedingte Requests über ETag, um Polling zu überspringen, wenn nichts Neues vorliegt.
+Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne jeden Endpunkt abzurufen. Der Endpunkt [`GET /v1/changes`](/de/v1/api-reference/changes) der Data API liefert Metadaten für geänderte Tabellen und unterstützt bedingte Requests über ETag, um Polling zu überspringen, wenn nichts Neues vorliegt.
 
 <Tip>
   Frage `/v1/changes` alle 15–60 Minuten ab. Der zugrunde liegende Sync läuft als täglicher Batch — häufigeres Abfragen liefert keine neueren Daten, sondern verbraucht nur mehr von deinem 500-Requests/h-Budget. Kombiniere das mit dem `since`/ETag-Muster weiter unten, damit unveränderte Abfragen günstig bleiben.
@@ -37,6 +37,8 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
       {
         "table_name": "sollart",
         "last_sync_at": "2026-07-07T06:05:00",
+        "category": null,
+        "api_table_name": null,
         "endpoint_url": "/v1/raw/sollart"
       }
     ]

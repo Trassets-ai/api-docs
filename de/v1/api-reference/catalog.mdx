@@ -1,0 +1,88 @@
+---
+title: "GET /v1/catalog: Kategorien und Tabellen auflisten"
+sidebarTitle: "Catalog"
+description: "GET /v1/catalog listet die Datenkategorien und ihre Tabellen, auf die dein API-Key zugreifen darf — die Grundlage für die URLs /v1/{category}/{api_table}."
+---
+
+`GET /v1/catalog` liefert die Datenkategorien und je Kategorie die Tabellen, auf die dein API-Key zugreifen darf. Jedes Paar aus `category` und Tabellenname ergibt einen Category-Endpunkt, `/v1/{category}/{api_table}`. Die Felder jeder Tabelle stehen in der [Datenmodell-Übersicht](/de/v1/data-model/overview).
+
+## Request
+
+```text
+GET https://api.trassets.ai/v1/catalog
+```
+
+| Header | Pflicht | Beschreibung |
+| --- | --- | --- |
+| `X-API-Key` | ja | Dein API-Key. |
+
+Der Endpunkt hat keine Query-Parameter und ist nicht paginiert.
+
+## Response
+
+`200 OK` mit einem JSON-Objekt:
+
+| Feld | Typ | Beschreibung |
+| --- | --- | --- |
+| `categories` | Array | Ein Eintrag je Kategorie mit mindestens einer sichtbaren Tabelle. |
+| `categories[].category` | String | Kategorie-Slug, z. B. `property`. Erstes Pfadsegment nach `/v1/`. |
+| `categories[].tables` | Array aus Strings | Tabellennamen dieser Kategorie, z. B. `properties`. Zweites Pfadsegment nach der Kategorie. |
+
+Kategorien und Tabellen sind alphabetisch sortiert.
+
+```json
+{
+  "categories": [
+    {
+      "category": "contracts",
+      "tables": ["contract_debits", "contract_ends"]
+    },
+    {
+      "category": "property",
+      "tables": ["properties", "property_structure", "technical_objects"]
+    }
+  ]
+}
+```
+
+## Key-Typen
+
+| Key-Typ | Was `/v1/catalog` listet |
+| --- | --- |
+| `raw` | Alle Kategorien und Tabellen. |
+| `transformed` | Nur die Kategorien und Tabellen, die die Zugriffsrechte des Keys erlauben. Eine Kategorie ohne erlaubte Tabelle fehlt. |
+
+Raw-Tabellen gehören nicht zum Catalog; sie listet `GET /v1/raw/tables`. Siehe [Key-Typen](/de/v1/authentication#key-typen).
+
+## Fehler
+
+Fehler kommen im [Problem-JSON-Format](/de/concepts/errors).
+
+| Status | Wann |
+| --- | --- |
+| `401` | Header `X-API-Key` fehlt (`API key required`) oder Key abgelaufen. |
+| `403` | Key unbekannt oder deaktiviert. |
+| `429` | Rate-Limit überschritten — 500 Requests pro Stunde, siehe [Rate-Limits](/de/concepts/rate-limits). |
+
+## Beispiele
+
+```bash
+curl -s "https://api.trassets.ai/v1/catalog" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+```
+
+```python list_catalog.py
+import os
+
+import requests
+
+BASE_URL = "https://api.trassets.ai"
+HEADERS = {"X-API-Key": os.environ["TRASSETS_API_KEY"]}
+
+resp = requests.get(f"{BASE_URL}/v1/catalog", headers=HEADERS, timeout=30)
+resp.raise_for_status()
+
+for entry in resp.json()["categories"]:
+    for table in entry["tables"]:
+        print(f"/v1/{entry['category']}/{table}")
+```

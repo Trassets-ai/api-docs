@@ -1,0 +1,162 @@
+---
+title: "GET /v1/changes: list tables changed since a timestamp"
+sidebarTitle: "Changes"
+description: "GET /v1/changes lists the tables whose last successful sync is after a given timestamp, with the endpoint_url to reload each one, plus ETag support for cheap polling."
+---
+
+`GET /v1/changes` lists every table whose last successful sync happened after the timestamp in `since`. Each entry carries the `endpoint_url` to fetch the table from. Use it to find out which tables you have to reload instead of fetching every table on each run. For the complete workflow, see [Delta Sync](/guides/delta-sync) and [Incremental Sync](/v1/guides/incremental-sync).
+
+<Warning>
+  There is no row-level delta. A table listed here was reloaded in full, so fetch it **in full** again via its `endpoint_url` and replace your local copy. See [Sync Cycle](/concepts/sync-cycle).
+</Warning>
+
+## Request
+
+```text
+GET https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z
+```
+
+| Parameter | In | Required | Type | Description |
+| --- | --- | --- | --- | --- |
+| `X-API-Key` | header | yes | string | Your API key. |
+| `since` | query | yes | string | ISO-8601 timestamp with a time part, e.g. `2026-07-01T00:00:00Z`. Only tables synced strictly **after** this point are returned. Must not be older than 120 days. A timestamp without an offset is read as UTC; an offset such as `+02:00` is converted to UTC — write the `+` as `%2B` in a query string. |
+| `category` | query | no | string | Only return tables of this category: `accounting`, `contracts`, `depreciation`, `operations`, `property`, or `stakeholder`. Tables without a category (raw-only tables) are excluded when the filter is set. |
+| `If-None-Match` | header | no | string | `ETag` from an earlier response. If nothing changed, the API answers `304 Not Modified`. |
+
+## Response
+
+`200 OK` with a JSON array, newest sync first. The array is empty if nothing changed.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `table_name` | string | Internal table name. |
+| `last_sync_at` | string (date-time) | UTC timestamp of the table's last successful sync, without a `Z` suffix. |
+| `category` | string or `null` | Category slug, e.g. `property`. `null` for tables that are only available via `/v1/raw/`. |
+| `api_table_name` | string or `null` | Table name in the category endpoint URL, e.g. `properties`. `null` when `category` is `null`. |
+| `endpoint_url` | string | Relative path to fetch the table from. Always starts with `/v1/`: `/v1/{category}/{api_table_name}` for category tables, `/v1/raw/{table_name}` for raw tables. |
+
+```json
+[
+  {
+    "table_name": "ixhaus__ixexpobj",
+    "last_sync_at": "2026-07-07T06:05:00",
+    "category": null,
+    "api_table_name": null,
+    "endpoint_url": "/v1/raw/ixhaus__ixexpobj"
+  },
+  {
+    "table_name": "properties",
+    "last_sync_at": "2026-07-07T06:00:00",
+    "category": "property",
+    "api_table_name": "properties",
+    "endpoint_url": "/v1/property/properties"
+  }
+]
+```
+
+| Response header | Description |
+| --- | --- |
+| `ETag` | Fingerprint of the current sync state for this `since` and `category`. |
+| `Cache-Control` | `no-cache` |
+
+Only tables with a completed sync are listed. Tables that are not released for your account do not appear.
+
+## ETag and conditional requests
+
+Store the `ETag` together with the `since` and `category` it was issued for, and send it back as `If-None-Match` on the next poll. If the sync state has not changed, the API returns `304 Not Modified` without a body. The `ETag` changes when a table finishes a new sync, when `since` or `category` differ, and — for `transformed` keys — when the key's access permissions change. A `304` still counts toward the rate limit.
+
+## Key types
+
+| Key type | What `/v1/changes` lists |
+| --- | --- |
+| `raw` | All changed tables, including raw-only tables. |
+| `transformed` | Only changed tables within the key's allowed categories and tables. Tables without a category are never listed. A `category` outside the key's permissions returns `403`. |
+
+See [Key types](/v1/authentication#key-types).
+
+## Errors
+
+Errors use the [problem JSON format](/concepts/errors).
+
+| Status | When | `detail` |
+| --- | --- | --- |
+| `400` | `since` is not an ISO-8601 timestamp or has no time part | `Invalid 'since' format. Expected ISO-8601 UTC timestamp, e.g. 2026-07-01T00:00:00Z` |
+| `400` | `since` is older than 120 days | `'since' must not be older than 120 days. Use a more recent timestamp.` |
+| `400` | `category` is not a category of your data | `Unknown category '…'.` — for `raw` keys followed by the list of valid categories |
+| `401` | `X-API-Key` header missing or key expired | `API key required` |
+| `403` | Key unknown or disabled, or `category` not allowed for a `transformed` key | |
+| `422` | `since` missing, or `category` not one of the six values above | `query -> since: Field required` |
+| `429` | Rate limit exceeded — 500 requests per hour, see [Rate Limits](/concepts/rate-limits) | |
+| `503` | The `category` value could not be validated at the moment | `Unable to validate category at this time. Please retry.` |
+
+```json
+{
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "'since' must not be older than 120 days. Use a more recent timestamp.",
+  "instance": "/v1/changes"
+}
+```
+
+## Examples
+
+```bash
+# First poll
+curl -s -i "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z&category=property" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+
+# Next poll with the ETag from the first response
+curl -s -i "https://api.trassets.ai/v1/changes?since=2026-07-01T00:00:00Z&category=property" \
+  -H "X-API-Key: $TRASSETS_API_KEY" \
+  -H "If-None-Match: \"<etag>\""
+```
+
+The Python example polls `/v1/changes` and reloads every listed table in full through its `endpoint_url`, following `next_cursor` until it is `null` (see [Pagination](/v1/concepts/pagination)).
+
+```python reload_changed_tables.py
+import os
+
+import requests
+
+BASE_URL = "https://api.trassets.ai"
+HEADERS = {"X-API-Key": os.environ["TRASSETS_API_KEY"]}
+
+
+def fetch_table(endpoint_url: str) -> list[dict]:
+    """Fetch every row of one table from its endpoint_url."""
+    rows: list[dict] = []
+    params: dict = {"limit": 1000}
+    while True:
+        resp = requests.get(f"{BASE_URL}{endpoint_url}", headers=HEADERS, params=params, timeout=60)
+        resp.raise_for_status()
+        body = resp.json()
+        rows.extend(body["data"])
+        if body["next_cursor"] is None:
+            return rows
+        params["cursor"] = body["next_cursor"]
+
+
+def sync(since: str, etag: str | None = None):
+    """Return (tables, next_since, next_etag)."""
+    headers = dict(HEADERS)
+    if etag:
+        headers["If-None-Match"] = etag
+    resp = requests.get(f"{BASE_URL}/v1/changes", headers=headers, params={"since": since}, timeout=30)
+    if resp.status_code == 304:
+        return {}, since, etag
+    resp.raise_for_status()
+    changed = resp.json()
+
+    tables = {t["table_name"]: fetch_table(t["endpoint_url"]) for t in changed}
+    # last_sync_at is UTC without a suffix; the API expects it with "Z"
+    next_since = max(t["last_sync_at"] for t in changed) + "Z" if changed else since
+    return tables, next_since, resp.headers.get("ETag")
+
+
+if __name__ == "__main__":
+    tables, next_since, next_etag = sync("2026-07-01T00:00:00Z")
+    for name, rows in tables.items():
+        print(f"{name}: {len(rows)} rows")
+    # Replace the local tables, then persist next_since and next_etag for the next run.
+```
