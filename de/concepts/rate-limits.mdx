@@ -1,10 +1,16 @@
 ---
 title: "Rate-Limits für die Data API"
 sidebarTitle: "Rate-Limits"
-description: "Die Data API erlaubt 500 Requests pro Stunde pro API-Key und Endpunkt — Umgang mit 429-Antworten und Minimierung unnötiger Requests per Delta Sync."
+description: "Die Data API erlaubt 2.500 Requests pro Stunde pro API-Key, gemeinsam für alle Endpunkte — Umgang mit 429-Antworten und Minimierung unnötiger Requests per Delta Sync."
 ---
 
-Die Data API erzwingt ein Rate-Limit von **500 Requests pro Stunde pro API-Key und Endpunkt**. Jeder Endpunkt führt einen eigenen Zähler, Requests an einen Endpunkt verbrauchen also nicht das Budget eines anderen. Jeder Request zählt auf dieses Limit, einschließlich Wiederholungen und Polling-Aufrufen. Wenn du das Limit überschreitest, liefert die API einen 429-Statuscode, und du musst warten, bis das aktuelle Stundenfenster zurückgesetzt wird, bevor du weitere Requests stellen kannst.
+Die Data API erzwingt ein Rate-Limit von **2.500 Requests pro Stunde pro API-Key**. Alle `/v1/`-Endpunkte teilen sich dieses eine Budget: Kategorie-Endpunkte, `/v1/raw`, `/v1/catalog` und `/v1/changes` ziehen vom selben Zähler ab. Jeder Request mit gültigem Key zählt genau einmal, einschließlich Wiederholungen, Polling-Aufrufen, `304 Not Modified`-Antworten und Client-Fehlern wie `400`, `403`, `404` oder `422`. Wenn du das Limit überschreitest, liefert die API einen 429-Statuscode, und du musst warten, bis das aktuelle Stundenfenster zurückgesetzt wird, bevor du weitere Requests stellen kannst.
+
+Jeder API-Key hat sein eigenes Budget. Erreicht ein Key das Limit, ist ein zweiter Key desselben Kunden nicht betroffen.
+
+## Requests ohne gültigen Key
+
+Requests ohne `X-API-Key`-Header oder mit unbekanntem, deaktiviertem oder abgelaufenem Key zählen auf ein eigenes Budget von **2.500 pro Stunde pro Client-IP-Adresse**. Hat eine IP-Adresse es aufgebraucht, beantwortet die API jeden Request von dieser Adresse mit 429 — auch Requests mit gültigem Key —, bis das Fenster zurückgesetzt wird. Requests mit gültigem Key zählen nie auf dieses IP-Budget; betroffen sind also nur Clients, die wiederholt ungültige Keys senden.
 
 ## Beispiel einer 429-Antwort
 
@@ -15,18 +21,20 @@ Wenn du das Rate-Limit erreichst, antwortet die API mit einem RFC-7807-Problem-J
   "type": "about:blank",
   "title": "Too Many Requests",
   "status": 429,
-  "detail": "Rate limit exceeded: 500 per 1 hour",
+  "detail": "Rate limit exceeded: 2500 per 1 hour",
   "instance": "/v1/property/properties"
 }
 ```
 
 ## Umgang mit Rate-Limits
 
-Jede Antwort enthält drei Header, mit denen du proaktiv drosseln kannst, statt auf einen 429 zu warten:
+Erfolgreiche Antworten (`2xx`, `304`) und 429-Antworten enthalten drei Header, mit denen du proaktiv drosseln kannst, statt auf einen 429 zu warten:
 
-- `X-RateLimit-Limit` — im Fenster erlaubte Requests (`500`)
-- `X-RateLimit-Remaining` — im aktuellen Fenster verbleibende Requests
+- `X-RateLimit-Limit` — im Fenster erlaubte Requests (`2500`)
+- `X-RateLimit-Remaining` — im aktuellen Fenster verbleibende Requests, über alle Endpunkte
 - `X-RateLimit-Reset` — Unix-Zeitstempel in Sekunden, zu dem das Fenster zurückgesetzt wird
+
+Andere Fehlerantworten (`400`, `401`, `403`, `404`, `422`) tragen diese Header nicht, zählen aber trotzdem. Die nächste erfolgreiche Antwort zeigt den aktuellen Stand.
 
 Wenn du dennoch eine 429-Antwort erhältst, nutze den `Retry-After`-Header, statt eine Wartezeit zu schätzen:
 
@@ -35,7 +43,7 @@ Wenn du dennoch eine 429-Antwort erhältst, nutze den `Retry-After`-Header, stat
 3. Verdopple die Wartezeit bei jedem weiteren Versuch, falls der 429-Fehler weiterhin auftritt.
 4. Nimm den normalen Request-Abstand wieder auf, sobald Requests wieder erfolgreich sind.
 
-Bei lang laufenden Sync-Jobs verteile die Requests gleichmäßig über die Stunde, statt sie am Anfang zu bündeln. Ein Job, der beispielsweise alle 7 Sekunden einen Request stellt, bleibt sicher unter dem Limit von 500 Requests.
+Bei lang laufenden Sync-Jobs verteile die Requests gleichmäßig über die Stunde, statt sie am Anfang zu bündeln. Ein Job, der beispielsweise alle 2 Sekunden einen Request stellt, bleibt sicher unter dem Limit von 2.500 Requests.
 
 <Tip>
   Nutze den [Delta-Sync-Endpunkt](/de/guides/delta-sync) (`GET /v1/changes`), um auf geänderte Tabellen zu pollen, statt wiederholt jeden Endpunkt abzufragen. So kannst du Endpunkte überspringen, die sich seit deinem letzten Sync nicht geändert haben, und reduzierst dein gesamtes Request-Volumen.

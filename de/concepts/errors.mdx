@@ -40,7 +40,7 @@ Beispiel-Fehlerantwort für einen ungültigen API-Key:
 | **404** | Unbekannter Endpunkt | Überprüfe den URL-Pfad sowie den Category- oder Tabellennamen. |
 | **409** | Snapshot geändert | Die Tabelle wurde während deiner Pagination neu synchronisiert. Starte neu ab der ersten Seite ohne `cursor`. Siehe [Pagination](/de/v1/concepts/pagination). |
 | **422** | Validierungsfehler | Ein Query-Parameter hat die Validierung nicht bestanden. Prüfe das `detail`-Feld für den genauen Parameter und die Einschränkung. |
-| **429** | Rate-Limit überschritten | Du hast das Limit von 500 Requests pro Stunde überschritten. Warte ab und versuche es erneut, nachdem das aktuelle Zeitfenster zurückgesetzt wurde. |
+| **429** | Rate-Limit überschritten | Du hast das Limit von 2.500 Requests pro Stunde deines API-Keys überschritten — oder, nach wiederholten Requests ohne gültigen Key, deiner IP-Adresse. Warte ab und versuche es erneut, nachdem das aktuelle Zeitfenster zurückgesetzt wurde. |
 | **500** | Interner Fehler | Ein serverseitiger Fehler ist aufgetreten. Wiederhole den Request nach einer kurzen Verzögerung und kontaktiere den Support, falls das Problem weiterhin besteht. |
 
 <Warning>

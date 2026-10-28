@@ -7,7 +7,7 @@ sidebarTitle: "Delta Sync"
 Discover which tables have been updated since your last sync without fetching every endpoint. The Data API [`GET /v1/changes`](/v1/api-reference/changes) endpoint returns metadata for changed tables and supports conditional requests via ETag to skip polling when nothing is new.
 
 <Tip>
-  Poll `/v1/changes` every 15–60 minutes. The underlying sync runs as a daily batch, so polling more often will not surface newer data — it only spends more of your 500 req/h budget. Combine this with the `since`/ETag pattern below so unchanged polls stay cheap.
+  Poll `/v1/changes` every 15–60 minutes. The underlying sync runs as a daily batch, so polling more often will not surface newer data — it only spends more of your 2,500 req/h budget, which all endpoints share. Combine this with the `since`/ETag pattern below so unchanged polls stay cheap.
 </Tip>
 
 <Note>
@@ -45,7 +45,7 @@ Discover which tables have been updated since your last sync without fetching ev
     ```
   </Step>
   <Step title="Fetch only changed tables">
-    For each item returned by `/v1/changes`, request the corresponding endpoint only. Skip any table that is absent from the response. This avoids unnecessary data transfer and preserves your 500 req/h rate limit budget.
+    For each item returned by `/v1/changes`, request the corresponding endpoint only. Skip any table that is absent from the response. This avoids unnecessary data transfer and preserves your 2,500 req/h rate limit budget.
   </Step>
   <Step title="Use conditional GET on subsequent polls">
     Store the `ETag` header from the first successful `/v1/changes` response. On your next poll, send it back as `If-None-Match`.
