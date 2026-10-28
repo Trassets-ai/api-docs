@@ -1,10 +1,10 @@
 ---
 title: "Data Model"
 sidebarTitle: "Overview"
-description: "The tables available under /v1/ and how they join — Accounting, Contracts, Depreciation, Operations, Property, and Stakeholder."
+description: "The tables available under /v1/ and how they join — Accounting, Contracts, Depreciation, KPI, Operations, Property, and Stakeholder."
 ---
 
-`/v1/` covers six data domains, listed by table below. Field-level detail lives in the
+`/v1/` covers six data domains plus pre-computed property KPIs, listed by table below. Field-level detail lives in the
 [API reference](/v1/api-reference/introduction) for each endpoint.
 
 <CardGroup cols={2}>
@@ -18,6 +18,10 @@ description: "The tables available under /v1/ and how they join — Accounting, 
 
   <Card title="Depreciation" icon="chart-line-down">
     `assets` and `depreciation`
+  </Card>
+
+  <Card title="KPI" icon="gauge" href="/v1/data-model/kpi">
+    `property_kpis` and `property_kpis_by_floor_area_type`, aggregated from the other domains
   </Card>
 
   <Card title="Operations" icon="clipboard-list">

@@ -1,0 +1,151 @@
+---
+title: "KPI"
+sidebarTitle: "KPI"
+description: "Field reference for the pre-computed property KPIs under /v1/kpi/."
+---
+
+The two tables below hold pre-computed key figures per property: floor area, vacancy,
+tenants, and net rent. They save you from aggregating the raw lists (`property_structure`,
+`tenants`, `contract_debits`) yourself, and because they are a separate category, a key can be
+restricted to `kpi` without access to those lists.
+
+Both tables are derived from the `/v1/` tables of the Property, Stakeholder, and Contracts
+domains, so they follow the same property selection. They join to the Property domain via
+`property_id`.
+
+## Reference dates
+
+Every row belongs to a `reference_date`: the first day of a month. Each table covers the last
+12 months including the current one, counted from the last sync. A floor area counts on a
+reference date if its active period covers that date; a tenancy counts if its contract runs on
+that date.
+
+## property_kpis
+
+`GET /v1/kpi/property_kpis`: one row per property and reference date. Filterable by
+`property_id` and `reference_date`.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="reference_date" type="date" required>
+  Reference date, always the first day of a month.
+</ResponseField>
+
+<ResponseField name="floor_area_count" type="integer">
+  Number of floor areas (rental units) active on the reference date.
+</ResponseField>
+
+<ResponseField name="floor_area_sqm" type="number">
+  Total floor area in square metres. Not historised: earlier reference dates show the current
+  area as well.
+</ResponseField>
+
+<ResponseField name="vacant_floor_area_count" type="integer">
+  Number of floor areas without a running tenancy on the reference date. Counts every floor
+  area, including those excluded from marketing.
+</ResponseField>
+
+<ResponseField name="vacant_floor_area_sqm" type="number">
+  Square metres of the vacant floor areas.
+</ResponseField>
+
+<ResponseField name="vacancy_rate_count_pct" type="number">
+  Vacancy rate by number of floor areas, in percent, rounded to two decimals.
+</ResponseField>
+
+<ResponseField name="vacancy_rate_sqm_pct" type="number">
+  Vacancy rate by square metres, in percent, rounded to two decimals. `null` if no floor area of
+  the property has square metres maintained.
+</ResponseField>
+
+<ResponseField name="tenant_count" type="integer">
+  Number of distinct tenants (persons) with a running tenancy on an active floor area. A tenant
+  renting several units counts once.
+</ResponseField>
+
+<ResponseField name="tenancy_count" type="integer">
+  Number of running tenancies (floor area × tenant) on active floor areas. A tenant renting
+  three units counts three times.
+</ResponseField>
+
+<ResponseField name="floor_count" type="integer">
+  Number of storeys: distinct storey names of the property, not summed across buildings. Two
+  buildings with ground floor to second floor each yield 3, not 6.
+</ResponseField>
+
+<ResponseField name="net_rent_monthly" type="number">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
+  Monthly net rent target: the net rent debits of all tenancies running on the reference date.
+</ResponseField>
+
+<ResponseField name="net_rent_annual" type="number">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
+  `net_rent_monthly` × 12.
+</ResponseField>
+
+## property_kpis_by_floor_area_type
+
+`GET /v1/kpi/property_kpis_by_floor_area_type`: the floor area, vacancy, and net rent figures of
+`property_kpis`, broken down by usage type. One row per property, reference date, and floor area
+type. Filterable by `property_id`, `reference_date`, and `floor_area_type`.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="reference_date" type="date" required>
+  Reference date, always the first day of a month.
+</ResponseField>
+
+<ResponseField name="floor_area_type" type="string" required>
+  Usage type of the floor areas, as in `property_structure.floor_area_type`. The values come from
+  the customer's property management catalogue and are not harmonised across customers. Floor areas
+  without a usage type are grouped under `ohne Angabe`.
+</ResponseField>
+
+<ResponseField name="floor_area_count" type="integer">
+  As in `property_kpis`, for this usage type.
+</ResponseField>
+
+<ResponseField name="floor_area_sqm" type="number">
+  As in `property_kpis`, for this usage type.
+</ResponseField>
+
+<ResponseField name="vacant_floor_area_count" type="integer">
+  As in `property_kpis`, for this usage type.
+</ResponseField>
+
+<ResponseField name="vacant_floor_area_sqm" type="number">
+  As in `property_kpis`, for this usage type.
+</ResponseField>
+
+<ResponseField name="vacancy_rate_count_pct" type="number">
+  As in `property_kpis`, for this usage type.
+</ResponseField>
+
+<ResponseField name="vacancy_rate_sqm_pct" type="number">
+  As in `property_kpis`, for this usage type.
+</ResponseField>
+
+<ResponseField name="net_rent_monthly" type="number">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
+  As in `property_kpis`, for this usage type.
+</ResponseField>
+
+<ResponseField name="net_rent_annual" type="number">
+  Requires the [`personal_financial` grant](/v1/authentication#personal-data-grants).
+  As in `property_kpis`, for this usage type.
+</ResponseField>
+
+<Note>
+  Tenant, tenancy, and storey counts are only in `property_kpis`: one tenant can rent units of
+  several usage types, so these counts do not add up per type. All other figures do — summing
+  `property_kpis_by_floor_area_type` over `floor_area_type` gives the values of `property_kpis`.
+</Note>
+
+<Note>
+  Net rent requires the `personal_financial` grant because for a group with a single let unit,
+  it is the rent of one individual tenant.
+</Note>

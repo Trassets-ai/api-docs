@@ -1,0 +1,152 @@
+---
+title: "KPI"
+sidebarTitle: "KPI"
+description: "Feldreferenz für die vorberechneten Objekt-Kennzahlen unter /v1/kpi/."
+---
+
+Die zwei Tabellen unten enthalten vorberechnete Kennzahlen je Objekt: Flächen, Leerstand,
+Mieter und Nettosoll. Damit entfällt das eigene Aggregieren der Rohlisten
+(`property_structure`, `tenants`, `contract_debits`). Weil sie eine eigene Kategorie sind, lässt
+sich ein Key auf `kpi` beschränken, ohne Zugriff auf diese Listen.
+
+Beide Tabellen werden aus den `/v1/`-Tabellen der Domänen Property, Stakeholder und Contracts
+abgeleitet und folgen deshalb derselben Objektauswahl. Mit der Property-Domäne verknüpfen sie
+sich über `property_id`.
+
+## Stichtage
+
+Jede Zeile gehört zu einem `reference_date`, dem Ersten eines Monats. Jede Tabelle deckt die
+letzten 12 Monate einschließlich des laufenden ab, gerechnet ab dem letzten Sync. Eine Fläche
+zählt an einem Stichtag, wenn ihr Gültigkeitszeitraum den Stichtag umfasst; ein Mietverhältnis
+zählt, wenn sein Vertrag am Stichtag läuft.
+
+## property_kpis
+
+`GET /v1/kpi/property_kpis`: eine Zeile je Objekt und Stichtag. Filterbar nach `property_id`
+und `reference_date`.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="reference_date" type="date" required>
+  Stichtag, immer der Erste eines Monats.
+</ResponseField>
+
+<ResponseField name="floor_area_count" type="integer">
+  Anzahl der am Stichtag aktiven Flächen (Mieteinheiten).
+</ResponseField>
+
+<ResponseField name="floor_area_sqm" type="number">
+  Gesamtfläche in m². Nicht historisiert: Auch frühere Stichtage zeigen die aktuelle Fläche.
+</ResponseField>
+
+<ResponseField name="vacant_floor_area_count" type="integer">
+  Anzahl der Flächen ohne laufendes Mietverhältnis am Stichtag. Zählt alle Flächen, auch die
+  von der Vermarktung ausgeschlossenen.
+</ResponseField>
+
+<ResponseField name="vacant_floor_area_sqm" type="number">
+  m² der leerstehenden Flächen.
+</ResponseField>
+
+<ResponseField name="vacancy_rate_count_pct" type="number">
+  Leerstandsquote nach Anzahl Flächen in Prozent, auf zwei Nachkommastellen gerundet.
+</ResponseField>
+
+<ResponseField name="vacancy_rate_sqm_pct" type="number">
+  Leerstandsquote nach m² in Prozent, auf zwei Nachkommastellen gerundet. `null`, wenn für keine
+  Fläche des Objekts m² gepflegt sind.
+</ResponseField>
+
+<ResponseField name="tenant_count" type="integer">
+  Anzahl verschiedener Mieter (Personen) mit laufendem Mietverhältnis auf einer aktiven Fläche.
+  Ein Mieter mit mehreren Einheiten zählt einmal.
+</ResponseField>
+
+<ResponseField name="tenancy_count" type="integer">
+  Anzahl laufender Mietverhältnisse (Fläche × Mieter) auf aktiven Flächen. Ein Mieter mit drei
+  Einheiten zählt dreimal.
+</ResponseField>
+
+<ResponseField name="floor_count" type="integer">
+  Anzahl Geschosse: verschiedene Geschossnamen des Objekts, nicht über Gebäude summiert. Zwei
+  Gebäude mit jeweils EG bis 2. OG ergeben 3, nicht 6.
+</ResponseField>
+
+<ResponseField name="net_rent_monthly" type="number">
+  Erfordert den [`personal_financial`-Grant](/de/v1/authentication#grants-für-personenbezogene-daten).
+  Monatliches Nettosoll: die Nettomiet-Sollstellungen aller am Stichtag laufenden
+  Mietverhältnisse.
+</ResponseField>
+
+<ResponseField name="net_rent_annual" type="number">
+  Erfordert den [`personal_financial`-Grant](/de/v1/authentication#grants-für-personenbezogene-daten).
+  `net_rent_monthly` × 12.
+</ResponseField>
+
+## property_kpis_by_floor_area_type
+
+`GET /v1/kpi/property_kpis_by_floor_area_type`: die Flächen-, Leerstands- und Nettosoll-Werte
+aus `property_kpis`, aufgeschlüsselt nach Nutzungsart. Eine Zeile je Objekt, Stichtag und
+Nutzungsart. Filterbar nach `property_id`, `reference_date` und `floor_area_type`.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="reference_date" type="date" required>
+  Stichtag, immer der Erste eines Monats.
+</ResponseField>
+
+<ResponseField name="floor_area_type" type="string" required>
+  Nutzungsart der Flächen, wie in `property_structure.floor_area_type`. Die Werte stammen aus dem
+  Katalog der Immobilienverwaltungs-Software des Kunden und sind nicht kundenübergreifend vereinheitlicht.
+  Flächen ohne Nutzungsart sind unter `ohne Angabe` zusammengefasst.
+</ResponseField>
+
+<ResponseField name="floor_area_count" type="integer">
+  Wie in `property_kpis`, je Nutzungsart.
+</ResponseField>
+
+<ResponseField name="floor_area_sqm" type="number">
+  Wie in `property_kpis`, je Nutzungsart.
+</ResponseField>
+
+<ResponseField name="vacant_floor_area_count" type="integer">
+  Wie in `property_kpis`, je Nutzungsart.
+</ResponseField>
+
+<ResponseField name="vacant_floor_area_sqm" type="number">
+  Wie in `property_kpis`, je Nutzungsart.
+</ResponseField>
+
+<ResponseField name="vacancy_rate_count_pct" type="number">
+  Wie in `property_kpis`, je Nutzungsart.
+</ResponseField>
+
+<ResponseField name="vacancy_rate_sqm_pct" type="number">
+  Wie in `property_kpis`, je Nutzungsart.
+</ResponseField>
+
+<ResponseField name="net_rent_monthly" type="number">
+  Erfordert den [`personal_financial`-Grant](/de/v1/authentication#grants-für-personenbezogene-daten).
+  Wie in `property_kpis`, je Nutzungsart.
+</ResponseField>
+
+<ResponseField name="net_rent_annual" type="number">
+  Erfordert den [`personal_financial`-Grant](/de/v1/authentication#grants-für-personenbezogene-daten).
+  Wie in `property_kpis`, je Nutzungsart.
+</ResponseField>
+
+<Note>
+  Mieter-, Mietverhältnis- und Geschosszahlen gibt es nur in `property_kpis`: Ein Mieter kann
+  Einheiten verschiedener Nutzungsarten mieten, deshalb lassen sich diese Zahlen nicht je
+  Nutzungsart aufsummieren. Alle anderen Werte schon: Die Summe von
+  `property_kpis_by_floor_area_type` über `floor_area_type` ergibt die Werte von `property_kpis`.
+</Note>
+
+<Note>
+  Das Nettosoll erfordert den `personal_financial`-Grant, weil es bei einer Gruppe mit nur einer
+  vermieteten Einheit die Miete eines einzelnen Mieters ist.
+</Note>
