@@ -1,10 +1,16 @@
 ---
 title: "Rate Limits for the Data API"
 sidebarTitle: "Rate Limits"
-description: "Data API allows 500 requests per hour per API key and endpoint. Learn how to handle 429 responses and minimize unnecessary requests with delta sync."
+description: "Data API allows 2,500 requests per hour per API key, shared across all endpoints. Learn how to handle 429 responses and minimize unnecessary requests with delta sync."
 ---
 
-The Data API enforces a rate limit of **500 requests per hour per API key and endpoint**. Each endpoint keeps its own counter, so traffic to one endpoint does not use up the budget of another. Every request counts toward this limit, including retries and polling calls. When you exceed the limit, the API returns a 429 status code and you must wait until the current hour window resets before making additional requests.
+The Data API enforces a rate limit of **2,500 requests per hour per API key**. All `/v1/` endpoints share this one budget: category endpoints, `/v1/raw`, `/v1/catalog` and `/v1/changes` draw from the same counter. Every request with a valid key counts once, including retries, polling calls, `304 Not Modified` responses and client errors such as `400`, `403`, `404` or `422`. When you exceed the limit, the API returns a 429 status code and you must wait until the current hour window resets before making additional requests.
+
+Each API key has its own budget. A second key of the same customer is not affected when the first one hits the limit.
+
+## Requests without a valid key
+
+Requests without an `X-API-Key` header, or with an unknown, disabled or expired key, do not count toward any budget. The API answers them with `401` or `403`, never with `429`.
 
 ## 429 Response Example
 
@@ -15,18 +21,20 @@ When you hit the rate limit, the API responds with an RFC 7807 problem JSON body
   "type": "about:blank",
   "title": "Too Many Requests",
   "status": 429,
-  "detail": "Rate limit exceeded: 500 per 1 hour",
+  "detail": "Rate limit exceeded: 2500 per 1 hour",
   "instance": "/v1/property/properties"
 }
 ```
 
 ## Handling Rate Limits
 
-Every response includes three headers so you can throttle proactively instead of waiting for a 429:
+Successful responses (`2xx`, `304`) and 429 responses include three headers so you can throttle proactively instead of waiting for a 429:
 
-- `X-RateLimit-Limit` — requests allowed in the window (`500`)
-- `X-RateLimit-Remaining` — requests left in the current window
+- `X-RateLimit-Limit` — requests allowed in the window (`2500`)
+- `X-RateLimit-Remaining` — requests left in the current window, across all endpoints
 - `X-RateLimit-Reset` — Unix timestamp in seconds at which the window resets
+
+Other error responses with a valid key (`400`, `403`, `404`, `422`) do not carry these headers, but still count. The next successful response shows the current state.
 
 If you do receive a 429 response, use the `Retry-After` header instead of guessing a wait time:
 
@@ -35,7 +43,7 @@ If you do receive a 429 response, use the `Retry-After` header instead of guessi
 3. Double the wait time on each subsequent retry if the 429 persists.
 4. Resume normal request spacing once requests succeed again.
 
-For long-running sync jobs, spread requests evenly across the hour instead of bursting at the start. For example, a job that issues one request every 7 seconds will stay safely under the 500 request limit.
+For long-running sync jobs, spread requests evenly across the hour instead of bursting at the start. For example, a job that issues one request every 2 seconds will stay safely under the 2,500 request limit.
 
 <Tip>
   Use the [Delta Sync endpoint](/guides/delta-sync) (`GET /v1/changes`) to poll for changed tables instead of repeatedly querying every endpoint. This lets you skip endpoints that have not changed since your last sync, reducing your overall request volume.

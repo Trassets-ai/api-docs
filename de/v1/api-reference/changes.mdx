@@ -86,7 +86,7 @@ Fehler kommen im [Problem-JSON-Format](/de/concepts/errors).
 | `401` | Header `X-API-Key` fehlt oder Key abgelaufen | `API key required` |
 | `403` | Key unbekannt oder deaktiviert, oder `category` für einen `transformed`-Key nicht erlaubt | |
 | `422` | `since` fehlt, oder `category` ist keiner der sechs Werte oben | `query -> since: Field required` |
-| `429` | Rate-Limit überschritten — 500 Requests pro Stunde, siehe [Rate-Limits](/de/concepts/rate-limits) | |
+| `429` | Rate-Limit überschritten — 2.500 Requests pro Stunde pro API-Key über alle Endpunkte, siehe [Rate-Limits](/de/concepts/rate-limits) | |
 | `503` | Der Wert von `category` ließ sich gerade nicht prüfen | `Unable to validate category at this time. Please retry.` |
 
 ```json

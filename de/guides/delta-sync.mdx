@@ -7,7 +7,7 @@ sidebarTitle: "Delta Sync"
 Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne jeden Endpunkt abzurufen. Der Endpunkt [`GET /v1/changes`](/de/v1/api-reference/changes) der Data API liefert Metadaten für geänderte Tabellen und unterstützt bedingte Requests über ETag, um Polling zu überspringen, wenn nichts Neues vorliegt.
 
 <Tip>
-  Frage `/v1/changes` alle 15–60 Minuten ab. Der zugrunde liegende Sync läuft als täglicher Batch — häufigeres Abfragen liefert keine neueren Daten, sondern verbraucht nur mehr von deinem 500-Requests/h-Budget. Kombiniere das mit dem `since`/ETag-Muster weiter unten, damit unveränderte Abfragen günstig bleiben.
+  Frage `/v1/changes` alle 15–60 Minuten ab. Der zugrunde liegende Sync läuft als täglicher Batch — häufigeres Abfragen liefert keine neueren Daten, sondern verbraucht nur mehr von deinem 2.500-Requests/h-Budget, das sich alle Endpunkte teilen. Kombiniere das mit dem `since`/ETag-Muster weiter unten, damit unveränderte Abfragen günstig bleiben.
 </Tip>
 
 <Note>
@@ -45,7 +45,7 @@ Finde heraus, welche Tabellen seit deinem letzten Sync aktualisiert wurden, ohne
     ```
   </Step>
   <Step title="Nur geänderte Tabellen abrufen">
-    Rufe für jedes von `/v1/changes` zurückgegebene Element nur den entsprechenden Endpunkt ab. Überspringe jede Tabelle, die nicht in der Antwort enthalten ist. So vermeidest du unnötigen Datentransfer und schonst dein Rate-Limit-Budget von 500 Req/h.
+    Rufe für jedes von `/v1/changes` zurückgegebene Element nur den entsprechenden Endpunkt ab. Überspringe jede Tabelle, die nicht in der Antwort enthalten ist. So vermeidest du unnötigen Datentransfer und schonst dein Rate-Limit-Budget von 2.500 Req/h.
   </Step>
   <Step title="Bedingtes GET bei nachfolgenden Abfragen nutzen">
     Speichere den `ETag`-Header aus der ersten erfolgreichen `/v1/changes`-Antwort. Sende ihn bei deiner nächsten Abfrage als `If-None-Match` zurück.

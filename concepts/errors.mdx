@@ -40,7 +40,7 @@ Example error response for an invalid API key:
 | **404** | Unknown endpoint | Verify the URL path and the category or table name. |
 | **409** | Snapshot changed | The table was re-synced while you paginated. Restart from the first page without `cursor`. See [Pagination](/v1/concepts/pagination). |
 | **422** | Validation error | A query parameter did not pass validation. Check the `detail` field for the exact parameter and constraint. |
-| **429** | Rate limit exceeded | You have exceeded the 500 requests per hour limit. Back off and retry after the current window resets. |
+| **429** | Rate limit exceeded | You have exceeded the 2,500 requests per hour limit of your API key. Back off and retry after the current window resets. |
 | **500** | Internal error | A server-side error occurred. Retry the request after a short delay, and contact support if it persists. |
 
 <Warning>

@@ -86,7 +86,7 @@ Errors use the [problem JSON format](/concepts/errors).
 | `401` | `X-API-Key` header missing or key expired | `API key required` |
 | `403` | Key unknown or disabled, or `category` not allowed for a `transformed` key | |
 | `422` | `since` missing, or `category` not one of the six values above | `query -> since: Field required` |
-| `429` | Rate limit exceeded — 500 requests per hour, see [Rate Limits](/concepts/rate-limits) | |
+| `429` | Rate limit exceeded — 2,500 requests per hour per API key across all endpoints, see [Rate Limits](/concepts/rate-limits) | |
 | `503` | The `category` value could not be validated at the moment | `Unable to validate category at this time. Please retry.` |
 
 ```json
