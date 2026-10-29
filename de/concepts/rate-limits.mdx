@@ -10,7 +10,7 @@ Jeder API-Key hat sein eigenes Budget. Erreicht ein Key das Limit, ist ein zweit
 
 ## Requests ohne gültigen Key
 
-Requests ohne `X-API-Key`-Header oder mit unbekanntem, deaktiviertem oder abgelaufenem Key zählen auf ein eigenes Budget von **2.500 pro Stunde pro Client-IP-Adresse**. Hat eine IP-Adresse es aufgebraucht, beantwortet die API jeden Request von dieser Adresse mit 429 — auch Requests mit gültigem Key —, bis das Fenster zurückgesetzt wird. Requests mit gültigem Key zählen nie auf dieses IP-Budget; betroffen sind also nur Clients, die wiederholt ungültige Keys senden.
+Requests ohne `X-API-Key`-Header oder mit unbekanntem, deaktiviertem oder abgelaufenem Key zählen auf kein Budget. Die API beantwortet sie mit `401` bzw. `403`, nie mit `429`.
 
 ## Beispiel einer 429-Antwort
 
@@ -34,7 +34,7 @@ Erfolgreiche Antworten (`2xx`, `304`) und 429-Antworten enthalten drei Header, m
 - `X-RateLimit-Remaining` — im aktuellen Fenster verbleibende Requests, über alle Endpunkte
 - `X-RateLimit-Reset` — Unix-Zeitstempel in Sekunden, zu dem das Fenster zurückgesetzt wird
 
-Andere Fehlerantworten (`400`, `401`, `403`, `404`, `422`) tragen diese Header nicht, zählen aber trotzdem. Die nächste erfolgreiche Antwort zeigt den aktuellen Stand.
+Andere Fehlerantworten mit gültigem Key (`400`, `403`, `404`, `422`) tragen diese Header nicht, zählen aber trotzdem. Die nächste erfolgreiche Antwort zeigt den aktuellen Stand.
 
 Wenn du dennoch eine 429-Antwort erhältst, nutze den `Retry-After`-Header, statt eine Wartezeit zu schätzen:
 
