@@ -1,10 +1,10 @@
 ---
 title: "Accounting"
 sidebarTitle: "Accounting"
-description: "Field reference for the accounts, booking_headers, booking_positions, and budgets tables under /v1/accounting/."
+description: "Field reference for the accounts, booking_headers, booking_positions, budgets, and account_hierarchies tables under /v1/accounting/."
 ---
 
-The four tables below join to each other and to three other domains — Property, Contracts,
+The five tables below join to each other and to three other domains — Property, Contracts,
 and Stakeholder. See the [Data Model Overview](/v1/data-model/overview) for the complete
 cross-domain diagram.
 
@@ -15,6 +15,7 @@ graph LR
     booking_positions["booking_positions"]
     accounts["accounts"]
     budgets["budgets"]
+    account_hierarchies["account_hierarchies"]
   end
 
   properties["Property.properties"]
@@ -27,6 +28,7 @@ graph LR
   booking_header -->|booking_header_id| booking_positions
   booking_positions -->|account_id| accounts
   budgets -->|account_id| accounts
+  account_hierarchies -->|account_id| accounts
 
   properties -.->|property_id| booking_header
   properties -.->|property_id| budgets
@@ -57,6 +59,11 @@ given month. A cost centre is always tied to part of the property structure
 ledger account listed in `accounts`, via `account_number`. `Contracts.contract_debit_diffs`
 uses the same field name but resolves to a tenant account instead — see the
 [overview page](/v1/data-model/overview) join-key table.
+
+Reporting structures group general ledger accounts into positions (`account_hierarchies`).
+To report by position instead of by individual account, join `booking_positions` or
+`budgets` to `account_hierarchies` via `property_id` + `account_id`, pick one
+`hierarchy_name`, and group by `position`.
 
 <Note>
   Bookings on a tenant account (Personenkonto) are only linkable to a tenant at the
@@ -354,3 +361,49 @@ belongs to exactly one booking header via `booking_header_id`.
 <ResponseField name="budget" type="number" required>
   Budget amount for the specific month and account.
 </ResponseField>
+
+## account_hierarchies
+
+`GET /v1/accounting/account_hierarchies` — where each general ledger account sits in a
+reporting structure. One row per property, account, and structure.
+
+<ResponseField name="property_id" type="string" required>
+  Unique property identifier.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer" required>
+  Account the row assigns. Joins to `accounts.account_id`, and to `booking_positions` and
+  `budgets` via `property_id` + `account_id`.
+</ResponseField>
+
+<ResponseField name="hierarchy_name" type="string" required>
+  Name of the reporting structure, e.g. `Trassets-Standard`. A property can have several
+  structures, so the same account appears once per structure. Filter on one structure
+  before summing amounts, or each amount is counted once per structure.
+</ResponseField>
+
+<ResponseField name="path" type="string[]">
+  The account's path through the structure, top level first. Empty levels are left out.
+  The last element is the position, prefixed with its sort number where the structure has
+  one (e.g. `["B – Bestandskonten", "04 – Forderungen & Verbindlichkeiten / Finanzamt",
+  "11 - Rückstellungen"]`).
+</ResponseField>
+
+<ResponseField name="position" type="string">
+  The position the account is assigned to — the last level of `path`, without the sort
+  number.
+</ResponseField>
+
+<ResponseField name="sort_order" type="integer">
+  Sort number of the position. In `Trassets-Standard` it equals `accounts.sort_order`.
+  `null` if the structure has no sort numbers.
+</ResponseField>
+
+<Note>
+  Only general ledger accounts are included. An account without a unique assignment in a
+  structure is missing from that structure, so totals per position can add up to less than
+  the total over all accounts.
+</Note>
+
+A key can be limited to certain positions of `Trassets-Standard` — see
+[Account restrictions](/v1/authentication#account-restrictions).

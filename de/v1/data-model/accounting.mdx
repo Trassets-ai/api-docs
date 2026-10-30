@@ -1,10 +1,10 @@
 ---
 title: "Accounting"
 sidebarTitle: "Accounting"
-description: "Feldreferenz für die Tabellen accounts, booking_headers, booking_positions und budgets unter /v1/accounting/."
+description: "Feldreferenz für die Tabellen accounts, booking_headers, booking_positions, budgets und account_hierarchies unter /v1/accounting/."
 ---
 
-Die vier Tabellen unten verknüpfen sich untereinander und mit drei weiteren Domänen —
+Die fünf Tabellen unten verknüpfen sich untereinander und mit drei weiteren Domänen —
 Property, Contracts und Stakeholder. Das vollständige Cross-Domain-Diagramm steht in der
 [Datenmodell-Übersicht](/de/v1/data-model/overview).
 
@@ -15,6 +15,7 @@ graph LR
     booking_positions["booking_positions"]
     accounts["accounts"]
     budgets["budgets"]
+    account_hierarchies["account_hierarchies"]
   end
 
   properties["Property.properties"]
@@ -27,6 +28,7 @@ graph LR
   booking_header -->|booking_header_id| booking_positions
   booking_positions -->|account_id| accounts
   budgets -->|account_id| accounts
+  account_hierarchies -->|account_id| accounts
 
   properties -.->|property_id| booking_header
   properties -.->|property_id| budgets
@@ -58,6 +60,11 @@ der Objektstruktur (`property_structure`) verbunden. Sollstellungen
 über `account_number`. `Contracts.contract_debit_diffs` nutzt denselben Feldnamen, löst aber
 gegen ein Personenkonto auf — siehe die Verknüpfungsschlüssel-Tabelle auf der
 [Übersichtsseite](/de/v1/data-model/overview).
+
+Reporting-Strukturen fassen Sachkonten zu Positionen zusammen (`account_hierarchies`). Für
+eine Auswertung nach Positionen statt nach Einzelkonten verknüpfst du `booking_positions`
+oder `budgets` über `property_id` + `account_id` mit `account_hierarchies`, wählst einen
+`hierarchy_name` und gruppierst nach `position`.
 
 <Note>
   Buchungen auf einem Personenkonto sind nur auf Objektebene mit einem Mieter
@@ -361,3 +368,48 @@ gehört über `booking_header_id` zu genau einem Buchungskopf.
 <ResponseField name="budget" type="number" required>
   Budgetbetrag für den spezifischen Monat und das Konto.
 </ResponseField>
+
+## account_hierarchies
+
+`GET /v1/accounting/account_hierarchies` — wo jedes Sachkonto in einer Reporting-Struktur
+steht. Eine Zeile pro Objekt, Konto und Struktur.
+
+<ResponseField name="property_id" type="string" required>
+  Eindeutige Objekt-ID.
+</ResponseField>
+
+<ResponseField name="account_id" type="integer" required>
+  Konto, das die Zeile zuordnet. Verknüpft sich mit `accounts.account_id` und über
+  `property_id` + `account_id` mit `booking_positions` und `budgets`.
+</ResponseField>
+
+<ResponseField name="hierarchy_name" type="string" required>
+  Name der Reporting-Struktur, z. B. `Trassets-Standard`. Ein Objekt kann mehrere Strukturen
+  haben, dasselbe Konto steht dann einmal je Struktur in der Tabelle. Vor dem Summieren von
+  Beträgen auf eine Struktur filtern, sonst zählt jeder Betrag einmal je Struktur.
+</ResponseField>
+
+<ResponseField name="path" type="string[]">
+  Pfad des Kontos durch die Struktur, oberste Ebene zuerst. Leere Ebenen fehlen. Das letzte
+  Element ist die Position, mit vorangestellter Sortiernummer, sofern die Struktur eine hat
+  (z. B. `["B – Bestandskonten", "04 – Forderungen & Verbindlichkeiten / Finanzamt",
+  "11 - Rückstellungen"]`).
+</ResponseField>
+
+<ResponseField name="position" type="string">
+  Position, der das Konto zugeordnet ist — die letzte Ebene von `path`, ohne Sortiernummer.
+</ResponseField>
+
+<ResponseField name="sort_order" type="integer">
+  Sortiernummer der Position. In `Trassets-Standard` gleich `accounts.sort_order`. `null`,
+  wenn die Struktur keine Sortiernummern hat.
+</ResponseField>
+
+<Note>
+  Enthalten sind nur Sachkonten. Ein Konto ohne eindeutige Zuordnung in einer Struktur fehlt
+  in dieser Struktur. Summen je Position können deshalb kleiner sein als die Summe über alle
+  Konten.
+</Note>
+
+Ein Key kann auf bestimmte Positionen von `Trassets-Standard` eingeschränkt sein — siehe
+[Konten-Einschränkungen](/de/v1/authentication#konten-einschränkungen).

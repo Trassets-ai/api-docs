@@ -45,6 +45,10 @@ Grants gelten für jeden Key, `raw` oder `transformed`, und haben Vorrang vor ei
 
 Ein `transformed`-Key kann zusätzlich auf eine Liste von Property-IDs eingeschränkt sein. Category-Endpunkte liefern dann nur Zeilen dieser Properties, und eine Tabelle ohne `property_id`-Spalte (zum Beispiel `/v1/stakeholder/creditors`) liefert für einen solchen Key 403. `/v1/catalog` und `/v1/changes` werden nicht nach Property gefiltert; sie listen Tabellen, keine Zeilen. Ein Administrator setzt die Property-Liste im Portal; ein Key ohne Liste sieht alle Properties.
 
+### Konten-Einschränkungen
+
+Ein Key kann zusätzlich auf Positionen der Reporting-Struktur `Trassets-Standard` eingeschränkt sein (siehe `account_hierarchies` unter [Accounting](/de/v1/data-model/accounting)). `/v1/accounting/accounts`, `booking_positions`, `budgets` und `account_hierarchies` liefern dann nur Zeilen, deren Konto (`property_id` + `account_id`) einer dieser Positionen zugeordnet ist. `/v1/accounting/booking_headers` und `/v1/raw/{table_name}` liefern für einen solchen Key 403, `/v1/raw/tables` eine leere Liste. Andere Kategorien werden nicht nach Konto gefiltert; ein Key, der ohne Kategorieauswahl erstellt wurde, ist auf Accounting beschränkt. Ein Administrator wählt die Positionen im Portal beim Erstellen des Keys; nachträglich lassen sie sich nicht ändern, dafür einen neuen Key erstellen. Ein Key ohne Positionen sieht alle Konten.
+
 ## Speicherung und Sicherheit des Keys
 
 Trassets speichert deinen API-Key niemals im Klartext. Auf unseren Servern wird nur ein HMAC-SHA-256-Hash zur Verifikation aufbewahrt. Das bedeutet: Wir können einen Key nach der Erstellung nicht wiederherstellen oder erneut anzeigen.

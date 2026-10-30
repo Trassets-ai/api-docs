@@ -9,7 +9,7 @@ description: "The tables available under /v1/ and how they join — Accounting, 
 
 <CardGroup cols={2}>
   <Card title="Accounting" icon="book">
-    `accounts`, `booking_headers`, `booking_positions`, and `budgets`
+    `accounts`, `booking_headers`, `booking_positions`, `budgets`, and `account_hierarchies`
   </Card>
 
   <Card title="Contracts" icon="file-contract">
@@ -57,6 +57,7 @@ graph LR
     booking_positions["booking_positions"]
     accounts["accounts"]
     budgets["budgets"]
+    account_hierarchies["account_hierarchies"]
   end
 
   subgraph Contracts
@@ -110,6 +111,7 @@ graph LR
   booking_header -->|booking_header_id| booking_positions
   booking_positions -->|account_id| accounts
   budgets -->|account_id| accounts
+  account_hierarchies -->|account_id| accounts
   contract_debits -.->|account_number| accounts
   contract_debit_diffs -.->|account_number| accounts
   property_structure -.->|account_id = account_number| accounts
@@ -151,7 +153,7 @@ graph LR
 |---|---|---|
 | `property_id` | Identifies a property. Present on every table on this page except `creditors` (a standalone entity, referenced via `creditor_id` instead). | 1 property → many rows in each domain |
 | `booking_header_id` | Groups booking line items under one header. | 1 `booking_headers` → many `booking_positions` |
-| `account_id` | Internal account identifier on `accounts`, `booking_positions`, and `budgets` — joins across those three. `index_rent.account_id` and `contract_debits.debit_type.code` mean something unrelated: a debit-type code — don't join those to `accounts`. On `property_structure`, it means something else again: a cost-centre business code, matching `accounts.account_number` for the corresponding cost-centre row, not `accounts.account_id`. | 1 `accounts` row → many `booking_positions`/`budgets` rows |
+| `account_id` | Internal account identifier on `accounts`, `booking_positions`, `budgets`, and `account_hierarchies` — joins across those four. `index_rent.account_id` and `contract_debits.debit_type.code` mean something unrelated: a debit-type code — don't join those to `accounts`. On `property_structure`, it means something else again: a cost-centre business code, matching `accounts.account_number` for the corresponding cost-centre row, not `accounts.account_id`. | 1 `accounts` row → many `booking_positions`/`budgets` rows, one `account_hierarchies` row per reporting structure |
 | `account_number` (on `contract_debits`/`contract_debit_diffs`) | The account a debit line posts to. On `contract_debits` this is a general ledger account; on `contract_debit_diffs` it's a tenant account instead — same column name, different account type. Matches `accounts.account_number`, not `accounts.account_id`. | 1 `accounts` row → many `contract_debits`/`contract_debit_diffs` rows |
 | `creditor_id` | Identifies a creditor. Referenced by `technical_objects`, `property_creditor_services`, `service_contracts`, `booking_headers`, `booking_positions`, `orders`, and `offers`. | 1 creditor → many rows across domains |
 | `project_account_id` | Links a request, offer, or order to the project account it belongs to. Present on `projects` (one per project), `requests`, and `offers`; on `orders` the same value is called `project_reference_id`. Empty outside a project; on `requests` and `offers` a few values have no matching project. | 1 project → 0..N requests/offers/orders |
