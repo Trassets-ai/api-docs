@@ -56,7 +56,7 @@ Trassets never stores your API key in plaintext. Only an HMAC-SHA-256 hash is re
 Treat your key like a password:
 
 - Do not commit it to version control.
-- Rotate keys regularly: generate a new key in the portal, switch your integration over, then delete the old one. There is no one-click rotation.
+- Rotate keys regularly: generate a new key in the portal, switch your integration over, then delete the old one. The **Last Used** column in the portal shows when a key last made a successful request (updated at most once per hour). Use it to check that the old key is no longer in use before you delete it. There is no one-click rotation.
 - Scope each key to the minimum access tier your integration needs.
 
 ## Authentication errors
