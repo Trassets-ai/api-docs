@@ -16,6 +16,10 @@ Jeder Listen-Endpunkt unter `/v1/` — Category wie Raw — nutzt Cursor-Paginat
   Der `next_cursor`-Wert aus der vorherigen Antwort, unverändert übergeben. Für die erste Seite weglassen.
 </ParamField>
 
+<ParamField query="include_total" type="boolean" default="false">
+  Nur Category-Endpunkte: `true` füllt `total`. Das Zählen kostet eine zusätzliche Abfrage — für Exporte weglassen und paginieren, bis `next_cursor` `null` ist. Raw-Endpunkte ignorieren den Parameter.
+</ParamField>
+
 Behalte innerhalb eines Laufs auf jeder Seite dieselben Filterparameter bei.
 
 ## Response
@@ -25,7 +29,7 @@ Behalte innerhalb eines Laufs auf jeder Seite dieselben Filterparameter bei.
   "data": [ { "…": "…" } ],
   "count": 1000,
   "next_cursor": "eyJjb2wiOiAi…",
-  "total": 167953
+  "total": null
 }
 ```
 
@@ -41,8 +45,8 @@ Behalte innerhalb eines Laufs auf jeder Seite dieselben Filterparameter bei.
   Opaker Cursor für die nächste Seite. `null`, wenn keine Zeilen mehr folgen. Auf Raw-Endpunkten trägt jede volle Seite einen Cursor, der letzte Request kann deshalb ein leeres `data`-Array liefern.
 </ResponseField>
 
-<ResponseField name="total" type="integer">
-  Category-Endpunkte: Zeilen, die ab der Cursor-Position zur Abfrage passen; auf der ersten Seite alle passenden Zeilen. Raw-Endpunkte: Zeilenzahl der Tabelle aus dem letzten abgeschlossenen Sync.
+<ResponseField name="total" type="integer | null">
+  Category-Endpunkte: `null`, außer der Request sendet `include_total=true`; dann die Zeilen, die ab der Cursor-Position zur Abfrage passen (auf der ersten Seite alle passenden Zeilen). Raw-Endpunkte: Zeilenzahl der Tabelle aus dem letzten abgeschlossenen Sync.
 </ResponseField>
 
 Raw-Endpunkte (`/v1/raw/{table_name}`) ergänzen den Body um `table_name` und senden einen `X-Snapshot-At`-Header mit dem Zeitstempel des letzten erfolgreichen Syncs der Tabelle.

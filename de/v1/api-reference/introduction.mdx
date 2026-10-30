@@ -19,7 +19,7 @@ Raw-Endpunkte sind generisch pro Kunde (keine tabellenweise Inhaltsprüfung). Si
 
 ### Pagination
 
-Nur Cursor, die Pagination-Felder stehen im Body: `total` und `next_cursor` (`null` = keine weitere Seite). Ein `offset` gibt es nicht; ein Request mit `offset` liefert `400 Bad Request`. Details: [Pagination](/de/v1/concepts/pagination).
+Nur Cursor, die Pagination-Felder stehen im Body: `next_cursor` (`null` = keine weitere Seite) und `total` (auf Category-Endpunkten `null`, außer der Request sendet `include_total=true`). Ein `offset` gibt es nicht; ein Request mit `offset` liefert `400 Bad Request`. Details: [Pagination](/de/v1/concepts/pagination).
 
 ## Fehlerformat
 

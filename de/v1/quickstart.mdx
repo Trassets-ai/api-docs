@@ -19,7 +19,7 @@ Diese Anleitung bringt dich in wenigen Minuten von null zum erfolgreichen `/v1/`
       -H "X-API-Key: $TRASSETS_API_KEY"
     ```
 
-    Die API liefert ein JSON-Objekt zurück: die Zeilen stehen in `data`, dazu `count`, `next_cursor` (`null` auf der letzten Seite) und `total`. Eine typische Antwort sieht so aus:
+    Die API liefert ein JSON-Objekt zurück: die Zeilen stehen in `data`, dazu `count`, `next_cursor` (`null` auf der letzten Seite) und `total` (`null`, außer du sendest `include_total=true`). Eine typische Antwort sieht so aus:
 
     ```json
     {
@@ -36,7 +36,7 @@ Diese Anleitung bringt dich in wenigen Minuten von null zum erfolgreichen `/v1/`
       ],
       "count": 1,
       "next_cursor": "eyJjb2wiOiAi…",
-      "total": 214
+      "total": null
     }
     ```
 
