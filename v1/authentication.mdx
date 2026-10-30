@@ -45,6 +45,10 @@ Grants apply to every key, `raw` or `transformed`, and override a column filter 
 
 A `transformed` key can additionally be limited to a list of property IDs. Category endpoints then return only rows of those properties, and a table that has no `property_id` column (for example `/v1/stakeholder/creditors`) returns 403 for such a key. `/v1/catalog` and `/v1/changes` are not filtered by property; they list tables, not rows. An administrator sets the property list in the portal; a key without a list sees all properties.
 
+### Account restrictions
+
+A key can additionally be limited to positions of the `Trassets-Standard` reporting structure (see `account_hierarchies` in [Accounting](/v1/data-model/accounting)). `/v1/accounting/accounts`, `booking_positions`, `budgets`, and `account_hierarchies` then return only rows whose account (`property_id` + `account_id`) is assigned to one of those positions. `/v1/accounting/booking_headers` and `/v1/raw/{table_name}` return 403 for such a key, and `/v1/raw/tables` returns an empty list. Other categories are not filtered by account; a key created without a category selection is limited to Accounting. An administrator selects the positions in the portal when creating the key; they can't be changed afterwards, create a new key instead. A key without positions sees all accounts.
+
 ## Key storage and security
 
 Trassets never stores your API key in plaintext. Only an HMAC-SHA-256 hash is retained on our servers for verification. This means we cannot recover or display a key after creation.
