@@ -16,6 +16,10 @@ Every list endpoint under `/v1/` — category and raw — uses cursor pagination
   The `next_cursor` value from the previous response, passed unchanged. Omit it for the first page.
 </ParamField>
 
+<ParamField query="include_total" type="boolean" default="false">
+  Category endpoints only: `true` fills `total`. Counting costs an extra query, so leave it off for exports and page until `next_cursor` is `null`. Raw endpoints ignore the parameter.
+</ParamField>
+
 Keep the same filter parameters on every page of one run.
 
 ## Response
@@ -25,7 +29,7 @@ Keep the same filter parameters on every page of one run.
   "data": [ { "…": "…" } ],
   "count": 1000,
   "next_cursor": "eyJjb2wiOiAi…",
-  "total": 167953
+  "total": null
 }
 ```
 
@@ -41,8 +45,8 @@ Keep the same filter parameters on every page of one run.
   Opaque cursor for the next page. `null` when no rows are left. On raw endpoints every full page carries a cursor, so the final request can return an empty `data` array.
 </ResponseField>
 
-<ResponseField name="total" type="integer">
-  Category endpoints: rows matching the query from the cursor position onward; on the first page, all matching rows. Raw endpoints: the table's row count from the last completed sync.
+<ResponseField name="total" type="integer | null">
+  Category endpoints: `null` unless the request sends `include_total=true`; with it, the rows matching the query from the cursor position onward (on the first page, all matching rows). Raw endpoints: the table's row count from the last completed sync.
 </ResponseField>
 
 Raw endpoints (`/v1/raw/{table_name}`) add `table_name` to the body and send an `X-Snapshot-At` header with the timestamp of the last successful sync for the table.

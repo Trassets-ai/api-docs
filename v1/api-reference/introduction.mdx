@@ -19,7 +19,7 @@ Raw endpoints are generic per customer (no per-table content review). They use t
 
 ### Pagination
 
-Cursor-only, with the pagination fields in the body: `total` and `next_cursor` (`null` = no further page). There is no `offset`; a request with `offset` returns `400 Bad Request`. Details: [Pagination](/v1/concepts/pagination).
+Cursor-only, with the pagination fields in the body: `next_cursor` (`null` = no further page) and `total` (on category endpoints `null` unless the request sends `include_total=true`). There is no `offset`; a request with `offset` returns `400 Bad Request`. Details: [Pagination](/v1/concepts/pagination).
 
 ## Error format
 
