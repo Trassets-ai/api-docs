@@ -45,7 +45,7 @@ Um die Pagination fortzusetzen, übergib den `next_cursor`-Wert aus der vorherig
 | Pfad | `/v1/{category}/{api_table}` | `/v1/raw/{table_name}` |
 | Daten | Normalisiert, geschäftsfertig | Vollständige Quelltabelle, ungefiltert |
 | Pagination | Cursor-basiert (`cursor`/`next_cursor`) | Cursor-basiert (`cursor`/`next_cursor`) |
-| Max. Seitengröße | 100.000 Zeilen | 10.000 Zeilen |
+| Max. Seitengröße | 10.000 Zeilen | 10.000 Zeilen |
 | Am besten für | Dashboards, inkrementelle Abrufe | Bulk-Sync, Data-Warehousing |
 | Header | – | `X-Snapshot-At` |
 

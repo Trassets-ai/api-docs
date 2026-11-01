@@ -9,7 +9,7 @@ Every list endpoint under `/v1/` — category and raw — uses cursor pagination
 ## Request
 
 <ParamField query="limit" type="integer" default="1000">
-  Rows per page. Maximum 100,000 on category endpoints, 10,000 on raw endpoints.
+  Rows per page. Maximum 10,000 on both category and raw endpoints.
 </ParamField>
 
 <ParamField query="cursor" type="string">
