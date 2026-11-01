@@ -45,7 +45,7 @@ To continue paginating, pass the `next_cursor` value from the previous response 
 | Path | `/v1/{category}/{api_table}` | `/v1/raw/{table_name}` |
 | Data | Normalized, business-ready | Full source table, unfiltered |
 | Pagination | Cursor-based (`cursor`/`next_cursor`) | Cursor-based (`cursor`/`next_cursor`) |
-| Max page size | 100,000 rows | 10,000 rows |
+| Max page size | 10,000 rows | 10,000 rows |
 | Best for | Dashboards, incremental fetches | Bulk sync, data warehousing |
 | Headers | – | `X-Snapshot-At` |
 
