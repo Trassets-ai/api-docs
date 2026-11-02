@@ -24,8 +24,7 @@ Verknüpfungen über Endpunkte hinweg hängen damit nie von der umgebenden Struk
   Enddatum kommt als `{"start": "2020-06-01", "end": null}` zurück, eines ohne beide Grenzen als
   `{"start": null, "end": null}`. Früher fehlten solche Schlüssel ganz (siehe
   [Changelog](/de/changelog)). Prüfe also auf Werte, nicht auf ein leeres Objekt oder auf beide
-  Grenzen: bei `Property.property_structure` führen `active_period` und `mandate_period` nie
-  beide gleichzeitig, und bei `Contracts.service_contracts` hat die Mehrheit der Zeilen nur
+  Grenzen: bei `Contracts.service_contracts` etwa hat die Mehrheit der Zeilen nur
   `contract_period.start`. Dasselbe gilt für Code/Label-Paare, bei denen `label` zu einem
   vorhandenen `code` `null` sein kann. Das gilt für die Category-Endpunkte: `/v1/raw` liefert
   Rohdaten unverändert, dort können Schlüssel weiterhin fehlen.

@@ -10,32 +10,36 @@ Hier stehen die Änderungen an Verhalten und Datenmodell der API seit dem 13.10.
 Breaking Changes tragen das Tag **Breaking**. Solange `/v1/` eine Preview ist, können sie ohne Vorlaufzeit kommen (siehe [Versionierung](/de/concepts/versioning)).
 
 <Update label="2026-11-03" tags={["Breaking", "Datenmodell"]}>
-  - Objekte in /v1/-Antworten führen jetzt immer alle Schlüssel. Fehlt ein Wert, steht dort null, bisher fehlte der Schlüssel ganz. Ein period ohne Grenzen kommt deshalb als Objekt mit start und end, beide null, statt als leeres Objekt. Prüfe auf Werte, nicht auf ein leeres Objekt. Siehe [Response-Struktur](/de/v1/response-shape-conventions).
+  - Objekte in den Antworten der Category-Endpunkte führen jetzt immer alle Schlüssel. Fehlt ein Wert, steht dort null, bisher fehlte der Schlüssel ganz. Ein period ohne Grenzen kommt deshalb als Objekt mit start und end, beide null, statt als leeres Objekt. Prüfe auf Werte, nicht auf ein leeres Objekt. /v1/raw liefert Rohdaten weiter unverändert. Siehe [Response-Struktur](/de/v1/response-shape-conventions).
 </Update>
 
 <Update label="2026-11-02" tags={["Fehler"]}>
   - Jede Antwort trägt den Header X-Request-ID. Bei Support-Anfragen schick ihn bitte mit, siehe [Fehler](/de/concepts/errors).
-  - Kann die API eine Tabelle wegen eines Datenbankfehlers nicht nachschlagen, antwortet sie mit 500. Bisher kam fälschlich 404 „Table not found“. Ein 404 ist damit wieder endgültig, nach einem 500 lohnt ein erneuter Versuch.
+  - Kann die API eine Tabelle wegen eines Datenbankfehlers nicht nachschlagen, antwortet sie mit 500. Bisher kam fälschlich 404 mit der Meldung, die Tabelle gebe es nicht. Ein 404 ist damit wieder endgültig, nach einem 500 lohnt ein erneuter Versuch.
 </Update>
 
 <Update label="2026-11-01" tags={["Breaking", "Pagination"]}>
   - limit ist auf den Category-Endpunkten jetzt höchstens 10.000, bisher waren es 100.000. Größere Werte liefern 422. Für mehr Zeilen blätterst du mit next_cursor, siehe [Pagination](/de/v1/concepts/pagination).
 </Update>
 
-<Update label="2026-10-30" tags={["Breaking", "Pagination", "API-Keys"]}>
-  - total ist ohne den neuen Parameter include_total=true jetzt null. Die API zählt die Zeilen nur noch auf Anfrage. next_cursor hängt nicht davon ab.
-  - Die OpenAPI-Spec deklariert die Feldtypen der v1-Ressourcen fest, statt sie aus Beispieldaten abzuleiten. total und next_cursor sind als nullable deklariert.
+<Update label="2026-10-30" tags={["Breaking", "Pagination", "OpenAPI", "API-Keys"]}>
+  - Auf den Category-Endpunkten ist total ohne den neuen Parameter include_total=true jetzt null. Die API zählt die Zeilen nur noch auf Anfrage. next_cursor hängt nicht davon ab. /v1/raw liefert total weiterhin immer.
+  - Die OpenAPI-Spec nimmt die Feldtypen der v1-Ressourcen aus einer festen Deklaration, nicht mehr beim Start aus der Datenbank eines Referenzkunden. Dadurch tragen 20 Filter-Parameter ihren echten Typ, etwa integer für account_id und floor_area_id oder ein Datum für booking_date und reference_date. Die Requests selbst bleiben gleich. Wenn du deinen Client aus der Spec generierst, erzeuge ihn neu. total und next_cursor sind als nullable deklariert.
   - Neue API-Keys beginnen mit trs_live_. Bestehende Keys bleiben gültig. Das Portal zeigt je Key die letzte Nutzung.
   - Beim Anlegen eines Keys im Portal lässt sich der Zugriff auf Positionen der Reporting-Struktur Trassets-Standard beschränken, siehe [Authentifizierung](/de/v1/authentication).
 </Update>
 
-<Update label="2026-10-29" tags={["Rate-Limits"]}>
-  - Jeder API-Key hat ein Budget von 2.500 Requests pro Stunde, gemeinsam für alle /v1/-Endpunkte. Fehlgeschlagene Key-Prüfungen zählen nicht mit. Siehe [Rate-Limits](/de/concepts/rate-limits).
+<Update label="2026-10-29" tags={["Rate-Limits", "Datenmodell"]}>
+  - Jeder API-Key hat ein Budget von 2.500 Requests pro Stunde, gemeinsam für alle /v1/-Endpunkte. Bisher galten 500 Requests pro Stunde je Pfad. Fehlgeschlagene Key-Prüfungen zählen nicht mit. Siehe [Rate-Limits](/de/concepts/rate-limits).
+  - Neue Ressource /v1/accounting/account_hierarchies mit den Kontenmapping-Strukturen je Konto, siehe [Accounting](/de/v1/data-model/accounting).
 </Update>
 
-<Update label="2026-10-27" tags={["Breaking", "Datenmodell"]}>
+<Update label="2026-10-28" tags={["Datenmodell"]}>
+  - Neue Kategorie kpi mit Objekt-Kennzahlen (property_kpis, property_kpis_by_floor_area_type), siehe [KPI](/de/v1/data-model/kpi). Auch /v1/changes filtert nach dieser Kategorie.
+</Update>
+
+<Update label="2026-10-27" tags={["Breaking", "Versionierung"]}>
   - Alle Endpunkte liegen jetzt unter /v1/: Category-Tabellen, Raw-Tabellen, Catalog und Changes. Unversionierte Pfade liefern 404 ohne Redirect. Offset-Pagination und die X-Pagination-Header gibt es nicht mehr, geblättert wird mit cursor. Siehe [Versionierung](/de/concepts/versioning).
-  - Neue Kategorie kpi mit Objekt-Kennzahlen (property_kpis, property_kpis_by_floor_area_type), siehe [KPI](/de/v1/data-model/kpi). Seit dem 28.10. kann /v1/changes auch nach dieser Kategorie filtern.
 </Update>
 
 <Update label="2026-10-26" tags={["Filter"]}>
@@ -45,6 +49,13 @@ Breaking Changes tragen das Tag **Breaking**. Solange `/v1/` eine Preview ist, k
 <Update label="2026-10-16" tags={["Breaking", "Datenmodell"]}>
   - Dezimalspalten kommen unter /v1/ als JSON-Zahl statt als String, zum Beispiel 19.0 statt "19.0000".
   - Weitere Freitext- und Bearbeiterspalten gelten als personenbezogen und kommen nur noch mit dem passenden Grant, darunter comment, responsible_user und responsible_person. Siehe [Authentifizierung](/de/v1/authentication).
+  - Neu unter /v1/operations: orders und offers. offers enthält nur Anfragen, zu denen es ein Angebot gibt; alle Anfragen stehen in requests. Siehe [Operations](/de/v1/data-model/operations).
+</Update>
+
+<Update label="2026-10-14" tags={["Breaking", "Datenmodell"]}>
+  - booking_positions.person_id ist jetzt ein String statt einer Zahl.
+  - notifications.person_id heißt jetzt reporter_key.
+  - projects liefert eine Zeile je Projekt und deutlich mehr Projekte, weil kein Statusfilter mehr greift. Die Felder to_hdr_id, to_name, request_hdr_id, request_number, report_id, report_number, creditor_id, offer_id und offer_number entfallen, neu ist project_account_id. Siehe [Operations](/de/v1/data-model/operations).
 </Update>
 
 <Update label="2026-10-13" tags={["API-Keys"]}>

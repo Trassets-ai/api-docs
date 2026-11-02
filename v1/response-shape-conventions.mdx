@@ -24,8 +24,7 @@ across endpoints never depend on the surrounding structure.
   comes back as `{"start": "2020-06-01", "end": null}`, one with neither bound as
   `{"start": null, "end": null}`. Before, such keys were left out entirely (see the
   [changelog](/changelog)). So check for values rather than for an empty object or for both
-  bounds: on `Property.property_structure`, `active_period` and `mandate_period` never carry
-  both at once, and on `Contracts.service_contracts` most rows have only
+  bounds: on `Contracts.service_contracts`, for example, most rows have only
   `contract_period.start`. The same applies to code/label pairs, where `label` can be `null`
   for a present `code`. This applies to the category endpoints: `/v1/raw` returns source data
   unchanged, so keys can still be missing there.
