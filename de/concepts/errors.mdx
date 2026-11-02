@@ -46,3 +46,15 @@ Beispiel-Fehlerantwort für einen ungültigen API-Key:
 <Warning>
   Ein **401** bedeutet nur, dass der `X-API-Key`-Header fehlt. Ein unbekannter oder deaktivierter Key liefert **403**, ebenso ein gültiger Key ohne die erforderliche Zugriffsstufe. Das Feld `detail` zeigt, welcher Fall vorliegt.
 </Warning>
+
+## Support kontaktieren
+
+Jede Antwort trägt den Header `X-Request-ID` mit einer UUID, auch jede Fehlerantwort. Der Header ist per CORS freigegeben, Browser-Clients können ihn also ebenfalls lesen. Wenn du dich wegen eines Requests an den Trassets-Support wendest, schick seine `X-Request-ID` mit. Damit finden wir genau diesen Request in unseren Logs.
+
+```bash
+curl -i "https://api.trassets.ai/v1/catalog" \
+  -H "X-API-Key: $TRASSETS_API_KEY"
+# x-request-id: 0b6c1f3e-5a2d-4c8e-9f71-2d4e6a8b0c13
+```
+
+Die ID erzeugt immer der Server. Einen `X-Request-ID`-Header im Request ignoriert die API.

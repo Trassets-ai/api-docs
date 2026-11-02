@@ -4,7 +4,7 @@ sidebarTitle: "Introduction"
 description: "Überblick über die /v1/-Endpunkte: Basis-URL, Authentifizierung, Response-Header, Fehler und die Endpunkt-Gruppen."
 ---
 
-Die `/v1/`-Endpunkte sind die versionierte Schnittstelle auf dieselben Immobiliendaten. Basis-URL: `https://api.trassets.ai`. Sende deinen API-Key im `X-API-Key`-Header bei jedem Request. Alle Antworten sind JSON.
+Die `/v1/`-Endpunkte sind die versionierte Schnittstelle auf dieselben Immobiliendaten. Basis-URL: `https://api.trassets.ai`. Sende deinen API-Key im `X-API-Key`-Header bei jedem Request. Alle Antworten sind JSON. Jede Antwort, auch eine Fehlerantwort, trägt den Header `X-Request-ID`. Schick ihn mit, wenn du [den Support kontaktierst](/de/concepts/errors#support-kontaktieren).
 
 Jede `/v1/{category}/{api_table}`-Response ist ein JSON-Objekt: die Zeilen stehen in `data`, daneben die Pagination-Felder. Siehe [Response-Struktur](/de/v1/response-shape-conventions) für die Objekt-, Array- und Code/Label-Muster, denen die Zeilen folgen.
 
