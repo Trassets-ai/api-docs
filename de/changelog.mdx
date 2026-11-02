@@ -52,6 +52,7 @@ Breaking Changes tragen das Tag **Breaking**. Solange `/v1/` eine Preview ist, k
 
 <Update label="2026-10-16" tags={["Breaking", "Datenmodell"]}>
   - Dezimalspalten kommen unter /v1/ als JSON-Zahl statt als String, zum Beispiel 19.0 statt "19.0000".
+  - requests.floor_area_id ist jetzt eine Zahl statt eines Strings. Auch die Werte sind neu und passen jetzt auf property_structure.floor_area_id.
   - Weitere Freitext- und Bearbeiterspalten gelten als personenbezogen und kommen nur noch mit dem passenden Grant, darunter comment, responsible_user und responsible_person. Siehe [Authentifizierung](/de/v1/authentication).
   - Neu unter /v1/operations: orders und offers. offers enthält eine Zeile je echtem Angebot; Anfragen ohne Angebot stehen nur in requests. Siehe [Operations](/de/v1/data-model/operations).
 </Update>

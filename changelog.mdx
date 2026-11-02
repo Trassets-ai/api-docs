@@ -52,6 +52,7 @@ Breaking changes carry the tag **Breaking**. While `/v1/` is a preview, they can
 
 <Update label="2026-10-16" tags={["Breaking", "Data model"]}>
   - Decimal columns under /v1/ come as JSON numbers instead of strings, for example 19.0 instead of "19.0000".
+  - requests.floor_area_id is now an integer instead of a string. Its values changed too and now match property_structure.floor_area_id.
   - More free-text and assignee columns count as personal data and now require the matching grant, among them comment, responsible_user, and responsible_person. See [Authentication](/v1/authentication).
   - New under /v1/operations: orders and offers. offers holds one row per actual offer; requests without an offer appear only in requests. See [Operations](/v1/data-model/operations).
 </Update>
