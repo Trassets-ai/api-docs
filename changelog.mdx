@@ -46,16 +46,21 @@ Breaking changes carry the tag **Breaking**. While `/v1/` is a preview, they can
   - Filters on columns with object values, such as account_type on property_structure, now return matches instead of 500. You filter by code or label. A filter value in the wrong format, such as text for a number or date column, returns 400 instead of 500.
 </Update>
 
+<Update label="2026-10-18" tags={["Breaking", "Data model"]}>
+  - notifications.priority_text now holds the numeric ERP ID of the priority as a string. Before, it held wrong labels from a status lookup or stayed empty. See [Operations](/v1/data-model/operations).
+</Update>
+
 <Update label="2026-10-16" tags={["Breaking", "Data model"]}>
   - Decimal columns under /v1/ come as JSON numbers instead of strings, for example 19.0 instead of "19.0000".
   - More free-text and assignee columns count as personal data and now require the matching grant, among them comment, responsible_user, and responsible_person. See [Authentication](/v1/authentication).
-  - New under /v1/operations: orders and offers. offers only contains requests that received an offer; all requests are in requests. See [Operations](/v1/data-model/operations).
+  - New under /v1/operations: orders and offers. offers holds one row per actual offer; requests without an offer appear only in requests. See [Operations](/v1/data-model/operations).
 </Update>
 
 <Update label="2026-10-14" tags={["Breaking", "Data model"]}>
   - booking_positions.person_id is now a string instead of a number.
   - notifications.person_id is now called reporter_key.
   - projects returns one row per project and considerably more projects, because no status filter applies anymore. The fields to_hdr_id, to_name, request_hdr_id, request_number, report_id, report_number, creditor_id, offer_id, and offer_number are gone, project_account_id is new. See [Operations](/v1/data-model/operations).
+  - New resource /v1/operations/requests with one row per request, joined to projects via project_account_id.
 </Update>
 
 <Update label="2026-10-13" tags={["API keys"]}>

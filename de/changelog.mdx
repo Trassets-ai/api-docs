@@ -46,16 +46,21 @@ Breaking Changes tragen das Tag **Breaking**. Solange `/v1/` eine Preview ist, k
   - Filter auf Spalten mit Objektwerten, etwa account_type an property_structure, liefern jetzt Treffer statt 500. Du filterst nach code oder label. Ein Filterwert im falschen Format, etwa Text für eine Zahlen- oder Datumsspalte, liefert 400 statt 500.
 </Update>
 
+<Update label="2026-10-18" tags={["Breaking", "Datenmodell"]}>
+  - notifications.priority_text enthält jetzt die numerische ERP-ID der Priorität als String. Bisher standen dort falsche Labels aus einem Status-Lookup, oder das Feld blieb leer. Siehe [Operations](/de/v1/data-model/operations).
+</Update>
+
 <Update label="2026-10-16" tags={["Breaking", "Datenmodell"]}>
   - Dezimalspalten kommen unter /v1/ als JSON-Zahl statt als String, zum Beispiel 19.0 statt "19.0000".
   - Weitere Freitext- und Bearbeiterspalten gelten als personenbezogen und kommen nur noch mit dem passenden Grant, darunter comment, responsible_user und responsible_person. Siehe [Authentifizierung](/de/v1/authentication).
-  - Neu unter /v1/operations: orders und offers. offers enthält nur Anfragen, zu denen es ein Angebot gibt; alle Anfragen stehen in requests. Siehe [Operations](/de/v1/data-model/operations).
+  - Neu unter /v1/operations: orders und offers. offers enthält eine Zeile je echtem Angebot; Anfragen ohne Angebot stehen nur in requests. Siehe [Operations](/de/v1/data-model/operations).
 </Update>
 
 <Update label="2026-10-14" tags={["Breaking", "Datenmodell"]}>
   - booking_positions.person_id ist jetzt ein String statt einer Zahl.
   - notifications.person_id heißt jetzt reporter_key.
   - projects liefert eine Zeile je Projekt und deutlich mehr Projekte, weil kein Statusfilter mehr greift. Die Felder to_hdr_id, to_name, request_hdr_id, request_number, report_id, report_number, creditor_id, offer_id und offer_number entfallen, neu ist project_account_id. Siehe [Operations](/de/v1/data-model/operations).
+  - Neue Ressource /v1/operations/requests mit einer Zeile je Anfrage, über project_account_id mit projects verknüpft.
 </Update>
 
 <Update label="2026-10-13" tags={["API-Keys"]}>
