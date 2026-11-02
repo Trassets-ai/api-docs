@@ -1,0 +1,48 @@
+---
+title: "Changelog der Data API"
+sidebarTitle: "Changelog"
+description: "Änderungen an der Data API nach Datum, die Breaking Changes sind markiert. Per RSS abonnierbar."
+rss: true
+---
+
+Hier steht jede Änderung, die du als API-Client bemerkst, mit dem Datum ihres Produktiv-Deployments. Abonnieren kannst du den Changelog per RSS: über den Button oben auf der Seite oder unter `https://docs.trassets.ai/de/changelog/rss.xml`.
+
+Breaking Changes tragen das Tag **Breaking**. Solange `/v1/` eine Preview ist, können sie ohne Vorlaufzeit kommen (siehe [Versionierung](/de/concepts/versioning)).
+
+<Update label="2026-11-02" tags={["Fehler"]}>
+  - Jede Antwort trägt den Header X-Request-ID. Bei Support-Anfragen schick ihn bitte mit, siehe [Fehler](/de/concepts/errors).
+  - Kann die API eine Tabelle wegen eines Datenbankfehlers nicht nachschlagen, antwortet sie mit 500. Bisher kam fälschlich 404 „Table not found“. Ein 404 ist damit wieder endgültig, nach einem 500 lohnt ein erneuter Versuch.
+</Update>
+
+<Update label="2026-11-01" tags={["Breaking", "Pagination"]}>
+  - limit ist auf den Category-Endpunkten jetzt höchstens 10.000, bisher waren es 100.000. Größere Werte liefern 422. Für mehr Zeilen blätterst du mit next_cursor, siehe [Pagination](/de/v1/concepts/pagination).
+</Update>
+
+<Update label="2026-10-30" tags={["Breaking", "Pagination", "API-Keys"]}>
+  - total ist ohne den neuen Parameter include_total=true jetzt null. Die API zählt die Zeilen nur noch auf Anfrage. next_cursor hängt nicht davon ab.
+  - Die OpenAPI-Spec deklariert die Feldtypen der v1-Ressourcen fest, statt sie aus Beispieldaten abzuleiten. total und next_cursor sind als nullable deklariert.
+  - Neue API-Keys beginnen mit trs_live_. Bestehende Keys bleiben gültig. Das Portal zeigt je Key die letzte Nutzung.
+  - Beim Anlegen eines Keys im Portal lässt sich der Zugriff auf Positionen der Reporting-Struktur Trassets-Standard beschränken, siehe [Authentifizierung](/de/v1/authentication).
+</Update>
+
+<Update label="2026-10-29" tags={["Rate-Limits"]}>
+  - Jeder API-Key hat ein Budget von 2.500 Requests pro Stunde, gemeinsam für alle /v1/-Endpunkte. Fehlgeschlagene Key-Prüfungen zählen nicht mit. Siehe [Rate-Limits](/de/concepts/rate-limits).
+</Update>
+
+<Update label="2026-10-27" tags={["Breaking", "Datenmodell"]}>
+  - Alle Endpunkte liegen jetzt unter /v1/: Category-Tabellen, Raw-Tabellen, Catalog und Changes. Unversionierte Pfade liefern 404 ohne Redirect. Offset-Pagination und die X-Pagination-Header gibt es nicht mehr, geblättert wird mit cursor. Siehe [Versionierung](/de/concepts/versioning).
+  - Neue Kategorie kpi mit Objekt-Kennzahlen (property_kpis, property_kpis_by_floor_area_type), siehe [KPI](/de/v1/data-model/kpi). Seit dem 28.10. kann /v1/changes auch nach dieser Kategorie filtern.
+</Update>
+
+<Update label="2026-10-26" tags={["Filter"]}>
+  - Filter auf Spalten mit Objektwerten, etwa account_type an property_structure, liefern jetzt Treffer statt 500. Du filterst nach code oder label. Passt ein Filterwert nicht zum Spaltentyp, kommt 400 statt 500.
+</Update>
+
+<Update label="2026-10-16" tags={["Breaking", "Datenmodell"]}>
+  - Dezimalspalten kommen unter /v1/ als JSON-Zahl statt als String, zum Beispiel 19.0 statt "19.0000".
+  - Weitere Freitext- und Bearbeiterspalten gelten als personenbezogen und kommen nur noch mit dem passenden Grant, darunter comment, responsible_user und responsible_person. Siehe [Authentifizierung](/de/v1/authentication).
+</Update>
+
+<Update label="2026-10-13" tags={["API-Keys"]}>
+  - API-Keys können ein Ablaufdatum haben, das du im Portal setzt. Ein abgelaufener Key liefert 401 „API key expired“.
+</Update>
