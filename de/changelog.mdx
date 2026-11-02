@@ -5,9 +5,13 @@ description: "Änderungen an der Data API nach Datum, die Breaking Changes sind 
 rss: true
 ---
 
-Hier steht jede Änderung, die du als API-Client bemerkst, mit dem Datum ihres Produktiv-Deployments. Abonnieren kannst du den Changelog per RSS: über den Button oben auf der Seite oder unter `https://docs.trassets.ai/de/changelog/rss.xml`.
+Hier stehen die Änderungen an Verhalten und Datenmodell der API seit dem 13.10.2026, jeweils mit dem Datum ihres Produktiv-Deployments. Abonnieren kannst du den Changelog per RSS: über den Button oben auf der Seite oder unter `https://docs.trassets.ai/de/changelog/rss.xml`.
 
 Breaking Changes tragen das Tag **Breaking**. Solange `/v1/` eine Preview ist, können sie ohne Vorlaufzeit kommen (siehe [Versionierung](/de/concepts/versioning)).
+
+<Update label="2026-11-03" tags={["Breaking", "Datenmodell"]}>
+  - Objekte in /v1/-Antworten führen jetzt immer alle Schlüssel. Fehlt ein Wert, steht dort null, bisher fehlte der Schlüssel ganz. Ein period ohne Grenzen kommt deshalb als Objekt mit start und end, beide null, statt als leeres Objekt. Prüfe auf Werte, nicht auf ein leeres Objekt. Siehe [Response-Struktur](/de/v1/response-shape-conventions).
+</Update>
 
 <Update label="2026-11-02" tags={["Fehler"]}>
   - Jede Antwort trägt den Header X-Request-ID. Bei Support-Anfragen schick ihn bitte mit, siehe [Fehler](/de/concepts/errors).
@@ -35,7 +39,7 @@ Breaking Changes tragen das Tag **Breaking**. Solange `/v1/` eine Preview ist, k
 </Update>
 
 <Update label="2026-10-26" tags={["Filter"]}>
-  - Filter auf Spalten mit Objektwerten, etwa account_type an property_structure, liefern jetzt Treffer statt 500. Du filterst nach code oder label. Passt ein Filterwert nicht zum Spaltentyp, kommt 400 statt 500.
+  - Filter auf Spalten mit Objektwerten, etwa account_type an property_structure, liefern jetzt Treffer statt 500. Du filterst nach code oder label. Ein Filterwert im falschen Format, etwa Text für eine Zahlen- oder Datumsspalte, liefert 400 statt 500.
 </Update>
 
 <Update label="2026-10-16" tags={["Breaking", "Datenmodell"]}>

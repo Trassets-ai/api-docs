@@ -20,13 +20,14 @@ Datensätze zwischen Endpunkten verknüpfst, liegen in jeder Response auf oberst
 Verknüpfungen über Endpunkte hinweg hängen damit nie von der umgebenden Struktur ab.
 
 <Warning>
-  Objekte führen nur die Schlüssel, die einen Wert haben. Ein `period` ohne Enddatum kommt als
-  `{"start": "2020-06-01"}` zurück, eines ohne beide Grenzen als `{}` — die fehlenden Schlüssel
-  sind **nicht vorhanden**, nicht `null`. `period.end` also defensiv lesen, statt beide Grenzen
-  vorauszusetzen: bei `Property.property_structure` führen `active_period` und `mandate_period`
-  nie beide gleichzeitig, und bei `Contracts.service_contracts` hat die Mehrheit der Zeilen nur
+  Objekte führen immer alle Schlüssel, ein fehlender Wert ist `null`. Ein `period` ohne
+  Enddatum kommt als `{"start": "2020-06-01", "end": null}` zurück, eines ohne beide Grenzen als
+  `{"start": null, "end": null}`. Früher fehlten solche Schlüssel ganz (siehe
+  [Changelog](/de/changelog)). Prüfe also auf Werte, nicht auf ein leeres Objekt oder auf beide
+  Grenzen: bei `Property.property_structure` führen `active_period` und `mandate_period` nie
+  beide gleichzeitig, und bei `Contracts.service_contracts` hat die Mehrheit der Zeilen nur
   `contract_period.start`. Dasselbe gilt für Code/Label-Paare, bei denen `label` zu einem
-  vorhandenen `code` fehlen kann.
+  vorhandenen `code` `null` sein kann.
 </Warning>
 
 <Note>

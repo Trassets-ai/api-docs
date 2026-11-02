@@ -5,9 +5,13 @@ description: "Changes to the Data API by date, with breaking changes marked. Sub
 rss: true
 ---
 
-This page lists every change you notice as an API client, dated by its production deployment. Subscribe via RSS: use the button at the top of the page or `https://docs.trassets.ai/changelog/rss.xml`.
+This page lists changes to the behavior and data model of the API since 13 October 2026, each dated by its production deployment. Subscribe via RSS: use the button at the top of the page or `https://docs.trassets.ai/changelog/rss.xml`.
 
 Breaking changes carry the tag **Breaking**. While `/v1/` is a preview, they can land without notice (see [Versioning](/concepts/versioning)).
+
+<Update label="2026-11-03" tags={["Breaking", "Data model"]}>
+  - Objects in /v1/ responses now always carry all their keys. A missing value is null, before the key was left out. A period with neither bound therefore comes as an object with start and end, both null, instead of an empty object. Check for values, not for an empty object. See [Response structure](/v1/response-shape-conventions).
+</Update>
 
 <Update label="2026-11-02" tags={["Errors"]}>
   - Every response carries the X-Request-ID header. Please include it in support requests, see [Errors](/concepts/errors).
@@ -35,7 +39,7 @@ Breaking changes carry the tag **Breaking**. While `/v1/` is a preview, they can
 </Update>
 
 <Update label="2026-10-26" tags={["Filtering"]}>
-  - Filters on columns with object values, such as account_type on property_structure, now return matches instead of 500. You filter by code or label. A filter value that does not fit the column type returns 400 instead of 500.
+  - Filters on columns with object values, such as account_type on property_structure, now return matches instead of 500. You filter by code or label. A filter value in the wrong format, such as text for a number or date column, returns 400 instead of 500.
 </Update>
 
 <Update label="2026-10-16" tags={["Breaking", "Data model"]}>

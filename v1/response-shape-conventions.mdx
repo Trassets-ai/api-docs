@@ -20,12 +20,14 @@ cross-reference records between endpoints stay at the top level of every respons
 across endpoints never depend on the surrounding structure.
 
 <Warning>
-  Objects carry only the keys that have a value. A `period` with no end date comes back as
-  `{"start": "2020-06-01"}`, one with neither bound as `{}` — the missing keys are **absent**,
-  not `null`. So read `period.end` defensively rather than assuming both bounds exist: on
-  `Property.property_structure`, `active_period` and `mandate_period` never carry both at once,
-  and on `Contracts.service_contracts` most rows have only `contract_period.start`. The same
-  applies to code/label pairs, where `label` can be missing for a present `code`.
+  Objects always carry all their keys; a missing value is `null`. A `period` with no end date
+  comes back as `{"start": "2020-06-01", "end": null}`, one with neither bound as
+  `{"start": null, "end": null}`. Before, such keys were left out entirely (see the
+  [changelog](/changelog)). So check for values rather than for an empty object or for both
+  bounds: on `Property.property_structure`, `active_period` and `mandate_period` never carry
+  both at once, and on `Contracts.service_contracts` most rows have only
+  `contract_period.start`. The same applies to code/label pairs, where `label` can be `null`
+  for a present `code`.
 </Warning>
 
 <Note>
