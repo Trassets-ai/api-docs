@@ -41,7 +41,7 @@ Example error response for an invalid API key:
 | **409** | Snapshot changed | The table was re-synced while you paginated. Restart from the first page without `cursor`. See [Pagination](/v1/concepts/pagination). |
 | **422** | Validation error | A query parameter did not pass validation. Check the `detail` field for the exact parameter and constraint. |
 | **429** | Rate limit exceeded | You have exceeded the 2,500 requests per hour limit of your API key. Back off and retry after the current window resets. |
-| **500** | Internal error | A server-side error occurred. Retry the request after a short delay, and contact support if it persists. |
+| **500** | Internal error | A server-side error occurred. Retry the request after a short delay, and [contact support](#contacting-support) if it persists. |
 
 <Warning>
   A **401** only means the `X-API-Key` header is missing. An unknown or disabled key returns **403**, as does a valid key that lacks the required access tier. Read the `detail` field to tell them apart.
@@ -49,7 +49,7 @@ Example error response for an invalid API key:
 
 ## Contacting support
 
-Every response carries an `X-Request-ID` header with a UUID, error responses included. The header is exposed via CORS, so browser clients can read it too. When you contact Trassets support about a request, include its `X-Request-ID`. It identifies exactly that request in our logs.
+Every response from the API carries an `X-Request-ID` header with a UUID, error responses included. Responses the load balancer sends on its own carry no ID, such as the redirect from `http://` or a `502` while the API is unreachable. The header is exposed via CORS, so browser clients can read it too. When you contact Trassets support about a request, include its `X-Request-ID`. It identifies exactly that request in our logs, which we keep for 30 days.
 
 ```bash
 curl -i "https://api.trassets.ai/v1/catalog" \
