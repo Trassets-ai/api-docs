@@ -9,8 +9,9 @@ This page lists changes to the behavior and data model of the API since 13 Octob
 
 Breaking changes carry the tag **Breaking**. While `/v1/` is a preview, they can land without notice (see [Versioning](/concepts/versioning)).
 
-<Update label="2026-11-03" tags={["Breaking", "Data model"]}>
+<Update label="2026-11-03" tags={["Breaking", "Data model", "MCP", "API keys"]}>
   - Objects in category endpoint responses now always carry all their keys. A missing value is null, before the key was left out. A period with neither bound therefore comes as an object with start and end, both null, instead of an empty object. Check for values, not for an empty object. /v1/raw still returns source data unchanged. See [Response structure](/v1/response-shape-conventions).
+  - New: through the Trassets MCP server at https://mcp.trassets.ai/mcp, AI clients such as Claude Code, Cursor, VS Code or Copilot Studio read your data. It needs a key with the new channel MCP, which you select in the portal when creating the key. Existing keys have channel API and work as before. See [MCP server](/v1/guides/mcp).
 </Update>
 
 <Update label="2026-11-02" tags={["Errors"]}>
