@@ -13,10 +13,10 @@ The server offers five tools. All of them only read data; each one calls a Data 
 | Tool | What it does | API endpoint |
 | --- | --- | --- |
 | `list_catalog` | Lists the categories and tables your key may read. | `GET /v1/catalog` |
-| `get_table_data` | Reads one page of a table, optionally filtered by exact values such as `property_id`. | `GET /v1/{category}/{table}` |
+| `get_table_data` | Reads one page of a table, filtered by exact values such as `property_id`. Some tables require a filter (see [Filtering](/v1/concepts/filtering)). | `GET /v1/{category}/{table}` |
 | `get_changes` | Lists the tables whose data changed since a point in time, at most 120 days back. | `GET /v1/changes` |
 | `list_raw_tables` | Lists the raw tables synced from your source systems. Empty for keys without raw access. | `GET /v1/raw/tables` |
-| `get_raw_table` | Reads one page of a raw table. Needs a key with raw access (see [Key types](/v1/authentication#key-types)). | `GET /v1/raw/{table_name}` |
+| `get_raw_table` | Reads one page of a raw table. Needs a key of type `raw` with both personal data grants (see [Key types](/v1/authentication#key-types)). | `GET /v1/raw/{table_name}` |
 
 ## Endpoint and key
 
@@ -65,7 +65,7 @@ Then ask Claude Code which Trassets tables it can read. Other clients need the s
 2. Enter a name, a description, and `https://mcp.trassets.ai/mcp` as server URL.
 3. Under authentication, choose **API key**, type **Header**, and enter `X-API-Key` as header name.
 4. Create a connection, enter your MCP key, and select **Add to agent**. All five tools are enabled by default.
-5. Before you publish the agent, check which credentials the tool uses. With maker-provided credentials, everyone who uses the agent reads with your key and sees everything your key may see. Let each user connect with their own key instead.
+5. Before you publish the agent, check which credentials the tool uses. With maker-provided credentials, everyone who uses the agent reads with your key and sees everything your key may see. Instead, have an administrator create one MCP key per user and let each user connect with their own key.
 
 Then ask the agent, for example, "Which Trassets tables can you read?" or "How many properties are in the data?"
 
@@ -73,9 +73,9 @@ Then ask the agent, for example, "Which Trassets tables can you read?" or "How m
 
 - **Read only.** The server can't create or change data.
 - **No calculations.** Tools return rows, not sums, averages, or KPIs. If you ask for a total, the model in your client computes it from the rows it has read, and it can miscount or stop after one page. For row counts, the tools return `total`. Pre-computed figures are only those in the [KPI tables](/v1/data-model/kpi).
-- **Small pages.** A tool call returns at most 200 rows (default 50). Reading a large table takes many calls, and each call counts against your key's budget of 2,500 requests per hour, shared with direct API requests (see [Rate limits](/concepts/rate-limits)). For full exports, use the REST API directly (see [Bulk export](/guides/bulk-export)).
+- **Small pages.** A tool call returns at most 200 rows (default 50). Reading a large table takes many calls, and each call counts against your key's budget of 2,500 requests per hour (see [Rate limits](/concepts/rate-limits)). For full exports, use the REST API with a separate key for channel API (see [Pagination](/v1/concepts/pagination)).
 - **Exact filters only.** `get_table_data` filters by exact value on a table's filter columns. Ranges and text search are not available.
-- **Daily data.** The data is as current as the API's daily sync (see [Sync cycle](/concepts/sync-cycle)).
+- **Data freshness.** The data is as current as the last sync of each table; there is no fixed interval. `get_changes` shows `last_sync_at` per table (see [Sync cycle](/concepts/sync-cycle)).
 - **API key only.** There is no OAuth sign-in yet (see [Supported AI clients](#supported-ai-clients)).
 
 ## Risks
@@ -84,7 +84,7 @@ Then ask the agent, for example, "Which Trassets tables can you read?" or "How m
 - **Instructions hidden in data.** Free-text fields such as comments or booking texts can contain text that reads like an instruction. The tools tell the model to ignore such text, but no model follows that reliably.
 - **Outbound tools.** An agent that reads your data, processes such text, and can also send data out (email, web requests, file uploads, MCP servers that write elsewhere) can be tricked into sending your data to third parties. Use the Trassets MCP server only in agents and sessions without such tools.
 - **Unverified answers.** The model can misread fields, mix up tables, or extrapolate from one page. Check figures against the API or your reports before you rely on them.
-- **One key per person.** A key belongs to exactly one person. Don't share it, not even through an agent that others use. When someone leaves, delete their key in the portal; that ends their MCP access too.
+- **One key per person.** Create one MCP key per person, name it after them in the portal, and don't share it, not even through an agent that others use. When someone leaves, delete their key; that ends their MCP access.
 
 ## Error messages
 
@@ -96,5 +96,8 @@ Tools report errors as text. The most common ones:
 | API key is missing or expired. | The key has expired. Create a new one in the portal. |
 | API key is invalid, disabled, or not permitted to access this resource. | The key is unknown or disabled, was created for channel API instead of MCP, or may not read this table. |
 | Table is unknown or not released in v1 for this customer. | The table doesn't exist for your organization. Call `list_catalog` for the available tables. |
+| Invalid request: … | The Data API rejected the request, for example because of an unknown or missing required filter or a `since` more than 120 days back. The rest of the message says why. |
 | Rate limit reached. Retry after N seconds. | Your key's hourly budget is used up. |
+| Data API error. Try again later. Request ID: … | Temporary server error. If it persists, contact support and quote the Request ID (see [Errors](/concepts/errors#contacting-support)). |
+| Data API did not respond in time. / Data API is not reachable. | Temporary problem. Try again later. |
 | Data was re-synced during pagination. Restart without cursor. | The table was refreshed while paging. Read it again from the first page. |

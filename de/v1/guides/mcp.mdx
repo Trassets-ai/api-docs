@@ -13,10 +13,10 @@ Der Server bietet fünf Tools. Alle lesen nur; jedes ruft mit deinem Key einen E
 | Tool | Was es tut | API-Endpunkt |
 | --- | --- | --- |
 | `list_catalog` | Listet die Kategorien und Tabellen, die dein Key lesen darf. | `GET /v1/catalog` |
-| `get_table_data` | Liest eine Seite einer Tabelle, optional gefiltert nach exakten Werten wie `property_id`. | `GET /v1/{category}/{table}` |
+| `get_table_data` | Liest eine Seite einer Tabelle, gefiltert nach exakten Werten wie `property_id`. Manche Tabellen verlangen einen Filter (siehe [Filtern](/de/v1/concepts/filtering)). | `GET /v1/{category}/{table}` |
 | `get_changes` | Listet die Tabellen, deren Daten sich seit einem Zeitpunkt geändert haben, höchstens 120 Tage zurück. | `GET /v1/changes` |
 | `list_raw_tables` | Listet die aus deinen Quellsystemen synchronisierten Raw-Tabellen. Leer für Keys ohne Raw-Zugriff. | `GET /v1/raw/tables` |
-| `get_raw_table` | Liest eine Seite einer Raw-Tabelle. Braucht einen Key mit Raw-Zugriff (siehe [Key-Typen](/de/v1/authentication#key-typen)). | `GET /v1/raw/{table_name}` |
+| `get_raw_table` | Liest eine Seite einer Raw-Tabelle. Braucht einen Key vom Typ `raw` mit beiden Grants für personenbezogene Daten (siehe [Key-Typen](/de/v1/authentication#key-typen)). | `GET /v1/raw/{table_name}` |
 
 ## Endpunkt und Key
 
@@ -65,7 +65,7 @@ Frag Claude Code danach, welche Trassets-Tabellen es lesen kann. Andere Clients 
 2. Gib einen Namen, eine Beschreibung und `https://mcp.trassets.ai/mcp` als Server-URL ein.
 3. Wähle bei der Authentifizierung **API key**, Typ **Header**, und trag `X-API-Key` als Header-Namen ein.
 4. Leg eine Verbindung an, gib deinen MCP-Key ein und wähle **Add to agent**. Alle fünf Tools sind standardmäßig aktiv.
-5. Prüfe vor dem Veröffentlichen, mit welchen Zugangsdaten das Tool arbeitet. Mit den Zugangsdaten des Erstellers (Maker-provided credentials) liest jeder, der den Agent nutzt, mit deinem Key und sieht alles, was dein Key sehen darf. Lass stattdessen jeden Nutzer mit seinem eigenen Key verbinden.
+5. Prüfe vor dem Veröffentlichen, mit welchen Zugangsdaten das Tool arbeitet. Mit den Zugangsdaten des Erstellers (Maker-provided credentials) liest jeder, der den Agent nutzt, mit deinem Key und sieht alles, was dein Key sehen darf. Lass stattdessen einen Administrator pro Nutzer einen MCP-Key erzeugen, und jeder Nutzer verbindet sich mit seinem eigenen Key.
 
 Frag den Agent danach zum Beispiel: „Welche Trassets-Tabellen kannst du lesen?“ oder „Wie viele Objekte sind in den Daten?“
 
@@ -73,9 +73,9 @@ Frag den Agent danach zum Beispiel: „Welche Trassets-Tabellen kannst du lesen?
 
 - **Nur lesen.** Der Server kann keine Daten anlegen oder ändern.
 - **Keine Berechnungen.** Tools liefern Zeilen, keine Summen, Durchschnitte oder KPIs. Fragst du nach einer Summe, rechnet das Modell deines Clients sie aus den gelesenen Zeilen aus und kann sich dabei verzählen oder nach einer Seite aufhören. Für Zeilenanzahlen liefern die Tools `total`. Vorberechnete Kennzahlen gibt es nur in den [KPI-Tabellen](/de/v1/data-model/kpi).
-- **Kleine Seiten.** Ein Tool-Aufruf liefert höchstens 200 Zeilen (Standard 50). Eine große Tabelle braucht viele Aufrufe, und jeder zählt gegen das Budget deines Keys von 2.500 Requests pro Stunde, das er mit direkten API-Requests teilt (siehe [Rate-Limits](/de/concepts/rate-limits)). Für vollständige Exporte nutze direkt die REST-API (siehe [Bulk-Export](/de/guides/bulk-export)).
+- **Kleine Seiten.** Ein Tool-Aufruf liefert höchstens 200 Zeilen (Standard 50). Eine große Tabelle braucht viele Aufrufe, und jeder zählt gegen das Budget deines Keys von 2.500 Requests pro Stunde (siehe [Rate-Limits](/de/concepts/rate-limits)). Für vollständige Exporte nutze die REST-API mit einem eigenen Key für den Kanal API (siehe [Paginierung](/de/v1/concepts/pagination)).
 - **Nur exakte Filter.** `get_table_data` filtert nach exakten Werten auf den Filterspalten einer Tabelle. Bereiche und Textsuche gibt es nicht.
-- **Tagesaktuelle Daten.** Die Daten sind so aktuell wie der tägliche Sync der API (siehe [Sync-Zyklus](/de/concepts/sync-cycle)).
+- **Aktualität.** Die Daten sind so aktuell wie der letzte Sync der jeweiligen Tabelle; ein festes Intervall gibt es nicht. `get_changes` zeigt `last_sync_at` pro Tabelle (siehe [Sync-Zyklus](/de/concepts/sync-cycle)).
 - **Nur API-Key.** Eine Anmeldung per OAuth gibt es noch nicht (siehe [Unterstützte KI-Clients](#unterstützte-ki-clients)).
 
 ## Risiken
@@ -84,7 +84,7 @@ Frag den Agent danach zum Beispiel: „Welche Trassets-Tabellen kannst du lesen?
 - **Anweisungen in den Daten.** Freitextfelder wie Kommentare oder Buchungstexte können Text enthalten, der wie eine Anweisung klingt. Die Tools weisen das Modell an, solchen Text zu ignorieren, aber kein Modell hält sich verlässlich daran.
 - **Tools, die Daten nach außen senden.** Ein Agent, der deine Daten liest, solchen Text verarbeitet und zugleich Daten versenden kann (E-Mail, Web-Requests, Datei-Uploads, MCP-Server, die anderswo schreiben), lässt sich dazu bringen, deine Daten an Dritte zu schicken. Nutze den Trassets-MCP-Server nur in Agents und Sitzungen ohne solche Tools.
 - **Ungeprüfte Antworten.** Das Modell kann Felder falsch lesen, Tabellen verwechseln oder von einer Seite hochrechnen. Prüfe Zahlen gegen die API oder deine Berichte, bevor du dich auf sie verlässt.
-- **Ein Key pro Person.** Ein Key gehört genau einer Person. Gib ihn nicht weiter, auch nicht über einen Agent, den andere nutzen. Verlässt jemand die Organisation, lösch seinen Key im Portal; damit endet auch sein MCP-Zugang.
+- **Ein Key pro Person.** Erzeuge pro Person einen eigenen MCP-Key, benenne ihn im Portal nach ihr und gib ihn nicht weiter, auch nicht über einen Agent, den andere nutzen. Verlässt jemand die Organisation, lösch seinen Key; damit endet sein MCP-Zugang.
 
 ## Fehlermeldungen
 
@@ -96,5 +96,8 @@ Tools melden Fehler als Text. Die häufigsten:
 | API key is missing or expired. | Der Key ist abgelaufen. Erzeuge im Portal einen neuen. |
 | API key is invalid, disabled, or not permitted to access this resource. | Der Key ist unbekannt oder deaktiviert, wurde für den Kanal API statt MCP erzeugt oder darf diese Tabelle nicht lesen. |
 | Table is unknown or not released in v1 for this customer. | Die Tabelle gibt es für deine Organisation nicht. Ruf `list_catalog` für die verfügbaren Tabellen auf. |
+| Invalid request: … | Die Data API hat den Request abgelehnt, zum Beispiel wegen eines unbekannten oder fehlenden Pflichtfilters oder eines `since`, das mehr als 120 Tage zurückliegt. Der Rest der Meldung nennt den Grund. |
 | Rate limit reached. Retry after N seconds. | Das Stundenbudget deines Keys ist aufgebraucht. |
+| Data API error. Try again later. Request ID: … | Vorübergehender Serverfehler. Bleibt er bestehen, kontaktiere den Support und nenne die Request ID (siehe [Fehler](/de/concepts/errors#support-kontaktieren)). |
+| Data API did not respond in time. / Data API is not reachable. | Vorübergehendes Problem. Versuch es später erneut. |
 | Data was re-synced during pagination. Restart without cursor. | Die Tabelle wurde während des Blätterns neu geladen. Lies sie ab der ersten Seite neu. |
