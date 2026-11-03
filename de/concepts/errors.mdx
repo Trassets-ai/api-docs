@@ -42,6 +42,9 @@ Beispiel-Fehlerantwort für einen ungültigen API-Key:
 | **422** | Validierungsfehler | Ein Query-Parameter hat die Validierung nicht bestanden. Prüfe das `detail`-Feld für den genauen Parameter und die Einschränkung. |
 | **429** | Rate-Limit überschritten | Du hast das Limit von 2.500 Requests pro Stunde deines API-Keys überschritten. Warte ab und versuche es erneut, nachdem das aktuelle Zeitfenster zurückgesetzt wurde. |
 | **500** | Interner Fehler | Ein serverseitiger Fehler ist aufgetreten. Wiederhole den Request nach einer kurzen Verzögerung und [kontaktiere den Support](#support-kontaktieren), falls das Problem weiterhin besteht. |
+| **503** | Vorübergehend überlastet | Kann jeder Endpunkt liefern: Alle Datenbankverbindungen der API sind belegt, und binnen 5 Sekunden ist keine frei geworden. `detail` lautet `Service temporarily unavailable. Please retry.` Warte die Sekunden aus dem `Retry-After`-Header ab und wiederhole dann den Request. |
+
+Unverändert wiederholen lohnt sich nur bei `429`, `500` und `503`. Trägt die Antwort einen `Retry-After`-Header, warte mindestens so viele Sekunden bis zum nächsten Versuch, sonst ein paar Sekunden. Verdopple die Wartezeit bei jedem weiteren Fehlschlag. Alle anderen Fehler brauchen einen korrigierten Request, unverändert scheitert er erneut.
 
 <Warning>
   Ein **401** bedeutet, dass der `X-API-Key`-Header fehlt oder der Key abgelaufen ist. Ein unbekannter oder deaktivierter Key liefert **403**, ebenso ein gültiger Key ohne die erforderliche Zugriffsstufe. Das Feld `detail` zeigt, welcher Fall vorliegt.

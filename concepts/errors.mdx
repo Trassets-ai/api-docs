@@ -42,6 +42,9 @@ Example error response for an invalid API key:
 | **422** | Validation error | A query parameter did not pass validation. Check the `detail` field for the exact parameter and constraint. |
 | **429** | Rate limit exceeded | You have exceeded the 2,500 requests per hour limit of your API key. Back off and retry after the current window resets. |
 | **500** | Internal error | A server-side error occurred. Retry the request after a short delay, and [contact support](#contacting-support) if it persists. |
+| **503** | Temporarily overloaded | Any endpoint can return it: all database connections of the API are busy, and none became free within 5 seconds. `detail` is `Service temporarily unavailable. Please retry.` Wait the number of seconds in the `Retry-After` header, then retry. |
+
+Retry only `429`, `500` and `503` unchanged. If the response carries a `Retry-After` header, wait at least that many seconds before the next attempt, otherwise a few seconds. Double the wait on each further failure. All other errors need a corrected request; sent unchanged, it fails again.
 
 <Warning>
   A **401** means the `X-API-Key` header is missing or the key has expired. An unknown or disabled key returns **403**, as does a valid key that lacks the required access tier. Read the `detail` field to tell them apart.
