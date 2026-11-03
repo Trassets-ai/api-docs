@@ -1,0 +1,103 @@
+---
+title: "KI-Clients über den Trassets-MCP-Server anbinden"
+sidebarTitle: "MCP-Server"
+description: "Claude Code, Cursor, VS Code, Copilot Studio und andere MCP-Clients per API-Key an deine Daten der Data API v1 anbinden, plus was der MCP-Server kann, wo seine Grenzen liegen und welche Risiken du steuern musst."
+---
+
+Über den Trassets-MCP-Server lesen KI-Clients deine Daten der Data API v1 per [Model Context Protocol](https://modelcontextprotocol.io). Jeder Aufruf läuft mit deinem API-Key und unterliegt denselben Einschränkungen, Grants und demselben Rate-Limit wie ein direkter API-Request.
+
+## Was der MCP-Server kann
+
+Der Server bietet fünf Tools. Alle lesen nur; jedes ruft mit deinem Key einen Endpunkt der Data API auf.
+
+| Tool | Was es tut | API-Endpunkt |
+| --- | --- | --- |
+| `list_catalog` | Listet die Kategorien und Tabellen, die dein Key lesen darf. | `GET /v1/catalog` |
+| `get_table_data` | Liest eine Seite einer Tabelle, gefiltert nach exakten Werten wie `property_id`. Manche Tabellen verlangen einen Filter (siehe [Filtern](/de/v1/concepts/filtering)). | `GET /v1/{category}/{table}` |
+| `get_changes` | Listet die Tabellen, deren Daten sich seit einem Zeitpunkt geändert haben, höchstens 120 Tage zurück. | `GET /v1/changes` |
+| `list_raw_tables` | Listet die aus deinen Quellsystemen synchronisierten Raw-Tabellen. Leer für Keys ohne Raw-Zugriff. | `GET /v1/raw/tables` |
+| `get_raw_table` | Liest eine Seite einer Raw-Tabelle. Braucht einen Key vom Typ `raw` mit beiden Grants für personenbezogene Daten (siehe [Key-Typen](/de/v1/authentication#key-typen)). | `GET /v1/raw/{table_name}` |
+
+## Endpunkt und Key
+
+| Einstellung | Wert |
+| --- | --- |
+| URL | `https://mcp.trassets.ai/mcp` |
+| Transport | Streamable HTTP |
+| Authentifizierung | `X-API-Key: <key>` oder `Authorization: Bearer <key>` bei jedem Request |
+
+Du brauchst einen Key mit Kanal **MCP**. Ein Administrator erzeugt ihn im [Portal](https://portal.api.trassets.ai) wie jeden anderen Key (siehe [Authentifizierung](/de/v1/authentication)) und wählt unter **Channel** den Eintrag **MCP**. Ein Key gilt für genau einen Kanal: Der MCP-Server lehnt für die API erzeugte Keys ab, die REST-API lehnt MCP-Keys ab.
+
+<Warning>
+  Daten, die ein Tool zurückgibt, verarbeitet der Modellanbieter deines KI-Clients. Binde nur Clients an, deren Anbieter deine Organisation für diese Daten freigegeben hat, und kombiniere den MCP-Server nicht mit Tools, die Daten an Dritte senden können. Siehe [Risiken](#risiken).
+</Warning>
+
+## Unterstützte KI-Clients
+
+MCP ist modellunabhängig: Das Modell bringt der Client mit, welches Modell antwortet, hängt also von deinem Client ab. Entscheidend ist, ob der Client einen festen API-Key-Header an einen entfernten MCP-Server senden kann. Eine Anmeldung per OAuth unterstützt der MCP-Server noch nicht, Clients, die nur OAuth anbieten, können sich deshalb nicht verbinden.
+
+Stand November 2026. Die Anbieter ändern ihre MCP-Unterstützung häufig; passt ein Schritt nicht, sieh in der Dokumentation des Clients nach.
+
+| Client | Unterstützt | Wo der Key hinkommt |
+| --- | --- | --- |
+| Claude Code | Ja | `--header` in `claude mcp add` (siehe unten) |
+| Cursor | Ja | `headers` in `.cursor/mcp.json` |
+| VS Code (GitHub Copilot, Agent-Modus) | Ja | `headers` in `.vscode/mcp.json` |
+| OpenAI Codex CLI | Ja | `bearer_token_env_var` in `~/.codex/config.toml` |
+| Gemini CLI | Ja | `headers` in `~/.gemini/settings.json` |
+| Microsoft Copilot Studio | Ja | Authentifizierung **API key**, Typ **Header**, Header-Name `X-API-Key` (siehe unten) |
+| Claude (claude.ai, Claude Desktop) als Custom Connector | Eingeschränkt | Nur wenn deine Organisation die Option **Request headers** sieht (Beta); sonst Claude Code nutzen |
+| ChatGPT | Noch nicht | Custom Connectors verlangen OAuth |
+| Microsoft 365 Copilot (Declarative Agents) | Noch nicht | MCP-Plugins verlangen OAuth |
+
+## Beispiel: Claude Code
+
+```bash
+claude mcp add --transport http trassets https://mcp.trassets.ai/mcp \
+  --header "X-API-Key: $TRASSETS_MCP_KEY"
+```
+
+Frag Claude Code danach, welche Trassets-Tabellen es lesen kann. Andere Clients brauchen dieselben zwei Werte: die URL und den Key, als `X-API-Key`-Header oder als `Authorization: Bearer <key>`. Schreib den Key nicht im Klartext in eine Config-Datei, die du committest: Cursor löst `${env:TRASSETS_MCP_KEY}` in `headers` auf, VS Code fragt ihn über `${input:...}` ab.
+
+## Beispiel: Microsoft Copilot Studio
+
+1. Öffne deinen Agent, geh zu **Tools**, wähle **Add a tool** und füge einen neuen Model-Context-Protocol-Server hinzu.
+2. Gib einen Namen, eine Beschreibung und `https://mcp.trassets.ai/mcp` als Server-URL ein.
+3. Wähle bei der Authentifizierung **API key**, Typ **Header**, und trag `X-API-Key` als Header-Namen ein.
+4. Leg eine Verbindung an, gib deinen MCP-Key ein und wähle **Add to agent**. Alle fünf Tools sind standardmäßig aktiv.
+5. Prüfe vor dem Veröffentlichen, mit welchen Zugangsdaten das Tool arbeitet. Mit den Zugangsdaten des Erstellers (Maker-provided credentials) liest jeder, der den Agent nutzt, mit deinem Key und sieht alles, was dein Key sehen darf. Lass stattdessen einen Administrator pro Nutzer einen MCP-Key erzeugen, und jeder Nutzer verbindet sich mit seinem eigenen Key.
+
+Frag den Agent danach zum Beispiel: „Welche Trassets-Tabellen kannst du lesen?“ oder „Wie viele Objekte sind in den Daten?“
+
+## Grenzen
+
+- **Nur lesen.** Der Server kann keine Daten anlegen oder ändern.
+- **Keine Berechnungen.** Tools liefern Zeilen, keine Summen, Durchschnitte oder KPIs. Fragst du nach einer Summe, rechnet das Modell deines Clients sie aus den gelesenen Zeilen aus und kann sich dabei verzählen oder nach einer Seite aufhören. Für Zeilenanzahlen liefern die Tools `total`. Vorberechnete Kennzahlen gibt es nur in den [KPI-Tabellen](/de/v1/data-model/kpi).
+- **Kleine Seiten.** Ein Tool-Aufruf liefert höchstens 200 Zeilen (Standard 50). Eine große Tabelle braucht viele Aufrufe, und jeder zählt gegen das Budget deines Keys von 2.500 Requests pro Stunde (siehe [Rate-Limits](/de/concepts/rate-limits)). Für vollständige Exporte nutze die REST-API mit einem eigenen Key für den Kanal API (siehe [Paginierung](/de/v1/concepts/pagination)).
+- **Nur exakte Filter.** `get_table_data` filtert nach exakten Werten auf den Filterspalten einer Tabelle. Bereiche und Textsuche gibt es nicht.
+- **Aktualität.** Die Daten sind so aktuell wie der letzte Sync der jeweiligen Tabelle; ein festes Intervall gibt es nicht. `get_changes` zeigt `last_sync_at` pro Tabelle (siehe [Sync-Zyklus](/de/concepts/sync-cycle)).
+- **Nur API-Key.** Eine Anmeldung per OAuth gibt es noch nicht (siehe [Unterstützte KI-Clients](#unterstützte-ki-clients)).
+
+## Risiken
+
+- **Daten verlassen Trassets.** Alles, was ein Tool zurückgibt, geht an den Modellanbieter deines Clients und wird nach dessen Bedingungen verarbeitet. Deine Organisation entscheidet, welcher Anbieter welche Daten verarbeiten darf. Nutze Keys ohne die [Grants für personenbezogene Daten](/de/v1/authentication#grants-für-personenbezogene-daten), solange der Anwendungsfall sie nicht braucht.
+- **Anweisungen in den Daten.** Freitextfelder wie Kommentare oder Buchungstexte können Text enthalten, der wie eine Anweisung klingt. Die Tools weisen das Modell an, solchen Text zu ignorieren, aber kein Modell hält sich verlässlich daran.
+- **Tools, die Daten nach außen senden.** Ein Agent, der deine Daten liest, solchen Text verarbeitet und zugleich Daten versenden kann (E-Mail, Web-Requests, Datei-Uploads, MCP-Server, die anderswo schreiben), lässt sich dazu bringen, deine Daten an Dritte zu schicken. Nutze den Trassets-MCP-Server nur in Agents und Sitzungen ohne solche Tools.
+- **Ungeprüfte Antworten.** Das Modell kann Felder falsch lesen, Tabellen verwechseln oder von einer Seite hochrechnen. Prüfe Zahlen gegen die API oder deine Berichte, bevor du dich auf sie verlässt.
+- **Ein Key pro Person.** Erzeuge pro Person einen eigenen MCP-Key, benenne ihn im Portal nach ihr und gib ihn nicht weiter, auch nicht über einen Agent, den andere nutzen. Verlässt jemand die Organisation, lösch seinen Key; damit endet sein MCP-Zugang.
+
+## Fehlermeldungen
+
+Tools melden Fehler als Text. Die häufigsten:
+
+| Meldung | Bedeutung |
+| --- | --- |
+| Missing API key. Send it in the X-API-Key header or as Authorization: Bearer \<key\>. | Der Client sendet keinen Key. Prüfe die Header-Konfiguration. |
+| API key is missing or expired. | Der Key ist abgelaufen. Erzeuge im Portal einen neuen. |
+| API key is invalid, disabled, or not permitted to access this resource. | Der Key ist unbekannt oder deaktiviert, wurde für den Kanal API statt MCP erzeugt oder darf diese Tabelle nicht lesen. |
+| Table is unknown or not released in v1 for this customer. | Die Tabelle gibt es für deine Organisation nicht. Ruf `list_catalog` für die verfügbaren Tabellen auf. |
+| Invalid request: … | Die Data API hat den Request abgelehnt, zum Beispiel wegen eines unbekannten oder fehlenden Pflichtfilters oder eines `since`, das mehr als 120 Tage zurückliegt. Der Rest der Meldung nennt den Grund. |
+| Rate limit reached. Retry after N seconds. | Das Stundenbudget deines Keys ist aufgebraucht. |
+| Data API error. Try again later. Request ID: … | Vorübergehender Serverfehler. Bleibt er bestehen, kontaktiere den Support und nenne die Request ID (siehe [Fehler](/de/concepts/errors#support-kontaktieren)). |
+| Data API did not respond in time. / Data API is not reachable. | Vorübergehendes Problem. Versuch es später erneut. |
+| Data was re-synced during pagination. Restart without cursor. | Die Tabelle wurde während des Blätterns neu geladen. Lies sie ab der ersten Seite neu. |

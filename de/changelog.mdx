@@ -9,8 +9,9 @@ Hier stehen die Änderungen an Verhalten und Datenmodell der API seit dem 13.10.
 
 Breaking Changes tragen das Tag **Breaking**. Solange `/v1/` eine Preview ist, können sie ohne Vorlaufzeit kommen (siehe [Versionierung](/de/concepts/versioning)).
 
-<Update label="2026-11-03" tags={["Breaking", "Datenmodell"]}>
+<Update label="2026-11-03" tags={["Breaking", "Datenmodell", "MCP", "API-Keys"]}>
   - Objekte in den Antworten der Category-Endpunkte führen jetzt immer alle Schlüssel. Fehlt ein Wert, steht dort null, bisher fehlte der Schlüssel ganz. Ein period ohne Grenzen kommt deshalb als Objekt mit start und end, beide null, statt als leeres Objekt. Prüfe auf Werte, nicht auf ein leeres Objekt. /v1/raw liefert Rohdaten weiter unverändert. Siehe [Response-Struktur](/de/v1/response-shape-conventions).
+  - Neu: Über den Trassets-MCP-Server unter https://mcp.trassets.ai/mcp lesen KI-Clients wie Claude Code, Cursor, VS Code oder Copilot Studio deine Daten. Er braucht einen Key mit dem neuen Kanal MCP, den du beim Erzeugen im Portal wählst. Bestehende Keys haben den Kanal API und funktionieren unverändert. Siehe [MCP-Server](/de/v1/guides/mcp).
 </Update>
 
 <Update label="2026-11-02" tags={["Fehler"]}>
