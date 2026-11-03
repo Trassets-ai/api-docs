@@ -49,6 +49,10 @@ Ein `transformed`-Key kann zusätzlich auf eine Liste von Property-IDs eingeschr
 
 Ein Key kann zusätzlich auf Positionen der Reporting-Struktur `Trassets-Standard` eingeschränkt sein (siehe `account_hierarchies` unter [Accounting](/de/v1/data-model/accounting)). `/v1/accounting/accounts`, `booking_positions`, `budgets` und `account_hierarchies` liefern dann nur Zeilen, deren Konto (`property_id` + `account_id`) einer dieser Positionen zugeordnet ist. `/v1/accounting/booking_headers` und `/v1/raw/{table_name}` liefern für einen solchen Key 403, `/v1/raw/tables` eine leere Liste. Andere Kategorien werden nicht nach Konto gefiltert; ein Key, der ohne Kategorieauswahl erstellt wurde, ist auf Accounting beschränkt. Ein Administrator wählt die Positionen im Portal beim Erstellen des Keys; nachträglich lassen sie sich nicht ändern, dafür einen neuen Key erstellen. Ein Key ohne Positionen sieht alle Konten.
 
+## Kanal
+
+Jeder Key hat einen Kanal, `api` oder `mcp`. Ein Administrator wählt ihn im Portal beim Erstellen des Keys; nachträglich lässt er sich nicht ändern. Ein `api`-Key funktioniert nur an der REST-API, ein `mcp`-Key nur über den [MCP-Server](/de/v1/guides/mcp). Ein aktiver Key am anderen Kanal liefert 403 mit `detail` "API key not enabled for this channel". Keys, die vor dem 3. November 2026 erstellt wurden, haben den Kanal `api`.
+
 ## Speicherung und Sicherheit des Keys
 
 Trassets speichert deinen API-Key niemals im Klartext. Auf unseren Servern wird nur ein HMAC-SHA-256-Hash zur Verifikation aufbewahrt. Das bedeutet: Wir können einen Key nach der Erstellung nicht wiederherstellen oder erneut anzeigen.
@@ -89,4 +93,4 @@ Das bedeutet, dass der Request keinen `X-API-Key`-Header enthielt.
 }
 ```
 
-Eine 403-Antwort bedeutet, dass der Key nicht akzeptiert wird: Er ist unbekannt (`Invalid API key`) oder deaktiviert (`API key is disabled`), oder er ist gültig, aber der angeforderte Endpunkt oder die Datenstufe ist nicht in deinem Abonnement enthalten. Das Feld `detail` zeigt, welcher Fall vorliegt. Kontaktiere deinen Account-Administrator oder den Trassets-Support, um deinen Zugang zu ändern.
+Eine 403-Antwort bedeutet, dass der Key nicht akzeptiert wird: Er ist unbekannt (`Invalid API key`), deaktiviert (`API key is disabled`) oder für den anderen [Kanal](#kanal) erstellt (`API key not enabled for this channel`), oder er ist gültig, aber der angeforderte Endpunkt oder die Datenstufe ist nicht in deinem Abonnement enthalten. Das Feld `detail` zeigt, welcher Fall vorliegt. Kontaktiere deinen Account-Administrator oder den Trassets-Support, um deinen Zugang zu ändern.

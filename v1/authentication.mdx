@@ -49,6 +49,10 @@ A `transformed` key can additionally be limited to a list of property IDs. Categ
 
 A key can additionally be limited to positions of the `Trassets-Standard` reporting structure (see `account_hierarchies` in [Accounting](/v1/data-model/accounting)). `/v1/accounting/accounts`, `booking_positions`, `budgets`, and `account_hierarchies` then return only rows whose account (`property_id` + `account_id`) is assigned to one of those positions. `/v1/accounting/booking_headers` and `/v1/raw/{table_name}` return 403 for such a key, and `/v1/raw/tables` returns an empty list. Other categories are not filtered by account; a key created without a category selection is limited to Accounting. An administrator selects the positions in the portal when creating the key; they can't be changed afterwards, create a new key instead. A key without positions sees all accounts.
 
+## Channel
+
+Every key has a channel, `api` or `mcp`. An administrator selects it in the portal when creating the key; it can't be changed afterwards. An `api` key works only against the REST API, an `mcp` key only through the [MCP server](/v1/guides/mcp). An active key used on the other channel returns 403 with `detail` "API key not enabled for this channel". Keys created before 3 November 2026 have channel `api`.
+
 ## Key storage and security
 
 Trassets never stores your API key in plaintext. Only an HMAC-SHA-256 hash is retained on our servers for verification. This means we cannot recover or display a key after creation.
@@ -89,4 +93,4 @@ This means the request did not include an `X-API-Key` header.
 }
 ```
 
-A 403 response means the key is not accepted: it is unknown (`Invalid API key`) or disabled (`API key is disabled`), or it is valid but the requested endpoint or data tier is not included in your subscription. Read the `detail` field to tell the cases apart. Contact your account administrator or Trassets support to change your access.
+A 403 response means the key is not accepted: it is unknown (`Invalid API key`), disabled (`API key is disabled`) or created for the other [channel](#channel) (`API key not enabled for this channel`), or it is valid but the requested endpoint or data tier is not included in your subscription. Read the `detail` field to tell the cases apart. Contact your account administrator or Trassets support to change your access.
