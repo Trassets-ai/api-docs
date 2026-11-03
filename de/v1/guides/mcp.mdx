@@ -14,7 +14,7 @@ description: "Claude Code, Cursor, VS Code, Copilot Studio und andere MCP-Client
 | Transport | Streamable HTTP |
 | Authentifizierung | `X-API-Key: <key>` oder `Authorization: Bearer <key>` bei jedem Request |
 
-Du brauchst einen Key mit Kanal **MCP**. Ein Administrator erzeugt ihn im [Portal](https://portal.api.trassets.ai) wie jeden anderen Key (siehe [Authentifizierung](/de/v1/authentication)) und wählt unter **Channel** den Eintrag **MCP**. Ein Key gilt für genau einen Kanal, ein für die API erzeugter Key wird vom MCP-Server also abgelehnt. Meldet ein Tool „API key is invalid, disabled, or not permitted to access this resource.“, prüfe zuerst den Kanal.
+Du brauchst einen Key mit Kanal **MCP**. Ein Administrator erzeugt ihn im [Portal](https://portal.api.trassets.ai) wie jeden anderen Key (siehe [Authentifizierung](/de/v1/authentication)) und wählt unter **Channel** den Eintrag **MCP**. Ein Key gilt für genau einen Kanal: Der MCP-Server lehnt für die API erzeugte Keys ab, die REST-API lehnt MCP-Keys ab. Meldet ein Tool „API key is invalid, disabled, or not permitted to access this resource.“, prüfe zuerst den Kanal.
 
 <Warning>
   Daten, die ein Tool zurückgibt, verarbeitet der Modellanbieter deines KI-Clients. Binde nur Clients an, deren Anbieter deine Organisation für diese Daten freigegeben hat, und kombiniere den MCP-Server nicht mit Tools, die Daten an Dritte senden können.
@@ -45,4 +45,4 @@ claude mcp add --transport http trassets https://mcp.trassets.ai/mcp \
   --header "X-API-Key: $TRASSETS_MCP_KEY"
 ```
 
-Frag Claude Code danach, welche Trassets-Tabellen es lesen kann. Andere Clients brauchen dieselben zwei Werte: die URL und den `X-API-Key`-Header.
+Frag Claude Code danach, welche Trassets-Tabellen es lesen kann. Andere Clients brauchen dieselben zwei Werte: die URL und den Key, als `X-API-Key`-Header oder als `Authorization: Bearer <key>`. Schreib den Key nicht im Klartext in eine Config-Datei, die du committest: Cursor löst `${env:TRASSETS_MCP_KEY}` in `headers` auf, VS Code fragt ihn über `${input:...}` ab.

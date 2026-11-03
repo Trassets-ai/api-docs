@@ -14,7 +14,7 @@ The Trassets MCP server lets AI clients read your Data API v1 data through the [
 | Transport | Streamable HTTP |
 | Authentication | `X-API-Key: <key>` or `Authorization: Bearer <key>` on every request |
 
-You need a key with channel **MCP**. An administrator creates it in the [portal](https://portal.api.trassets.ai) like any other key (see [Authentication](/v1/authentication)) and selects **MCP** under **Channel**. A key works for exactly one channel, so a key created for the API is rejected by the MCP server. If a tool returns "API key is invalid, disabled, or not permitted to access this resource.", check the channel first.
+You need a key with channel **MCP**. An administrator creates it in the [portal](https://portal.api.trassets.ai) like any other key (see [Authentication](/v1/authentication)) and selects **MCP** under **Channel**. A key works for exactly one channel: the MCP server rejects keys created for the API, and the REST API rejects MCP keys. If a tool returns "API key is invalid, disabled, or not permitted to access this resource.", check the channel first.
 
 <Warning>
   Data that a tool returns is processed by the model provider of your AI client. Only connect clients whose provider your organization has approved for this data, and don't combine the MCP server with tools that can send data to third parties.
@@ -45,4 +45,4 @@ claude mcp add --transport http trassets https://mcp.trassets.ai/mcp \
   --header "X-API-Key: $TRASSETS_MCP_KEY"
 ```
 
-Then ask Claude Code which Trassets tables it can read. Other clients take the same two values: the URL and the `X-API-Key` header.
+Then ask Claude Code which Trassets tables it can read. Other clients need the same two values: the URL and the key, sent as `X-API-Key` header or as `Authorization: Bearer <key>`. Don't put the plaintext key into a config file you commit: Cursor resolves `${env:TRASSETS_MCP_KEY}` in `headers`, and VS Code prompts for it through `${input:...}`.
