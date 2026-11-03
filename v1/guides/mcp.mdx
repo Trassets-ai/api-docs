@@ -26,7 +26,7 @@ The server offers five tools. All of them only read data; each one calls a Data 
 | Transport | Streamable HTTP |
 | Authentication | `X-API-Key: <key>` or `Authorization: Bearer <key>` on every request |
 
-You need a key with channel **MCP**. An administrator creates it in the [portal](https://portal.api.trassets.ai) like any other key (see [Authentication](/v1/authentication)) and selects **MCP** under **Channel**. A key works for exactly one channel: the MCP server rejects keys created for the API, and the REST API rejects MCP keys.
+You need a key with channel **MCP**. An administrator creates it in the [portal](https://portal.api.trassets.ai) like any other key (see [Authentication](/v1/authentication#channel)) and selects **MCP** under **Channel**. A key works for exactly one channel: the MCP server rejects keys created for the API, and the REST API rejects MCP keys.
 
 <Warning>
   Data that a tool returns is processed by the model provider of your AI client. Only connect clients whose provider your organization has approved for this data, and don't combine the MCP server with tools that can send data to third parties. See [Risks](#risks).

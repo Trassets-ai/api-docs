@@ -26,7 +26,7 @@ Der Server bietet fünf Tools. Alle lesen nur; jedes ruft mit deinem Key einen E
 | Transport | Streamable HTTP |
 | Authentifizierung | `X-API-Key: <key>` oder `Authorization: Bearer <key>` bei jedem Request |
 
-Du brauchst einen Key mit Kanal **MCP**. Ein Administrator erzeugt ihn im [Portal](https://portal.api.trassets.ai) wie jeden anderen Key (siehe [Authentifizierung](/de/v1/authentication)) und wählt unter **Channel** den Eintrag **MCP**. Ein Key gilt für genau einen Kanal: Der MCP-Server lehnt für die API erzeugte Keys ab, die REST-API lehnt MCP-Keys ab.
+Du brauchst einen Key mit Kanal **MCP**. Ein Administrator erzeugt ihn im [Portal](https://portal.api.trassets.ai) wie jeden anderen Key (siehe [Authentifizierung](/de/v1/authentication#kanal)) und wählt unter **Channel** den Eintrag **MCP**. Ein Key gilt für genau einen Kanal: Der MCP-Server lehnt für die API erzeugte Keys ab, die REST-API lehnt MCP-Keys ab.
 
 <Warning>
   Daten, die ein Tool zurückgibt, verarbeitet der Modellanbieter deines KI-Clients. Binde nur Clients an, deren Anbieter deine Organisation für diese Daten freigegeben hat, und kombiniere den MCP-Server nicht mit Tools, die Daten an Dritte senden können. Siehe [Risiken](#risiken).
