@@ -1,0 +1,69 @@
+---
+title: "Data API Changelog"
+sidebarTitle: "Changelog"
+description: "Changes to the Data API by date, with breaking changes marked. Subscribe via RSS."
+rss: true
+---
+
+This page lists changes to the behavior and data model of the API since 13 October 2026, each dated by its production deployment. Subscribe via RSS: use the button at the top of the page or `https://docs.trassets.ai/changelog/rss.xml`.
+
+Breaking changes carry the tag **Breaking**. While `/v1/` is a preview, they can land without notice (see [Versioning](/concepts/versioning)).
+
+<Update label="2026-11-03" tags={["Breaking", "Data model"]}>
+  - Objects in category endpoint responses now always carry all their keys. A missing value is null, before the key was left out. A period with neither bound therefore comes as an object with start and end, both null, instead of an empty object. Check for values, not for an empty object. /v1/raw still returns source data unchanged. See [Response structure](/v1/response-shape-conventions).
+</Update>
+
+<Update label="2026-11-02" tags={["Errors"]}>
+  - Every response carries the X-Request-ID header. Please include it in support requests, see [Errors](/concepts/errors).
+  - If the API cannot look up a table because of a database error, it now answers 500. Before, it wrongly returned 404 saying the table does not exist. A 404 is final again, a 500 is worth a retry.
+</Update>
+
+<Update label="2026-11-01" tags={["Breaking", "Pagination"]}>
+  - limit on the category endpoints is now at most 10,000, down from 100,000. Larger values return 422. To get more rows, page with next_cursor, see [Pagination](/v1/concepts/pagination).
+</Update>
+
+<Update label="2026-10-30" tags={["Breaking", "Pagination", "OpenAPI", "API keys"]}>
+  - On the category endpoints, total is now null unless you send the new parameter include_total=true. The API counts rows only on request. next_cursor does not depend on it. /v1/raw still always returns total.
+  - The OpenAPI spec takes the field types of the v1 resources from a fixed declaration instead of reading them from a reference customer's database at startup. As a result, 20 filter parameters now carry their real type, such as integer for account_id and floor_area_id or a date for booking_date and reference_date. The requests themselves stay the same. If you generate your client from the spec, regenerate it. total and next_cursor are declared nullable.
+  - New API keys start with trs_live_. Existing keys stay valid. The portal shows when each key was last used.
+  - When creating a key in the portal, access can be restricted to positions of the Trassets-Standard reporting structure, see [Authentication](/v1/authentication).
+</Update>
+
+<Update label="2026-10-29" tags={["Rate limits", "Data model"]}>
+  - Each API key has a budget of 2,500 requests per hour, shared across all /v1/ endpoints. Before, the limit was 500 requests per hour per path. Failed key checks do not count. See [Rate limits](/concepts/rate-limits).
+  - New resource /v1/accounting/account_hierarchies with the account mapping structures per account, see [Accounting](/v1/data-model/accounting).
+</Update>
+
+<Update label="2026-10-28" tags={["Data model"]}>
+  - New category kpi with property KPIs (property_kpis, property_kpis_by_floor_area_type), see [KPI](/v1/data-model/kpi). /v1/changes can filter by this category too.
+</Update>
+
+<Update label="2026-10-27" tags={["Breaking", "Versioning"]}>
+  - All endpoints now live under /v1/: category tables, raw tables, catalog, and changes. Unversioned paths return 404 without a redirect. Offset pagination and the X- pagination headers are gone, paging uses cursor. See [Versioning](/concepts/versioning).
+</Update>
+
+<Update label="2026-10-26" tags={["Filtering"]}>
+  - Filters on columns with object values, such as account_type on property_structure, now return matches instead of 500. You filter by code or label. A filter value in the wrong format, such as text for a number or date column, returns 400 instead of 500.
+</Update>
+
+<Update label="2026-10-18" tags={["Breaking", "Data model"]}>
+  - notifications.priority_text now holds the numeric ERP ID of the priority as a string. Before, it held wrong labels from a status lookup or stayed empty. See [Operations](/v1/data-model/operations).
+</Update>
+
+<Update label="2026-10-16" tags={["Breaking", "Data model"]}>
+  - Decimal columns under /v1/ come as JSON numbers instead of strings, for example 19.0 instead of "19.0000".
+  - requests.floor_area_id is now an integer instead of a string. Its values changed too and now match property_structure.floor_area_id.
+  - More free-text and assignee columns count as personal data and now require the matching grant, among them comment, responsible_user, and responsible_person. See [Authentication](/v1/authentication).
+  - New under /v1/operations: orders and offers. offers holds one row per actual offer; requests without an offer appear only in requests. See [Operations](/v1/data-model/operations).
+</Update>
+
+<Update label="2026-10-14" tags={["Breaking", "Data model"]}>
+  - booking_positions.person_id is now a string instead of a number.
+  - notifications.person_id is now called reporter_key.
+  - projects returns one row per project and considerably more projects, because no status filter applies anymore. The fields to_hdr_id, to_name, request_hdr_id, request_number, report_id, report_number, creditor_id, offer_id, and offer_number are gone, project_account_id is new. See [Operations](/v1/data-model/operations).
+  - New resource /v1/operations/requests with one row per request, joined to projects via project_account_id.
+</Update>
+
+<Update label="2026-10-13" tags={["API keys"]}>
+  - API keys can have an expiry date, set in the portal. An expired key returns 401 "API key expired".
+</Update>

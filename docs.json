@@ -38,7 +38,8 @@
                       "concepts/errors",
                       "concepts/rate-limits",
                       "concepts/sync-cycle",
-                      "concepts/versioning"
+                      "concepts/versioning",
+                      "changelog"
                     ]
                   },
                   {
@@ -113,7 +114,8 @@
                       "de/concepts/errors",
                       "de/concepts/rate-limits",
                       "de/concepts/sync-cycle",
-                      "de/concepts/versioning"
+                      "de/concepts/versioning",
+                      "de/changelog"
                     ]
                   },
                   {
