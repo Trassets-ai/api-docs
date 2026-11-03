@@ -47,7 +47,8 @@
                     "pages": [
                       "guides/bulk-export",
                       "guides/delta-sync",
-                      "v1/guides/incremental-sync"
+                      "v1/guides/incremental-sync",
+                      "v1/mcp"
                     ]
                   },
                   {
@@ -123,7 +124,8 @@
                     "pages": [
                       "de/guides/bulk-export",
                       "de/guides/delta-sync",
-                      "de/v1/guides/incremental-sync"
+                      "de/v1/guides/incremental-sync",
+                      "de/v1/mcp"
                     ]
                   },
                   {

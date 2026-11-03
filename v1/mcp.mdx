@@ -1,0 +1,48 @@
+---
+title: "Connect AI clients through the Trassets MCP server"
+sidebarTitle: "MCP server"
+description: "Connect Claude Code, Cursor, VS Code, Copilot Studio and other MCP clients to your Data API v1 data with an API key, and see which AI clients are supported."
+---
+
+The Trassets MCP server lets AI clients read your Data API v1 data through the [Model Context Protocol](https://modelcontextprotocol.io). Every call runs with your API key and is subject to the same restrictions, grants, and rate limit as a direct API request.
+
+## Endpoint and key
+
+| Setting | Value |
+| --- | --- |
+| URL | `https://mcp.trassets.ai/mcp` |
+| Transport | Streamable HTTP |
+| Authentication | `X-API-Key: <key>` or `Authorization: Bearer <key>` on every request |
+
+You need a key with channel **MCP**. An administrator creates it in the [portal](https://portal.api.trassets.ai) like any other key (see [Authentication](/v1/authentication)) and selects **MCP** under **Channel**. A key works for exactly one channel, so a key created for the API is rejected by the MCP server. If a tool returns "API key is invalid, disabled, or not permitted to access this resource.", check the channel first.
+
+<Warning>
+  Data that a tool returns is processed by the model provider of your AI client. Only connect clients whose provider your organization has approved for this data, and don't combine the MCP server with tools that can send data to third parties.
+</Warning>
+
+## Supported AI clients
+
+MCP is model-independent: the client brings the model, so the model that answers depends on your client. What matters is whether the client can send a fixed API key header to a remote MCP server. The MCP server does not support OAuth sign-in yet, so clients that only offer OAuth can't connect.
+
+As of November 2026. Vendors change their MCP support often; if a step doesn't match, check the client's documentation.
+
+| Client | Supported | Where the key goes |
+| --- | --- | --- |
+| Claude Code | Yes | `--header` in `claude mcp add` (see below) |
+| Cursor | Yes | `headers` in `.cursor/mcp.json` |
+| VS Code (GitHub Copilot agent mode) | Yes | `headers` in `.vscode/mcp.json` |
+| OpenAI Codex CLI | Yes | `bearer_token_env_var` in `~/.codex/config.toml` |
+| Gemini CLI | Yes | `headers` in `~/.gemini/settings.json` |
+| Microsoft Copilot Studio | Yes | Authentication **API key**, type **Header**, header name `Authorization`, value `Bearer <key>` |
+| Claude (claude.ai, Claude Desktop) as custom connector | Limited | Only if your organization sees the **Request headers** option (beta); otherwise use Claude Code |
+| ChatGPT | Not yet | Custom connectors require OAuth |
+| Microsoft 365 Copilot (declarative agents) | Not yet | MCP plugins require OAuth |
+
+## Example: Claude Code
+
+```bash
+claude mcp add --transport http trassets https://mcp.trassets.ai/mcp \
+  --header "X-API-Key: $TRASSETS_MCP_KEY"
+```
+
+Then ask Claude Code which Trassets tables it can read. Other clients take the same two values: the URL and the `X-API-Key` header.

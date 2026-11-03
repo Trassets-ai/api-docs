@@ -1,0 +1,48 @@
+---
+title: "KI-Clients über den Trassets-MCP-Server anbinden"
+sidebarTitle: "MCP-Server"
+description: "Claude Code, Cursor, VS Code, Copilot Studio und andere MCP-Clients per API-Key an deine Daten der Data API v1 anbinden, plus eine Übersicht der unterstützten KI-Clients."
+---
+
+Über den Trassets-MCP-Server lesen KI-Clients deine Daten der Data API v1 per [Model Context Protocol](https://modelcontextprotocol.io). Jeder Aufruf läuft mit deinem API-Key und unterliegt denselben Einschränkungen, Grants und demselben Rate-Limit wie ein direkter API-Request.
+
+## Endpunkt und Key
+
+| Einstellung | Wert |
+| --- | --- |
+| URL | `https://mcp.trassets.ai/mcp` |
+| Transport | Streamable HTTP |
+| Authentifizierung | `X-API-Key: <key>` oder `Authorization: Bearer <key>` bei jedem Request |
+
+Du brauchst einen Key mit Kanal **MCP**. Ein Administrator erzeugt ihn im [Portal](https://portal.api.trassets.ai) wie jeden anderen Key (siehe [Authentifizierung](/de/v1/authentication)) und wählt unter **Channel** den Eintrag **MCP**. Ein Key gilt für genau einen Kanal, ein für die API erzeugter Key wird vom MCP-Server also abgelehnt. Meldet ein Tool „API key is invalid, disabled, or not permitted to access this resource.“, prüfe zuerst den Kanal.
+
+<Warning>
+  Daten, die ein Tool zurückgibt, verarbeitet der Modellanbieter deines KI-Clients. Binde nur Clients an, deren Anbieter deine Organisation für diese Daten freigegeben hat, und kombiniere den MCP-Server nicht mit Tools, die Daten an Dritte senden können.
+</Warning>
+
+## Unterstützte KI-Clients
+
+MCP ist modellunabhängig: Das Modell bringt der Client mit, welches Modell antwortet, hängt also von deinem Client ab. Entscheidend ist, ob der Client einen festen API-Key-Header an einen entfernten MCP-Server senden kann. Eine Anmeldung per OAuth unterstützt der MCP-Server noch nicht, Clients, die nur OAuth anbieten, können sich deshalb nicht verbinden.
+
+Stand November 2026. Die Anbieter ändern ihre MCP-Unterstützung häufig; passt ein Schritt nicht, sieh in der Dokumentation des Clients nach.
+
+| Client | Unterstützt | Wo der Key hinkommt |
+| --- | --- | --- |
+| Claude Code | Ja | `--header` in `claude mcp add` (siehe unten) |
+| Cursor | Ja | `headers` in `.cursor/mcp.json` |
+| VS Code (GitHub Copilot, Agent-Modus) | Ja | `headers` in `.vscode/mcp.json` |
+| OpenAI Codex CLI | Ja | `bearer_token_env_var` in `~/.codex/config.toml` |
+| Gemini CLI | Ja | `headers` in `~/.gemini/settings.json` |
+| Microsoft Copilot Studio | Ja | Authentifizierung **API key**, Typ **Header**, Header-Name `Authorization`, Wert `Bearer <key>` |
+| Claude (claude.ai, Claude Desktop) als Custom Connector | Eingeschränkt | Nur wenn deine Organisation die Option **Request headers** sieht (Beta); sonst Claude Code nutzen |
+| ChatGPT | Noch nicht | Custom Connectors verlangen OAuth |
+| Microsoft 365 Copilot (Declarative Agents) | Noch nicht | MCP-Plugins verlangen OAuth |
+
+## Beispiel: Claude Code
+
+```bash
+claude mcp add --transport http trassets https://mcp.trassets.ai/mcp \
+  --header "X-API-Key: $TRASSETS_MCP_KEY"
+```
+
+Frag Claude Code danach, welche Trassets-Tabellen es lesen kann. Andere Clients brauchen dieselben zwei Werte: die URL und den `X-API-Key`-Header.
