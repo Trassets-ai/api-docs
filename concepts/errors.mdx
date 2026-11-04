@@ -12,7 +12,7 @@ Every error response body contains these fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `type` | string | A URI that identifies the error type. Defaults to `about:blank` for generic errors. |
+| `type` | string | A URI that identifies the error type, one per status code (see [Status Codes](#status-codes)). Two export limits on raw tables use their own types, see [Too Many Requests](#too-many-requests). |
 | `title` | string | A short, human-readable summary of the error type. |
 | `status` | integer | The HTTP status code. |
 | `detail` | string | A detailed, human-readable explanation of this specific occurrence. |
@@ -22,7 +22,7 @@ Example error response for an invalid API key:
 
 ```json
 {
-  "type": "about:blank",
+  "type": "https://docs.trassets.ai/concepts/errors#forbidden",
   "title": "Forbidden",
   "status": 403,
   "detail": "Invalid API key",
@@ -32,16 +32,63 @@ Example error response for an invalid API key:
 
 ## Status Codes
 
-| Status | Meaning | What to do |
-| --- | --- | --- |
-| **400** | Missing required filter | Check the endpoint documentation for required query parameters and add them to the request. |
-| **401** | Missing or expired API key | Send the `X-API-Key` header with every request. If `detail` says `API key expired`, use a key that is still valid. |
-| **403** | Key rejected or access tier missing | The key is unknown or disabled, or it was created for the MCP server (`API key not enabled for this channel`, see [Channel](/v1/authentication#channel)), or it has no permission for this endpoint or table, or it is restricted to properties and the table has no `property_id` column. Check the `detail` field. Contact Trassets support to change your access tier. |
-| **404** | Unknown endpoint | Verify the URL path and the category or table name. |
-| **409** | Snapshot changed | The table was re-synced while you paginated. Restart from the first page without `cursor`. See [Pagination](/v1/concepts/pagination). |
-| **422** | Validation error | A query parameter did not pass validation. Check the `detail` field for the exact parameter and constraint. |
-| **429** | Rate limit exceeded | You have exceeded the 2,500 requests per hour limit of your API key. Back off and retry after the current window resets. |
-| **500** | Internal error | A server-side error occurred. Retry the request after a short delay, and [contact support](#contacting-support) if it persists. |
+Every status code has a fixed `type` URI that points to its section on this page. Use `status` or `type` to branch in your code, and `detail` for logs and messages.
+
+### Bad Request
+
+**400** · `type`: `https://docs.trassets.ai/concepts/errors#bad-request`
+
+A required filter is missing or a parameter value is invalid. Check the endpoint documentation for required query parameters and read the `detail` field. A `cursor` that was modified, not issued by the API, or issued for another endpoint returns `Invalid cursor`: pass `next_cursor` unchanged to the endpoint it came from.
+
+### Unauthorized
+
+**401** · `type`: `https://docs.trassets.ai/concepts/errors#unauthorized`
+
+The API key is missing or expired. Send the `X-API-Key` header with every request. If `detail` says `API key expired`, use a key that is still valid.
+
+### Forbidden
+
+**403** · `type`: `https://docs.trassets.ai/concepts/errors#forbidden`
+
+The key is rejected or the access tier is missing. The key is unknown or disabled, or it was created for the MCP server (`API key not enabled for this channel`, see [Channel](/v1/authentication#channel)), or it has no permission for this endpoint or table, or it is restricted to properties and the table has no `property_id` column. Check the `detail` field. Contact Trassets support to change your access tier.
+
+### Not Found
+
+**404** · `type`: `https://docs.trassets.ai/concepts/errors#not-found`
+
+Unknown endpoint. Verify the URL path and the category or table name.
+
+### Conflict
+
+**409** · `type`: `https://docs.trassets.ai/concepts/errors#conflict`
+
+The snapshot changed: the table was re-synced while you paginated. Restart from the first page without `cursor`. See [Pagination](/v1/concepts/pagination).
+
+### Unprocessable Entity
+
+**422** · `type`: `https://docs.trassets.ai/concepts/errors#unprocessable-entity`
+
+A query parameter did not pass validation. Check the `detail` field for the exact parameter and constraint.
+
+### Too Many Requests
+
+**429** · `type`: `https://docs.trassets.ai/concepts/errors#too-many-requests`
+
+You have exceeded the 2,500 requests per hour limit of your API key. Back off and retry after the number of seconds in the `Retry-After` header, see [Rate Limits](/concepts/rate-limits).
+
+Raw table exports have two additional limits with their own `type`: `too_many_parallel_exports` when too many export requests of your account run at the same time, and `export_rate_limited` when an hourly export limit configured for your account or table is used up.
+
+### Internal Server Error
+
+**500** · `type`: `https://docs.trassets.ai/concepts/errors#internal-server-error`
+
+A server-side error occurred. Retry the request after a short delay, and [contact support](#contacting-support) if it persists.
+
+### Service Unavailable
+
+**503** · `type`: `https://docs.trassets.ai/concepts/errors#service-unavailable`
+
+The API is temporarily overloaded or could not validate the request right now. Retry after the number of seconds in the `Retry-After` header.
 
 <Warning>
   A **401** means the `X-API-Key` header is missing or the key has expired. An unknown or disabled key returns **403**, as does a key created for the MCP server or a valid key that lacks the required access tier. Read the `detail` field to tell them apart.

@@ -71,7 +71,7 @@ Wenn der Key fehlt, ungültig ist oder nicht die erforderliche Zugriffsstufe hat
 
 ```json
 {
-  "type": "about:blank",
+  "type": "https://docs.trassets.ai/concepts/errors#unauthorized",
   "title": "Unauthorized",
   "status": 401,
   "detail": "API key required",
@@ -85,7 +85,7 @@ Das bedeutet, dass der Request keinen `X-API-Key`-Header enthielt.
 
 ```json
 {
-  "type": "about:blank",
+  "type": "https://docs.trassets.ai/concepts/errors#forbidden",
   "title": "Forbidden",
   "status": 403,
   "detail": "API key is disabled",
