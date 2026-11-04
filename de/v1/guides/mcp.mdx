@@ -69,6 +69,44 @@ Frag Claude Code danach, welche Trassets-Tabellen es lesen kann. Andere Clients 
 
 Frag den Agent danach zum Beispiel: „Welche Trassets-Tabellen kannst du lesen?“ oder „Wie viele Objekte sind in den Daten?“
 
+## Beispiel-Prompts
+
+Drei Aufgaben, die mit den v1-Tabellen funktionieren. Die Prompts nennen die Tabellen, damit das Modell nicht raten muss. Ersetz `<property_id>` und den Stichtag (erster Tag eines Monats).
+
+**Objektsteckbrief**
+
+```text
+Erstelle einen Objektsteckbrief für Objekt <property_id> zum Stichtag 2026-11-01.
+Nimm Stammdaten aus property/properties, Gebäude und Flächen aus property/property_structure,
+Fläche, Leerstand und Nettosoll aus kpi/property_kpis_by_floor_area_type
+(Filter property_id und reference_date) und die technische Ausstattung aus property/technical_objects.
+Rechne Kennzahlen nicht selbst nach, sondern übernimm sie aus den KPI-Tabellen.
+```
+
+**Leerstandsliste**
+
+```text
+Erstelle eine Leerstandsliste zum Stichtag 2026-11-01 aus kpi/property_kpis
+(Filter reference_date): alle Objekte mit Leerstand, sortiert nach leerer Fläche in m².
+Liste danach für die drei Objekte mit dem größten Leerstand die leeren Flächen auf:
+Flächen aus property/property_structure, Mietverträge aus stakeholder/tenants, jeweils mit Filter property_id.
+Leer ist eine Fläche, für die am Stichtag kein Mietvertrag (contract_period) läuft.
+```
+
+**Exposé**
+
+```text
+Entwirf ein Exposé für Objekt <property_id>. Nimm Lage und Baujahr aus property/properties,
+Flächen, Marktmiete und das Objektfoto (Spalte url) aus property/property_structure und den
+Vermietungsstand aus kpi/property_kpis_by_floor_area_type. Nenne keine Mieter und keine Personen.
+Markiere alles, was nicht aus den Daten kommt, als Platzhalter.
+```
+
+Die Prompts stoßen an diese Grenzen:
+
+- Leere Flächen für das ganze Portfolio auf einmal: Dafür müsste das Modell alle Zeilen von `property_structure` und `tenants` lesen, bei einem mittelgroßen Bestand mehrere tausend. Das passt nicht in den Kontext eines Chats. Frag deshalb Objekt für Objekt.
+- Pro Objekt gibt es höchstens ein Foto (`url`). Logo, Farben, Energieausweis, Grundrisse und Beschreibungstexte liefert der MCP-Server nicht; das Exposé braucht dafür Platzhalter.
+
 ## Grenzen
 
 - **Nur lesen.** Der Server kann keine Daten anlegen oder ändern.
