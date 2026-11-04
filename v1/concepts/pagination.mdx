@@ -42,7 +42,7 @@ Keep the same filter parameters on every page of one run.
 </ResponseField>
 
 <ResponseField name="next_cursor" type="string | null">
-  Opaque, signed cursor for the next page. Pass it unchanged: a modified cursor returns `400 Invalid cursor`. `null` when no rows are left. On raw endpoints every full page carries a cursor, so the final request can return an empty `data` array.
+  Opaque, signed cursor for the next page. Pass it unchanged to the same endpoint: a modified cursor, or one from another endpoint, returns `400 Invalid cursor`. `null` when no rows are left. On raw endpoints every full page carries a cursor, so the final request can return an empty `data` array.
 </ResponseField>
 
 <ResponseField name="total" type="integer | null">

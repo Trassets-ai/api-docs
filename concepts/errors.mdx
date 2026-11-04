@@ -38,7 +38,7 @@ Every status code has a fixed `type` URI that points to its section on this page
 
 **400** · `type`: `https://docs.trassets.ai/concepts/errors#bad-request`
 
-A required filter is missing or a parameter value is invalid. Check the endpoint documentation for required query parameters and read the `detail` field. A `cursor` that was modified or not issued by the API returns `Invalid cursor`: pass `next_cursor` unchanged.
+A required filter is missing or a parameter value is invalid. Check the endpoint documentation for required query parameters and read the `detail` field. A `cursor` that was modified, not issued by the API, or issued for another endpoint returns `Invalid cursor`: pass `next_cursor` unchanged to the endpoint it came from.
 
 ### Unauthorized
 

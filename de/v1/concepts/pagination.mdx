@@ -42,7 +42,7 @@ Behalte innerhalb eines Laufs auf jeder Seite dieselben Filterparameter bei.
 </ResponseField>
 
 <ResponseField name="next_cursor" type="string | null">
-  Opaker, signierter Cursor für die nächste Seite. Gib ihn unverändert weiter: Ein veränderter Cursor liefert `400 Invalid cursor`. `null`, wenn keine Zeilen mehr folgen. Auf Raw-Endpunkten trägt jede volle Seite einen Cursor, der letzte Request kann deshalb ein leeres `data`-Array liefern.
+  Opaker, signierter Cursor für die nächste Seite. Gib ihn unverändert an denselben Endpunkt weiter: Ein veränderter Cursor oder einer von einem anderen Endpunkt liefert `400 Invalid cursor`. `null`, wenn keine Zeilen mehr folgen. Auf Raw-Endpunkten trägt jede volle Seite einen Cursor, der letzte Request kann deshalb ein leeres `data`-Array liefern.
 </ResponseField>
 
 <ResponseField name="total" type="integer | null">

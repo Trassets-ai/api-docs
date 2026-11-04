@@ -38,7 +38,7 @@ Jeder Statuscode hat eine feste `type`-URI, die auf seinen Abschnitt auf dieser 
 
 **400** · `type`: `https://docs.trassets.ai/concepts/errors#bad-request`
 
-Ein erforderlicher Filter fehlt oder ein Parameterwert ist ungültig. Prüfe die Endpunkt-Dokumentation auf erforderliche Query-Parameter und lies das Feld `detail`. Ein `cursor`, der verändert wurde oder nicht von der API stammt, liefert `Invalid cursor`: Gib `next_cursor` unverändert weiter.
+Ein erforderlicher Filter fehlt oder ein Parameterwert ist ungültig. Prüfe die Endpunkt-Dokumentation auf erforderliche Query-Parameter und lies das Feld `detail`. Ein `cursor`, der verändert wurde, nicht von der API stammt oder zu einem anderen Endpunkt gehört, liefert `Invalid cursor`: Gib `next_cursor` unverändert an den Endpunkt weiter, von dem er stammt.
 
 ### Unauthorized
 
