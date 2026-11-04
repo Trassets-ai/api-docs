@@ -69,6 +69,44 @@ Then ask Claude Code which Trassets tables it can read. Other clients need the s
 
 Then ask the agent, for example, "Which Trassets tables can you read?" or "How many properties are in the data?"
 
+## Example prompts
+
+Three tasks that work with the v1 tables. The prompts name the tables so the model doesn't have to guess. Replace `<property_id>` and the reference date (first day of a month).
+
+**Property fact sheet**
+
+```text
+Create a fact sheet for property <property_id> as of 2026-11-01.
+Take master data from property/properties, buildings and units from property/property_structure,
+floor area, vacancy, and net rent from kpi/property_kpis_by_floor_area_type
+(filter property_id and reference_date), and technical equipment from property/technical_objects.
+Don't recompute figures; take them from the KPI tables.
+```
+
+**Vacancy list**
+
+```text
+Create a vacancy list as of 2026-11-01 from kpi/property_kpis (filter reference_date):
+all properties with vacancy, sorted by vacant floor area in sqm.
+Then list the vacant units of the three properties with the largest vacancy:
+units from property/property_structure, leases from stakeholder/tenants, each filtered by property_id.
+A unit is vacant if no lease (contract_period) runs on the reference date.
+```
+
+**Sales brochure**
+
+```text
+Draft a sales brochure for property <property_id>. Take location and construction year from
+property/properties, units, market rent, and the property photo (column url) from
+property/property_structure, and the letting status from kpi/property_kpis_by_floor_area_type.
+Don't name tenants or other people. Mark everything that doesn't come from the data as a placeholder.
+```
+
+The prompts hit these limits:
+
+- Vacant units for the whole portfolio at once: the model would have to read every row of `property_structure` and `tenants`, several thousand for a mid-sized portfolio. That doesn't fit into a chat's context. Ask property by property instead.
+- There's at most one photo per property (`url`). The MCP server doesn't provide logos, colors, energy certificates, floor plans, or descriptions; the brochure needs placeholders for them.
+
 ## Limits
 
 - **Read only.** The server can't create or change data.
